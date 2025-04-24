@@ -199,78 +199,101 @@
             }
         }
 
-        // *** Modified playTone with explicit semicolons and ES5 param handling ***
         function playTone(frequency, duration, type, volume) {
             var freq = (typeof frequency !== 'undefined') ? frequency : 440;
             var dur = (typeof duration !== 'undefined') ? duration : 0.1;
             var waveType = (typeof type !== 'undefined') ? type : 'sine';
             var vol = (typeof volume !== 'undefined') ? volume : 0.5;
-
-            if (!audioCtx) {
-                return; // Semicolon added
-            }
+            if (!audioCtx) { return; }
             try {
-                var oscillator = audioCtx.createOscillator(); // Semicolon added
-                var gainNode = audioCtx.createGain(); // Semicolon added
-                oscillator.type = waveType; // Semicolon added
-                oscillator.frequency.setValueAtTime(freq, audioCtx.currentTime); // Semicolon added
-                gainNode.gain.setValueAtTime(vol, audioCtx.currentTime); // Semicolon added
-                gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + dur); // Semicolon added
-                oscillator.connect(gainNode); // Semicolon added
-                gainNode.connect(audioCtx.destination); // Semicolon added
-                oscillator.start(audioCtx.currentTime); // Semicolon added
-                oscillator.stop(audioCtx.currentTime + dur + 0.05); // Semicolon added
+                var oscillator = audioCtx.createOscillator();
+                var gainNode = audioCtx.createGain();
+                oscillator.type = waveType;
+                oscillator.frequency.setValueAtTime(freq, audioCtx.currentTime);
+                gainNode.gain.setValueAtTime(vol, audioCtx.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + dur);
+                oscillator.connect(gainNode);
+                gainNode.connect(audioCtx.destination);
+                oscillator.start(audioCtx.currentTime);
+                oscillator.stop(audioCtx.currentTime + dur + 0.05);
             } catch (e) {
-                console.error("Error playing tone:", e); // Semicolon added
+                console.error("Error playing tone:", e);
             }
-        } // Semicolon (optional)
+        }
 
-        // *** Sound functions with explicit semicolons ***
-        function playClickSound() { playTone(880, 0.05, 'triangle', 0.3); } // Semicolon (optional)
-        function playInteractSound() { playTone(660, 0.08, 'sine', 0.4); } // Semicolon (optional)
+        function playClickSound() { playTone(880, 0.05, 'triangle', 0.3); }
+        function playInteractSound() { playTone(660, 0.08, 'sine', 0.4); }
         function playCorrectSound() {
-            playTone(523.25, 0.1, 'sine', 0.5); // Semicolon added
-            setTimeout(function(){ playTone(659.25, 0.15, 'sine', 0.5); }, 100); // Semicolon added
-        } // Semicolon (optional)
+            playTone(523.25, 0.1, 'sine', 0.5);
+            setTimeout(function(){ playTone(659.25, 0.15, 'sine', 0.5); }, 100);
+        }
         function playWrongSound() {
-            playTone(349.23, 0.15, 'square', 0.4); // Semicolon added
-            setTimeout(function(){ playTone(261.63, 0.2, 'square', 0.4); }, 150); // Semicolon added
-        } // Semicolon (optional)
+            playTone(349.23, 0.15, 'square', 0.4);
+            setTimeout(function(){ playTone(261.63, 0.2, 'square', 0.4); }, 150);
+        }
         function playCollectSound() {
-            playTone(783.99, 0.08, 'triangle', 0.6); // Semicolon added
-            setTimeout(function(){ playTone(1046.50, 0.08, 'triangle', 0.6); }, 80); // Semicolon added
-            setTimeout(function(){ playTone(1318.51, 0.1, 'triangle', 0.6); }, 160); // Semicolon added
-        } // Semicolon (optional)
-        function playFreezeSound() { playTone(440, 0.3, 'sawtooth', 0.4); } // Semicolon (optional)
-        function playUnfreezeSound() { playTone(587.33, 0.2, 'sine', 0.4); } // Semicolon (optional)
-        function playEnemySpawnSound() { playTone(110, 0.3, 'sawtooth', 0.5); } // Semicolon (optional)
-        function playEnemyHitSound() { playTone(220, 0.2, 'square', 0.6); } // Semicolon (optional)
+            playTone(783.99, 0.08, 'triangle', 0.6);
+            setTimeout(function(){ playTone(1046.50, 0.08, 'triangle', 0.6); }, 80);
+            setTimeout(function(){ playTone(1318.51, 0.1, 'triangle', 0.6); }, 160);
+        }
+        function playFreezeSound() { playTone(440, 0.3, 'sawtooth', 0.4); }
+        function playUnfreezeSound() { playTone(587.33, 0.2, 'sine', 0.4); }
+        function playEnemySpawnSound() { playTone(110, 0.3, 'sawtooth', 0.5); }
+        function playEnemyHitSound() { playTone(220, 0.2, 'square', 0.6); }
         function playLevelUpJingle() {
             if (levelUpSound && audioCtx) {
-                levelUpSound.play().catch(function(e){ console.error("Error playing level up sound:", e); }); // Semicolon added
+                levelUpSound.play().catch(function(e){ console.error("Error playing level up sound:", e); });
             } else {
-                playTone(523, 0.1); // Semicolon added
-                setTimeout(function(){ playTone(783, 0.1); }, 100); // Semicolon added
-                setTimeout(function(){ playTone(1046, 0.2); }, 200); // Semicolon added
+                playTone(523, 0.1);
+                setTimeout(function(){ playTone(783, 0.1); }, 100);
+                setTimeout(function(){ playTone(1046, 0.2); }, 200);
             }
-        } // Semicolon (optional)
+        }
         function playGameOverSound() {
-            playTone(1046, 0.2); // Semicolon added
-            setTimeout(function(){ playTone(783, 0.2); }, 200); // Semicolon added
-            setTimeout(function(){ playTone(523, 0.3); }, 400); // Semicolon added
-        } // Semicolon (optional)
+            playTone(1046, 0.2);
+            setTimeout(function(){ playTone(783, 0.2); }, 200);
+            setTimeout(function(){ playTone(523, 0.3); }, 400);
+        }
 
 
         // --- Spielzustand (using var) ---
-        var currentPlayerName = "Anonym"; var currentLevel = 1; var flowersCollected = 0; var flowers = []; var activeItem = null; var activeItemType = null; var currentQuestions = []; var currentQuestionIndex = 0; var correctAnswersForItem = 0; var heroIsMoving = false; var gameIsOver = false; var startTime = 0; var wrongAnswersLog = {}; var monsterEncounters = 0; var localHighScores = [];
+        var currentPlayerName = "Anonym";
+        var currentLevel = 1;
+        var flowersCollected = 0;
+        var flowers = [];
+        var activeItem = null;
+        var activeItemType = null;
+        var currentQuestions = [];
+        var currentQuestionIndex = 0;
+        var correctAnswersForItem = 0;
+        var heroIsMoving = false;
+        var gameIsOver = false;
+        var startTime = 0;
+        var wrongAnswersLog = {};
+        var monsterEncounters = 0;
+        var localHighScores = [];
 
         // --- Konfiguration (using var) ---
-        var FLOWER_GOAL = 20; var CORRECT_ANSWERS_NEEDED_FOR_FLOWER = 3; var NUM_QUESTIONS_PER_ENEMY = 5; var NUM_QUESTIONS_TO_GENERATE = 5;
-        var flowerColors = [ { bg: '#f48fb1', border: '#ad1457' }, { bg: '#90caf9', border: '#1e88e5' }, { bg: '#ffe082', border: '#ffab00' }, { bg: '#a5d6a7', border: '#388e3c' }, { bg: '#b39ddb', border: '#5e35b1' }];
+        var FLOWER_GOAL = 20;
+        var CORRECT_ANSWERS_NEEDED_FOR_FLOWER = 3;
+        var NUM_QUESTIONS_PER_ENEMY = 5;
+        var NUM_QUESTIONS_TO_GENERATE = 5;
+        var flowerColors = [
+            { bg: '#f48fb1', border: '#ad1457' },
+            { bg: '#90caf9', border: '#1e88e5' },
+            { bg: '#ffe082', border: '#ffab00' },
+            { bg: '#a5d6a7', border: '#388e3c' },
+            { bg: '#b39ddb', border: '#5e35b1' }
+        ];
 
         // --- Feind Konfiguration & Zustand (using var) ---
-        var BASE_ENEMY_STEP_SIZE = 10; var BASE_ENEMY_MOVE_INTERVAL = 200; var ENEMY_RANDOM_FACTOR = 4; var ENEMY_FREEZE_DURATION = 10000; var ENEMY_SPAWN_DELAY = 5000;
-        var currentEnemyStepSize = BASE_ENEMY_STEP_SIZE; var currentEnemyMoveInterval = BASE_ENEMY_MOVE_INTERVAL;
+        var BASE_ENEMY_STEP_SIZE = 10;
+        var BASE_ENEMY_MOVE_INTERVAL = 200;
+        var ENEMY_RANDOM_FACTOR = 4;
+        var ENEMY_FREEZE_DURATION = 10000;
+        var ENEMY_SPAWN_DELAY = 5000;
+        var currentEnemyStepSize = BASE_ENEMY_STEP_SIZE;
+        var currentEnemyMoveInterval = BASE_ENEMY_MOVE_INTERVAL;
         var enemyData = { element: enemyElement, position: { x: -100, y: -100 }, active: false, frozen: false, freezeTimeoutId: null, moveIntervalId: null };
 
         // --- Initialisierung ---
