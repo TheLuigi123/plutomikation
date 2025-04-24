@@ -67,18 +67,27 @@
 
 </head>
 <body>
-    <!-- HTML Structure remains the same -->
-    <div id="start-screen"><h2>Willkommen...</h2><!-- Rest --></div>
+    <!-- HTML Structure -->
+    <div id="start-screen"><h2>Willkommen...</h2><label for="player-name">Dein Name:</label><input type="text" id="player-name" placeholder="Gib deinen Namen ein"><button id="start-game-button">Spiel starten</button><div class="highscore-section"><h3>Klasse Top 10</h3><table id="global-highscore-table" class="highscore-table"><thead><tr><th>#</th><th>Name</th><th>Zeit</th><th>Monster getroffen</th></tr></thead><tbody id="global-highscore-body"><tr class="loading-msg"><td colspan="4">Lade Klasse Top 10...</td></tr></tbody></table></div><div class="highscore-section"><h3>Deine Top 10 (Lokal)</h3><table id="local-highscore-table" class="highscore-table"><thead><tr><th>#</th><th>Name</th><th>Zeit</th><th>Monster getroffen</th></tr></thead><tbody id="local-highscore-body"><tr class="loading-msg"><td colspan="4">Keine lokalen Highscores gefunden.</td></tr></tbody></table></div></div>
     <div id="game-area" class="hidden"><div id="hero"></div><div id="enemy" class="hidden"></div></div>
     <div id="inventory" class="hidden">Blumen: 0</div>
-    <div id="quiz-modal" class="hidden"><!-- Rest --></div>
-    <div id="end-screen" class="hidden"><!-- Rest --></div>
+    <div id="quiz-modal" class="hidden"><h3 id="quiz-title">...</h3><div id="quiz-question">...</div><div id="quiz-input-display" aria-live="polite"></div><div id="numpad-container"><button data-digit="1">1</button> <button data-digit="2">2</button> <button data-digit="3">3</button><button data-digit="4">4</button> <button data-digit="5">5</button> <button data-digit="6">6</button><button data-digit="7">7</button> <button data-digit="8">8</button> <button data-digit="9">9</button><button id="numpad-clear">Löschen</button> <button data-digit="0" id="numpad-zero">0</button> <button id="numpad-submit">OK</button></div><div id="quiz-message"></div></div>
+    <div id="end-screen" class="hidden"><h2>Geschafft!</h2><p id="final-time">...</p><div class="highscore-section"><h3>...</h3><table id="local-end-highscore-table" class="highscore-table"><thead><tr><th>#</th><th>Name</th><th>Zeit</th><th>Monster getroffen</th></tr></thead><tbody id="local-end-highscore-body"><tr class="loading-msg"><td colspan="4">...</td></tr></tbody></table></div><h3>Fehlerhafte Aufgaben:</h3><ul id="wrong-answers-list"><li>...</li></ul><button id="play-again-button">Nochmal spielen?</button></div>
 
     <script>
         console.log("SCRIPT START");
 
         // --- Firebase Konfiguration ---
-        var firebaseConfig = { /* ... */ }; // Keep config
+        var firebaseConfig = {
+            apiKey: "AIzaSyAJWO7g9Xgy-c2nX8ovNpSlqmuFp_EZy9Q",
+            authDomain: "blumen-b5bac.firebaseapp.com",
+            projectId: "blumen-b5bac",
+            storageBucket: "blumen-b5bac.firebasestorage.app",
+            messagingSenderId: "699410546284",
+            appId: "1:699410546284:web:5be1a7fd826d324f95a249",
+            measurementId: "G-1LPR6QT9GR",
+            databaseURL: "https://blumen-b5bac-default-rtdb.europe-west1.firebasedatabase.app/"
+        };
         try {
             firebase.initializeApp(firebaseConfig);
             var database = firebase.database();
@@ -114,10 +123,11 @@
         console.log("Audio section deleted.");
 
         // --- Spielzustand (using var) ---
-        var currentPlayerName = "Anonym";
+        // Keep this block commented out for now
+        /*
+        var currentPlayerName = "Anonym"; // Declared minimally below if needed
         var gameIsOver = false;
         var localHighScores = [];
-        // Add back more variables as needed later
         var currentLevel = 1;
         var flowersCollected = 0;
         var flowers = [];
@@ -130,7 +140,8 @@
         var startTime = 0;
         var wrongAnswersLog = {};
         var monsterEncounters = 0;
-        console.log("Basic game state variables declared.");
+        */
+        console.log("Game state variables SKIPPED for now.");
 
         // --- Konfiguration (using var) ---
         var FLOWER_GOAL = 20;
@@ -162,7 +173,11 @@
             console.log("DOMContentLoaded event fired");
             try {
                 var savedName = localStorage.getItem('lastPlayerName');
-                if (savedName && playerNameInput) { playerNameInput.value = savedName; console.log("Player name loaded"); }
+                // *** SPLIT THE LINE ***
+                if (savedName && playerNameInput) {
+                    playerNameInput.value = savedName;
+                    console.log("Player name loaded"); // Now on its own line
+                }
                 console.log("High score functions skipped");
                 if (startGameButton) {
                     startGameButton.addEventListener('click', function() {
@@ -170,7 +185,9 @@
                         var name = "";
                         if(playerNameInput) { name = playerNameInput.value.trim(); }
                         if (!name) { console.log("Player name missing"); return; }
-                        currentPlayerName = name; localStorage.setItem('lastPlayerName', name);
+                        // Assign to global scope directly if state variables block is commented
+                        window.currentPlayerName = name;
+                        localStorage.setItem('lastPlayerName', name);
                         if(startScreen) { startScreen.classList.add('hidden'); }
                         console.log("Starting game setup (calling initGame)");
                         initGame();
@@ -180,61 +197,60 @@
             } catch(e) { console.error("Error in DOMContentLoaded:", e); }
         });
 
+        // Minimal global declaration if main state block is commented
+        var currentPlayerName = "Anonym";
+
+
         // --- ALL GAME LOGIC FUNCTIONS COMMENTED OUT OR EMPTY ---
-        function handleFirstClick(event) { /* Content commented out */ }
-        function setupLevel() { /* Content commented out */ }
-        function replenishFlowers() { /* Content commented out */ }
-        function updateTitle() { /* Content commented out */ }
-        function clearOldFlowers() { /* Content commented out */ }
-        function createFlowers() { /* Content commented out */ }
-        function handleGameAreaClick(event) { /* Content commented out */ }
-        function moveHero(tX, tY) { /* Content commented out */ }
-        function onHeroMovementEnd() { /* Content commented out */ }
-        function checkCollision() { /* Content commented out */ }
-        function checkRectOverlap(r1, r2) { /* Content commented out */ }
-        function handleNumpadClick(event) { /* Content commented out */ }
-        function startQuiz() { /* Content commented out */ }
-        function triggerEnemyQuiz() { /* Content commented out */ }
+        // ... function stubs ...
+        function handleFirstClick(event) { /* ... */ }
+        function setupLevel() { /* ... */ }
+        function replenishFlowers() { /* ... */ }
+        function updateTitle() { /* ... */ }
+        function clearOldFlowers() { /* ... */ }
+        function createFlowers() { /* ... */ }
+        function handleGameAreaClick(event) { /* ... */ }
+        function moveHero(tX, tY) { /* ... */ }
+        function onHeroMovementEnd() { /* ... */ }
+        function checkCollision() { /* ... */ }
+        function checkRectOverlap(r1, r2) { /* ... */ }
+        function handleNumpadClick(event) { /* ... */ }
+        function startQuiz() { /* ... */ }
+        function triggerEnemyQuiz() { /* ... */ }
         function generateQuestions(count) { return []; }
-        function displayQuestion() { /* Content commented out */ }
-        function checkAnswer() { /* Content commented out */ }
-        function handleQuizSuccess() { /* Content commented out */ }
-        function updateInventory() { /* Content commented out */ }
-        function startEnemyLogic() { /* Content commented out */ }
-        function spawnEnemy() { /* Content commented out */ }
-        function despawnEnemy() { /* Content commented out */ }
-        function moveEnemy() { /* Content commented out */ }
-        function freezeEnemy() { /* Content commented out */ }
-        function unfreezeEnemy() { /* Content commented out */ }
+        function displayQuestion() { /* ... */ }
+        function checkAnswer() { /* ... */ }
+        function handleQuizSuccess() { /* ... */ }
+        function updateInventory() { /* ... */ }
+        function startEnemyLogic() { /* ... */ }
+        function spawnEnemy() { /* ... */ }
+        function despawnEnemy() { /* ... */ }
+        function moveEnemy() { /* ... */ }
+        function freezeEnemy() { /* ... */ }
+        function unfreezeEnemy() { /* ... */ }
         function formatTime(milliseconds) { return "00:00.0"; }
-        function loadLocalHighScores() { /* Content commented out */ }
-        function saveLocalHighScores() { /* Content commented out */ }
-        function updateLocalHighScores(newScore) { /* Content commented out */ }
-        function populateScoreTable(tbodyEl, scores) { /* Content commented out */ }
-        function displayLocalHighScores() { /* Content commented out */ }
-        function displayLocalHighScoresEndScreen() { /* Content commented out */ }
-        function fetchAndDisplayGlobalHighScores() { /* Content commented out */ }
-        function logWrongAnswer(num1, num2) { /* Content commented out */ }
+        function loadLocalHighScores() { /* ... */ }
+        function saveLocalHighScores() { /* ... */ }
+        function updateLocalHighScores(newScore) { /* ... */ }
+        function populateScoreTable(tbodyEl, scores) { /* ... */ }
+        function displayLocalHighScores() { /* ... */ }
+        function displayLocalHighScoresEndScreen() { /* ... */ }
+        function fetchAndDisplayGlobalHighScores() { /* ... */ }
+        function logWrongAnswer(num1, num2) { /* ... */ }
         function formatWrongAnswersForDisplay() { return ["<li>Keine Fehler gemacht!</li>"]; }
-        function endGame() { /* Content commented out */ }
+        function endGame() { /* ... */ }
 
         // --- Hilfsfunktionen ---
-        // *** UNCOMMENTED ***
+        // Keep uncommented
         function getRandomPosition(bounds, margin) {
              var w = bounds.width || window.innerWidth;
              var h = bounds.height || window.innerHeight;
-             var sz = 40; // Approx size of flower/item
-             var x = Math.random() * (w - margin * 2 - sz) + margin;
-             var y = Math.random() * (h - margin * 2 - sz) + margin;
+             var sz = 40; var x = Math.random() * (w - margin * 2 - sz) + margin; var y = Math.random() * (h - margin * 2 - sz) + margin;
              return { x: x, y: y };
         }
         function escapeHtml(unsafe) {
              if (!unsafe) return "";
-             return unsafe.replace(/&/g, "&")
-                          .replace(/</g, "<")
-                          .replace(/>/g, ">")
-                          .replace(/"/g, """)
-                          .replace(/'/g, "'");
+             return unsafe.replace(/&/g, "&").replace(/</g, "<").replace(/>/g, ">").replace(/"/g, """).replace(/'/g, "'");
         }
         console.log("Helper functions defined.");
 
