@@ -2,14 +2,16 @@
 <html lang="de">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Multiplikations-Abenteuer</title>
+    <!-- Wichtig für Tablet-Optimierung: Passt die Breite an Gerätebreite an -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Koalas Multiplikations-Abenteuer</title>
     <style>
         /* CSS für das Aussehen */
-        body {
-            font-family: sans-serif;
+        html, body {
+            height: 100%; /* Stellt sicher, dass body die volle Höhe einnimmt */
             margin: 0;
-            overflow: hidden; /* Verhindert Scrollbalken */
+            overflow: hidden; /* Verhindert Scrollbalken auf dem gesamten Fenster */
+            font-family: sans-serif;
             background-color: #e0f7fa; /* Heller Himmelblau-Hintergrund */
         }
 
@@ -19,24 +21,24 @@
             height: 100vh; /* Volle Höhe des Ansichtsfensters */
             background-color: #c8e6c9; /* Hellgrüner Spielbereich */
             cursor: pointer;
-            overflow: hidden; /* Stellt sicher, dass Elemente nicht außerhalb landen */
+            overflow: hidden; /* Verhindert, dass Elemente überlaufen */
         }
 
         #hero {
             position: absolute;
-            width: 30px;
-            height: 30px;
-            background-color: #ffeb3b; /* Gelb */
-            border: 2px solid #fbc02d; /* Dunkleres Gelb */
-            border-radius: 50%; /* Kreis */
+            width: 50px;  /* Angepasst für Koala-Bild */
+            height: 50px; /* Angepasst für Koala-Bild */
+            /* Koala-Grafik als Base64-kodiertes PNG (Beispiel) */
+            /* Ersetze dies durch dein eigenes Base64-Bild eines Koalas falls gewünscht */
+            background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj4KICA8ZyBmaWxsPSIjODg4Ij4KICAgIDwhLS0gQm9keSAtLT4KICAgIDxlbGxpcHNlIGN4PSI1MCIgY3k9IjcwIiByeD0iMzAiIHJ5PSIyNSIgZmlsbD0iI2NjYyIvPgogICAgPGNpcmNsZSBjeD0iNTAiIGN5PSI1MCIgcj0iMjUiIGZpbGw9IiNjY2MiLz4KICAgIDwhLS0gRWFycyAtLT4KICAgIDxlbGxpcHNlIGN4PSIzMCIgY3k9IjMwIiByeD0iMTUiIHJ5PSIyMCIgZmlsbD0iI2NjYyIvPgogICAgPGVsbGlwc2UgY3g9IjcwIiBjeT0iMzAiIHJ4PSIxNSIgcnk9IjIwIiBmaWxsPSIjY2NjIi8+CiAgICA8ZWxsaXBzZSBjeD0iMzAiIGN5PSIzMCIgcng9IjEwIiByeT0iMTUiIGZpbGw9IiNmZmYiLz4KICAgIDxlbGxpcHNlIGN4PSI3MCIgY3k9IjMwIiByeD0iMTAiIHJ5PSIxNSIgZmlsbD0iI2ZmZiIvPgogICAgPCEtLSBGZWF0dXJlcyAtLT4KICAgIDxjaXJjbGUgY3g9IjQzIiBjeT0iNTAiIHI9IjMiIGZpbGw9IiMwMDAiLz4KICAgIDxjaXJjbGUgY3g9IjU3IiBjeT0iNTAiIHI9IjMiIGZpbGw9IiMwMDAiLz4KICAgIDxlbGxpcHNlIGN4PSI1MCIgY3k9IjYwIiByeD0iNiIgcnk9IjQiIGZpbGw9IiMwMDAiLz4KICA8L2c+Cjwvc3ZnPg==');
+            background-size: contain; /* Bild an Div anpassen */
+            background-repeat: no-repeat;
+            background-position: center;
+           /* Entferne alte Kreis-Styles: background-color, border, border-radius */
             top: 50px;
             left: 50px;
             transition: top 0.5s ease-in-out, left 0.5s ease-in-out; /* Sanfte Bewegung */
-            z-index: 10; /* Über den Blumen */
-            display: flex; /* Für Zentrierung des Inhalts, falls gewünscht */
-            justify-content: center;
-            align-items: center;
-            font-size: 16px; /* Falls Text im Helden sein soll */
+            z-index: 10; /* Über Blumen und Hindernissen */
         }
 
         .flower {
@@ -46,112 +48,180 @@
             background-color: #f48fb1; /* Rosa */
             border: 2px solid #ad1457; /* Dunkles Pink */
             border-radius: 50% 50% 0 0 / 60% 60% 0 0; /* Einfache Blütenform oben */
-            transform: rotate(45deg); /* Drehen für interessantere Form */
+            transform: rotate(45deg);
             cursor: default;
             z-index: 5;
         }
-        /* Stiel für die Blume (optional, macht es hübscher) */
         .flower::before {
             content: '';
             position: absolute;
             width: 5px;
             height: 20px;
             background-color: #388e3c; /* Grün */
-            bottom: -18px; /* Unterhalb der Blüte */
+            bottom: -18px;
             left: 50%;
-            transform: translateX(-50%) rotate(-45deg); /* Zurückdrehen und zentrieren */
+            transform: translateX(-50%) rotate(-45deg);
             z-index: -1;
+        }
+
+        .obstacle {
+            position: absolute;
+            width: 80px; /* Breite des Hindernisses */
+            height: 25px; /* Höhe des Hindernisses */
+            background-color: #8d6e63; /* Braun für Zaun/Holz */
+            border: 3px solid #5d4037; /* Dunkleres Braun */
+            border-radius: 4px;
+            cursor: default;
+            z-index: 6; /* Über Blumen, unter Held */
+        }
+        /* Optional: Textur für den Zaun */
+        .obstacle::after {
+             content: '';
+             position: absolute;
+             inset: 3px; /* Innerhalb des Borders */
+             background: repeating-linear-gradient(
+                45deg,
+                #a1887f,
+                #a1887f 5px,
+                #8d6e63 5px,
+                #8d6e63 10px
+             );
         }
 
 
         #inventory {
-            position: fixed; /* Bleibt beim Scrollen sichtbar (obwohl Scrollen deaktiviert ist) */
+            position: fixed;
             top: 10px;
             right: 10px;
             padding: 10px 15px;
-            background-color: rgba(255, 255, 255, 0.8); /* Halbtransparent weiß */
+            background-color: rgba(255, 255, 255, 0.8);
             border: 1px solid #ccc;
             border-radius: 5px;
-            font-size: 1.2em;
-            z-index: 20; /* Über allem */
+            font-size: clamp(1em, 2.5vw, 1.5em); /* Responsive Schriftgröße */
+            z-index: 20;
         }
 
         /* Pop-up für Aufgaben */
         #quiz-modal {
-            display: none; /* Standardmäßig versteckt */
+            display: none;
             position: fixed;
             left: 50%;
             top: 50%;
             transform: translate(-50%, -50%);
-            width: 300px;
-            padding: 25px;
+            /* Breite anpassen für NumPad */
+            width: clamp(280px, 80vw, 400px); /* Responsive Breite */
+            padding: 20px;
             background-color: white;
-            border: 2px solid #4CAF50; /* Grün */
+            border: 2px solid #4CAF50;
             border-radius: 10px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            z-index: 30; /* Über allem */
+            z-index: 30;
             text-align: center;
         }
 
         #quiz-modal h3 {
             margin-top: 0;
+            margin-bottom: 15px;
             color: #4CAF50;
+            font-size: clamp(1.1em, 3vw, 1.6em);
         }
 
         #quiz-question {
-            font-size: 1.5em;
+            font-size: clamp(1.3em, 4vw, 1.8em); /* Größere Schrift für Lesbarkeit */
             margin-bottom: 15px;
             color: #333;
+            min-height: 1.5em; /* Platzhalterhöhe */
         }
 
-        #quiz-input {
-            width: 80px;
-            padding: 8px;
-            margin-bottom: 15px;
-            text-align: center;
-            font-size: 1.2em;
+        /* Anzeige für NumPad-Eingabe */
+        #quiz-input-display {
+            width: 80%;
+            margin: 0 auto 15px auto;
+            padding: 10px;
+            font-size: clamp(1.2em, 3.5vw, 1.7em);
             border: 1px solid #ccc;
             border-radius: 4px;
+            min-height: 1.5em; /* Höhe wie bei einem Textfeld */
+            background-color: #f8f8f8;
+            color: #333;
+            text-align: center;
+            letter-spacing: 2px; /* Bessere Lesbarkeit der Zahlen */
         }
 
-        #quiz-submit {
-            padding: 10px 20px;
-            font-size: 1em;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
+        /* Container für NumPad */
+        #numpad-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr); /* 3 Spalten */
+            gap: 8px; /* Abstand zwischen Tasten */
+            margin-top: 15px;
+        }
+
+        #numpad-container button {
+            padding: 12px 0; /* Mehr Höhe */
+            font-size: clamp(1.1em, 3.5vw, 1.6em); /* Größere Tastenbeschriftung */
+            background-color: #e0e0e0;
+            border: 1px solid #bdbdbd;
             border-radius: 5px;
             cursor: pointer;
-            transition: background-color 0.3s;
+            transition: background-color 0.2s;
+             -webkit-tap-highlight-color: transparent; /* Verhindert blauen Kasten bei Tap */
         }
-        #quiz-submit:hover {
-            background-color: #45a049;
+
+        #numpad-container button:hover:not(:active) {
+             background-color: #d5d5d5;
         }
+         #numpad-container button:active {
+             background-color: #cccccc;
+         }
+
+        /* Spezialtasten (Letzte Reihe) */
+        #numpad-clear {
+            background-color: #ffcdd2; /* Hellrot */
+            border-color: #ef9a9a;
+        }
+         #numpad-clear:hover:not(:active) { background-color: #ef9a9a; }
+         #numpad-clear:active { background-color: #e57373; }
+
+        #numpad-zero {
+            /* Nimmt den Platz in der Mitte ein */
+        }
+
+        #numpad-submit {
+            background-color: #a5d6a7; /* Hellgrün */
+            border-color: #81c784;
+        }
+         #numpad-submit:hover:not(:active) { background-color: #81c784; }
+         #numpad-submit:active { background-color: #66bb6a; }
 
         #quiz-message {
             margin-top: 15px;
             font-weight: bold;
+            min-height: 1.2em; /* Platzhalter, vermeidet Layout-Sprünge */
+            font-size: clamp(0.9em, 2.5vw, 1.2em);
         }
-        .correct {
-            color: green;
-        }
-        .incorrect {
-            color: red;
-        }
+        .correct { color: green; }
+        .incorrect { color: red; }
 
         /* Klasse zum Verstecken von Elementen */
-        .hidden {
-            display: none !important; /* Wichtig, um andere Display-Regeln zu überschreiben */
+        .hidden { display: none !important; }
+
+        /* Zusätzliche Tablet-Optimierungen */
+        @media (min-width: 600px) {
+            /* Eventuell größere Tasten auf größeren Tablets */
+            #numpad-container button {
+                 padding: 15px 0;
+            }
         }
+
     </style>
 </head>
 <body>
 
     <!-- Spielbereich -->
     <div id="game-area">
-        <!-- Held -->
+        <!-- Held (Koala) -->
         <div id="hero"></div>
-        <!-- Blumen werden hier durch JavaScript hinzugefügt -->
+        <!-- Blumen und Hindernisse werden hier durch JavaScript hinzugefügt -->
     </div>
 
     <!-- Inventar-Anzeige -->
@@ -161,8 +231,23 @@
     <div id="quiz-modal">
         <h3>Multiplikations-Aufgabe!</h3>
         <div id="quiz-question">Frage lädt...</div>
-        <input type="number" id="quiz-input" placeholder="Antwort">
-        <button id="quiz-submit">Prüfen</button>
+        <!-- Ersetzt das Input-Feld -->
+        <div id="quiz-input-display" aria-live="polite"></div>
+        <!-- On-Screen NumPad -->
+        <div id="numpad-container">
+            <button data-digit="1">1</button>
+            <button data-digit="2">2</button>
+            <button data-digit="3">3</button>
+            <button data-digit="4">4</button>
+            <button data-digit="5">5</button>
+            <button data-digit="6">6</button>
+            <button data-digit="7">7</button>
+            <button data-digit="8">8</button>
+            <button data-digit="9">9</button>
+            <button id="numpad-clear">C</button> <!-- Löschen -->
+            <button data-digit="0" id="numpad-zero">0</button>
+            <button id="numpad-submit">OK</button> <!-- Bestätigen -->
+        </div>
         <div id="quiz-message"></div>
     </div>
 
@@ -173,37 +258,41 @@
         const inventoryDisplay = document.getElementById('inventory');
         const quizModal = document.getElementById('quiz-modal');
         const quizQuestion = document.getElementById('quiz-question');
-        const quizInput = document.getElementById('quiz-input');
-        const quizSubmit = document.getElementById('quiz-submit');
+        // const quizInput = document.getElementById('quiz-input'); // Nicht mehr verwendet
+        const quizInputDisplay = document.getElementById('quiz-input-display'); // Neu
         const quizMessage = document.getElementById('quiz-message');
+        const numpadContainer = document.getElementById('numpad-container');
+        const numpadSubmit = document.getElementById('numpad-submit');
+        const numpadClear = document.getElementById('numpad-clear');
 
         let flowersCollected = 0;
-        let flowers = []; // Array für Blumen-Daten
-        let activeFlower = null; // Die Blume, mit der interagiert wird
+        let flowers = [];
+        let obstacles = []; // Array für Hindernis-Daten
+        let activeItem = null; // Die Blume ODER das Hindernis, mit der/dem interagiert wird
+        let activeItemType = null; // 'flower' oder 'obstacle'
         let currentQuestions = [];
         let currentQuestionIndex = 0;
-        let heroIsMoving = false; // Verhindert Interaktion während der Bewegung
+        let heroIsMoving = false;
 
-        const NUM_FLOWERS = 5; // Anzahl der Blumen im Spiel
-        const NUM_QUESTIONS_PER_FLOWER = 5; // Anzahl der Fragen pro Blume
+        const NUM_FLOWERS = 5;
+        const NUM_OBSTACLES = 3; // Anzahl der Hindernisse
+        const NUM_QUESTIONS_PER_ITEM = 5; // Fragen pro Blume/Hindernis
 
         // --- Initialisierung ---
         function initGame() {
             createFlowers();
+            createObstacles();
             updateInventory();
             // Event Listener für Heldenbewegung
-            gameArea.addEventListener('click', moveHero);
-            // Event Listener für Quiz-Antwort
-            quizSubmit.addEventListener('click', checkAnswer);
+            gameArea.addEventListener('click', handleGameAreaClick);
             // Event Listener für das Ende der Heldenbewegung (Transition)
             hero.addEventListener('transitionend', onHeroMovementEnd);
-            // Erlaube Eingabe im Quiz mit Enter-Taste
-             quizInput.addEventListener('keyup', function(event) {
-                if (event.key === 'Enter') {
-                    event.preventDefault(); // Verhindert Standardverhalten (z.B. Formularabsendung)
-                    quizSubmit.click(); // Simuliert Klick auf den Prüfen-Button
-                }
-            });
+
+            // Event Listener für NumPad-Tasten (Delegation)
+            numpadContainer.addEventListener('click', handleNumpadClick);
+            // Die Submit/Clear Buttons sind innerhalb des Containers,
+            // also werden sie auch vom obigen Listener erfasst.
+            // Man könnte auch separate Listener hinzufügen, aber Delegation ist effizienter.
         }
 
         // --- Blumen erstellen ---
@@ -213,10 +302,30 @@
                 const flowerElement = document.createElement('div');
                 flowerElement.classList.add('flower');
                 flowerElement.id = `flower-${i}`;
+                // Sicherstellen, dass sie nicht mit Hindernissen überlappen (vereinfachte Prüfung)
+                let pos;
+                let tooClose;
+                do {
+                    tooClose = false;
+                    pos = getRandomPosition(areaRect, 60); // Größerer Abstand
+                    // Prüfe Abstand zu bestehenden Hindernissen (falls schon erstellt)
+                    for (const obs of obstacles) {
+                        const dist = Math.sqrt(Math.pow(pos.x - obs.position.x, 2) + Math.pow(pos.y - obs.position.y, 2));
+                        if (dist < 60) { // Mindestabstand zwischen Blume und Hindernis
+                            tooClose = true;
+                            break;
+                        }
+                    }
+                     // Prüfe Abstand zu anderen Blumen
+                    for (const flw of flowers) {
+                        const dist = Math.sqrt(Math.pow(pos.x - flw.position.x, 2) + Math.pow(pos.y - flw.position.y, 2));
+                        if (dist < 50) { // Mindestabstand zwischen Blumen
+                             tooClose = true;
+                            break;
+                        }
+                    }
+                } while (tooClose);
 
-                // Zufällige Position, aber nicht zu nah am Rand oder anderen Blumen
-                let pos = getRandomPosition(areaRect, 50); // 50px Mindestabstand zum Rand
-                // TODO: Hier könnte man noch prüfen, ob die Position zu nah an anderen Blumen ist
                 flowerElement.style.left = `${pos.x}px`;
                 flowerElement.style.top = `${pos.y}px`;
 
@@ -230,88 +339,248 @@
             }
         }
 
+        // --- Hindernisse erstellen ---
+        function createObstacles() {
+            const areaRect = gameArea.getBoundingClientRect();
+            for (let i = 0; i < NUM_OBSTACLES; i++) {
+                const obstacleElement = document.createElement('div');
+                obstacleElement.classList.add('obstacle');
+                obstacleElement.id = `obstacle-${i}`;
+
+                let pos;
+                 let tooClose;
+                 do {
+                    tooClose = false;
+                    pos = getRandomPosition(areaRect, 60); // Größerer Abstand
+                    // Prüfe Abstand zu bestehenden Blumen
+                    for (const flw of flowers) {
+                        const dist = Math.sqrt(Math.pow(pos.x - flw.position.x, 2) + Math.pow(pos.y - flw.position.y, 2));
+                        if (dist < 60) { // Mindestabstand
+                             tooClose = true;
+                            break;
+                        }
+                    }
+                     // Prüfe Abstand zu anderen Hindernissen
+                    for (const obs of obstacles) {
+                         const dist = Math.sqrt(Math.pow(pos.x - obs.position.x, 2) + Math.pow(pos.y - obs.position.y, 2));
+                         if (dist < 100) { // Hindernisse weiter auseinander
+                             tooClose = true;
+                            break;
+                        }
+                    }
+                } while (tooClose);
+
+                obstacleElement.style.left = `${pos.x}px`;
+                obstacleElement.style.top = `${pos.y}px`;
+
+                gameArea.appendChild(obstacleElement);
+                obstacles.push({
+                    id: obstacleElement.id,
+                    element: obstacleElement,
+                    solved: false, // Hindernisse werden 'gelöst', nicht 'gesammelt'
+                    position: pos
+                });
+            }
+        }
+
+
         // Hilfsfunktion für zufällige Position
         function getRandomPosition(bounds, margin) {
-            const x = Math.random() * (bounds.width - margin * 2) + margin;
-            const y = Math.random() * (bounds.height - margin * 2) + margin;
+            // Stelle sicher, dass bounds gültige Werte hat
+            const width = bounds.width || window.innerWidth;
+            const height = bounds.height || window.innerHeight;
+            const x = Math.random() * (width - margin * 2) + margin;
+            const y = Math.random() * (height - margin * 2) + margin;
             return { x, y };
         }
 
-        // --- Heldenbewegung ---
-        function moveHero(event) {
+        // --- Heldenbewegung & Klick-Handling ---
+        function handleGameAreaClick(event) {
+             // Verhindere Bewegung/Interaktion, wenn Quiz offen ist oder Held sich bewegt
             if (heroIsMoving || quizModal.style.display === 'block') {
-                 // Bewege den Helden nicht, wenn er schon unterwegs ist oder ein Quiz aktiv ist
                 return;
             }
 
-            heroIsMoving = true; // Bewegung beginnt
-
-            // Klickposition relativ zum gameArea bekommen
+             // Klickposition relativ zum gameArea bekommen
             const areaRect = gameArea.getBoundingClientRect();
             const targetX = event.clientX - areaRect.left;
             const targetY = event.clientY - areaRect.top;
 
-            // Zielposition für die obere linke Ecke des Helden setzen
-            // (damit der Mittelpunkt des Helden das Ziel erreicht)
-            const heroRect = hero.getBoundingClientRect();
-            hero.style.left = `${targetX - heroRect.width / 2}px`;
-            hero.style.top = `${targetY - heroRect.height / 2}px`;
+            // Prüfen, ob direkt auf ein Hindernis geklickt wurde
+            // (Alternative zur Kollision nach Bewegung für Hindernisinteraktion)
+            /* // Optional: Klick auf Hindernis direkt
+            for (let obstacle of obstacles) {
+                if (!obstacle.solved) {
+                    const obsRect = obstacle.element.getBoundingClientRect();
+                    if (targetX >= obsRect.left - areaRect.left && targetX <= obsRect.right - areaRect.left &&
+                        targetY >= obsRect.top - areaRect.top && targetY <= obsRect.bottom - areaRect.top) {
+                        activeItem = obstacle;
+                        activeItemType = 'obstacle';
+                        startQuiz();
+                        return; // Keine Bewegung, direkt Quiz starten
+                    }
+                }
+            }
+            */
 
-            // Normalerweise würde die Kollisionsprüfung im 'transitionend' Event stattfinden
-            // Aber für ein einfacheres Spiel prüfen wir nach kurzer Verzögerung
-            // setTimeout(checkCollision, 500); // Warte auf das Ende der Transition (ca.)
-            // Besser: Event Listener 'transitionend' verwenden (siehe initGame und onHeroMovementEnd)
+            moveHero(targetX, targetY);
+        }
+
+
+        function moveHero(targetX, targetY) {
+            heroIsMoving = true; // Bewegung beginnt
+
+            // Zielposition für die obere linke Ecke des Helden setzen
+            const heroRect = hero.getBoundingClientRect();
+            // Verwende die gespeicherten Maße oder berechne sie neu, falls sie sich ändern könnten
+            const heroWidth = hero.offsetWidth || 50;
+            const heroHeight = hero.offsetHeight || 50;
+
+            // Berechne die Zielkoordinaten für top/left
+            let finalX = targetX - heroWidth / 2;
+            let finalY = targetY - heroHeight / 2;
+
+            // Randbegrenzung (verhindert, dass der Held den Bildschirm verlässt)
+            const areaRect = gameArea.getBoundingClientRect();
+            finalX = Math.max(0, Math.min(finalX, areaRect.width - heroWidth));
+            finalY = Math.max(0, Math.min(finalY, areaRect.height - heroHeight));
+
+
+            // --- HINDERNIS-KOLLISIONSPRÜFUNG VOR BEWEGUNG (Vereinfacht) ---
+            // Dies ist eine sehr einfache Kollisionsprüfung. Sie prüft nur, ob das *Ziel* in einem Hindernis liegt.
+            // Eine echte Pfadprüfung wäre komplexer.
+            let blocked = false;
+            const targetRect = {
+                left: finalX,
+                top: finalY,
+                right: finalX + heroWidth,
+                bottom: finalY + heroHeight
+            };
+
+            for (let obstacle of obstacles) {
+                if (!obstacle.solved) {
+                    const obsRect = obstacle.element.getBoundingClientRect();
+                     // Konvertiere Hindernis-Rect zu gameArea-Koordinaten
+                    const obsAreaRect = {
+                         left: obsRect.left - areaRect.left,
+                         top: obsRect.top - areaRect.top,
+                         right: obsRect.right - areaRect.left,
+                         bottom: obsRect.bottom - areaRect.top
+                    };
+
+                    // Einfache Rechteck-Überlappungsprüfung zwischen Ziel und Hindernis
+                    if (!(targetRect.right < obsAreaRect.left ||
+                          targetRect.left > obsAreaRect.right ||
+                          targetRect.bottom < obsAreaRect.top ||
+                          targetRect.top > obsAreaRect.bottom))
+                    {
+                        blocked = true;
+                         // Optional: Starte Quiz direkt bei Blockade?
+                        // activeItem = obstacle;
+                        // activeItemType = 'obstacle';
+                        // startQuiz();
+                        break;
+                    }
+                }
+            }
+
+            if (!blocked) {
+                 hero.style.left = `${finalX}px`;
+                 hero.style.top = `${finalY}px`;
+            } else {
+                 // Ziel ist blockiert, bewege dich nicht (oder nur bis zum Hindernis - komplexer)
+                 console.log("Weg blockiert!");
+                 heroIsMoving = false; // Bewegung wurde verhindert/abgebrochen
+            }
+            // Kollisionsprüfung mit Blumen findet im 'transitionend' statt
         }
 
         function onHeroMovementEnd() {
             heroIsMoving = false; // Bewegung beendet
-            checkCollision();
+            checkCollision(); // Prüfe auf Blumen-Kollision am Zielort
         }
 
-        // --- Kollisionserkennung ---
+        // --- Kollisionserkennung (nach Bewegung, hauptsächlich für Blumen) ---
         function checkCollision() {
-            if (heroIsMoving) return; // Nicht prüfen während der Bewegung
+            if (heroIsMoving || quizModal.style.display === 'block') return; // Nicht prüfen wenn Quiz aktiv
 
             const heroRect = hero.getBoundingClientRect();
+            const areaRect = gameArea.getBoundingClientRect(); // Referenz für Konvertierung
 
+            // Zuerst Hindernisse prüfen (falls Held trotz Blockade-Check kollidiert)
+            for (let obstacle of obstacles) {
+                if (!obstacle.solved) {
+                    const obsRect = obstacle.element.getBoundingClientRect();
+                    if (checkRectOverlap(heroRect, obsRect)) {
+                        activeItem = obstacle;
+                        activeItemType = 'obstacle';
+                        startQuiz();
+                        return; // Nur eine Interaktion auf einmal
+                    }
+                }
+            }
+
+            // Dann Blumen prüfen
             for (let flower of flowers) {
                 if (!flower.collected) {
-                    const flowerElement = flower.element;
-                    const flowerRect = flowerElement.getBoundingClientRect();
-
-                    // Einfache Rechteck-Kollisionsprüfung
-                    const collision = !(
-                        heroRect.right < flowerRect.left ||
-                        heroRect.left > flowerRect.right ||
-                        heroRect.bottom < flowerRect.top ||
-                        heroRect.top > flowerRect.bottom
-                    );
-
-                    if (collision) {
-                        // Kollision gefunden! Starte das Quiz für diese Blume
-                        activeFlower = flower;
+                    const flowerRect = flower.element.getBoundingClientRect();
+                    if (checkRectOverlap(heroRect, flowerRect)) {
+                        activeItem = flower;
+                        activeItemType = 'flower';
                         startQuiz();
-                        break; // Nur eine Kollision auf einmal behandeln
+                        return; // Nur eine Interaktion auf einmal
                     }
                 }
             }
         }
 
+        // Hilfsfunktion für Rechteck-Überlappung
+        function checkRectOverlap(rect1, rect2) {
+            return !(
+                rect1.right < rect2.left ||
+                rect1.left > rect2.right ||
+                rect1.bottom < rect2.top ||
+                rect1.top > rect2.bottom
+            );
+        }
+
+
+        // --- NumPad-Logik ---
+        function handleNumpadClick(event) {
+            const target = event.target;
+            if (target.tagName !== 'BUTTON') return; // Nur auf Buttons reagieren
+
+            if (target.hasAttribute('data-digit')) {
+                const digit = target.getAttribute('data-digit');
+                // Begrenze die Eingabelänge (optional)
+                if (quizInputDisplay.textContent.length < 4) {
+                    quizInputDisplay.textContent += digit;
+                }
+            } else if (target.id === 'numpad-clear') {
+                quizInputDisplay.textContent = ''; // Löschen
+            } else if (target.id === 'numpad-submit') {
+                checkAnswer(); // Prüfen
+            }
+        }
+
         // --- Quiz-Logik ---
         function startQuiz() {
-            currentQuestions = generateQuestions(NUM_QUESTIONS_PER_FLOWER);
+            if (!activeItem) return;
+
+            currentQuestions = generateQuestions(NUM_QUESTIONS_PER_ITEM);
             currentQuestionIndex = 0;
-            quizMessage.textContent = ''; // Nachrichten zurücksetzen
-            quizMessage.className = ''; // Klassen zurücksetzen
+            quizMessage.textContent = '';
+            quizMessage.className = '';
+            quizInputDisplay.textContent = ''; // NumPad-Anzeige leeren
             displayQuestion();
-            quizModal.style.display = 'block'; // Modal anzeigen
-            quizInput.focus(); // Fokus auf das Eingabefeld
+            quizModal.style.display = 'block';
+            // Kein Input-Feld mehr zum Fokussieren
         }
 
         function generateQuestions(count) {
             const questions = [];
             for (let i = 0; i < count; i++) {
-                const num1 = Math.floor(Math.random() * 10) + 1; // Zahlen von 1 bis 10
+                const num1 = Math.floor(Math.random() * 10) + 1;
                 const num2 = Math.floor(Math.random() * 10) + 1;
                 questions.push({
                     text: `${num1} x ${num2} = ?`,
@@ -324,20 +593,27 @@
         function displayQuestion() {
             if (currentQuestionIndex < currentQuestions.length) {
                 quizQuestion.textContent = currentQuestions[currentQuestionIndex].text;
-                quizInput.value = ''; // Eingabefeld leeren
             } else {
-                // Sollte nicht passieren, wenn checkAnswer korrekt funktioniert
                 console.error("Versucht, Frage außerhalb des Bereichs anzuzeigen.");
             }
         }
 
         function checkAnswer() {
-            const userAnswer = parseInt(quizInput.value, 10);
+            const userAnswerText = quizInputDisplay.textContent;
+            if (userAnswerText === '') {
+                 quizMessage.textContent = "Bitte gib eine Antwort über die Tasten ein!";
+                 quizMessage.className = 'incorrect';
+                 return;
+            }
+
+            const userAnswer = parseInt(userAnswerText, 10);
             const correctAnswer = currentQuestions[currentQuestionIndex].answer;
 
             if (isNaN(userAnswer)) {
-                quizMessage.textContent = "Bitte gib eine Zahl ein!";
+                // Sollte durch NumPad nicht passieren, aber sicher ist sicher
+                quizMessage.textContent = "Ungültige Eingabe.";
                 quizMessage.className = 'incorrect';
+                quizInputDisplay.textContent = ''; // Anzeige leeren
                 return;
             }
 
@@ -346,43 +622,50 @@
                 quizMessage.className = 'correct';
                 currentQuestionIndex++;
 
-                if (currentQuestionIndex >= currentQuestions.length) {
-                    // Alle Fragen richtig beantwortet!
-                    setTimeout(handleQuizSuccess, 500); // Kurze Verzögerung, um "Richtig!" zu sehen
-                } else {
-                    // Nächste Frage nach kurzer Verzögerung anzeigen
-                     setTimeout(() => {
-                        quizMessage.textContent = ''; // Nachricht löschen
+                // Nächste Frage oder Erfolg
+                setTimeout(() => {
+                     if (currentQuestionIndex >= currentQuestions.length) {
+                        handleQuizSuccess();
+                    } else {
+                        quizMessage.textContent = '';
                         quizMessage.className = '';
+                        quizInputDisplay.textContent = ''; // Anzeige für nächste Frage leeren
                         displayQuestion();
-                        quizInput.focus();
-                    }, 500); // 0.5 Sekunden warten
-                }
+                    }
+                }, 800); // Etwas längere Pause, um "Richtig!" zu sehen
+
             } else {
-                quizMessage.textContent = `Leider falsch. Die richtige Antwort ist ${correctAnswer}. Versuche es nochmal!`;
+                quizMessage.textContent = `Leider falsch. Die richtige Antwort war ${correctAnswer}. Versuche die Frage erneut!`;
                 quizMessage.className = 'incorrect';
                 // Frage bleibt gleich, Spieler muss es erneut versuchen
-                quizInput.value = '';
-                quizInput.focus();
+                quizInputDisplay.textContent = ''; // Anzeige leeren für neuen Versuch
             }
         }
 
         function handleQuizSuccess() {
             quizModal.style.display = 'none'; // Modal schließen
-            activeFlower.element.classList.add('hidden'); // Blume verstecken
-            activeFlower.collected = true;
-            flowersCollected++;
-            updateInventory();
 
-            // Prüfen, ob alle Blumen gesammelt wurden
-             if (flowersCollected === NUM_FLOWERS) {
-                alert("Herzlichen Glückwunsch! Du hast alle Blumen gesammelt und die Multiplikationen gemeistert!");
-                // Optional: Spiel neu starten oder eine andere Aktion
+            if (activeItemType === 'flower') {
+                activeItem.element.classList.add('hidden');
+                activeItem.collected = true;
+                flowersCollected++;
+                updateInventory();
+            } else if (activeItemType === 'obstacle') {
+                activeItem.element.classList.add('hidden'); // Hindernis verschwindet
+                activeItem.solved = true;
+                // Optional: Belohnung für das Entfernen von Hindernissen?
             }
 
-            activeFlower = null; // Keine aktive Blume mehr
-        }
+            activeItem = null; // Reset
+            activeItemType = null; // Reset
 
+            // Prüfen, ob alle Blumen gesammelt wurden
+            if (flowers.every(f => f.collected)) {
+                 setTimeout(()=> { // Kleine Verzögerung nach dem Schließen des Modals
+                    alert("Herzlichen Glückwunsch! Du hast alle Blumen gesammelt und die Multiplikationen gemeistert!");
+                 }, 100);
+            }
+        }
 
         // --- Inventar aktualisieren ---
         function updateInventory() {
@@ -390,7 +673,6 @@
         }
 
         // --- Spielstart ---
-        // Warte bis das DOM vollständig geladen ist
         document.addEventListener('DOMContentLoaded', initGame);
 
     </script>
