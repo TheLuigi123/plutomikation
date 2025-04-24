@@ -1,3 +1,322 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Koalas Multiplikations-Abenteuer Lvl. 1</title>
+    <style>
+        /* CSS (inkl. neuem End Screen Style) */
+        html, body {
+            height: 100%;
+            margin: 0;
+            overflow: hidden; /* Verhindert Scrollbalken */
+            font-family: sans-serif;
+            background-color: #e0f7fa; /* Heller Himmelblau-Hintergrund */
+        }
+
+        #game-area {
+            position: relative;
+            width: 100vw; /* Volle Breite des Ansichtsfensters */
+            height: 100vh; /* Volle Höhe des Ansichtsfensters */
+            background-color: #c8e6c9; /* Hellgrüner Spielbereich */
+            cursor: pointer;
+            overflow: hidden; /* Verhindert, dass Elemente überlaufen */
+        }
+
+        #hero {
+            position: absolute;
+            width: 50px;  /* Angepasst für Koala-Bild */
+            height: 50px; /* Angepasst für Koala-Bild */
+            /* Koala-Grafik als Base64-kodiertes PNG (Beispiel SVG) */
+            background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj4KICA8ZyBmaWxsPSIjODg4Ij4KICAgIDwhLS0gQm9keSAtLT4KICAgIDxlbGxpcHNlIGN4PSI1MCIgY3k9IjcwIiByeD0iMzAiIHJ5PSIyNSIgZmlsbD0iI2NjY2NjIi8+CiAgICA8Y2lyY2xlIGN4PSI1MCIgY3k9IjUwIiByPSIyNSIgZmlsbD0iI2NjY2NjIi8+CiAgICA8IS0tIEVhcnMgLS0+CiAgICA8ZWxsaXBzZSBjeD0iMzAiIGN5PSIzMCIgcng9IjE1IiByeT0iMjAiIGZpbGw9IiNjY2NjY2MiLz4KICAgIDxlbGxpcHNlIGN4PSI3MCIgY3k9IjMwIiByeD0iMTUiIHJ5PSIyMCIgZmlsbD0iI2NjY2NjIi8+CiAgICA8ZWxsaXBzZSBjeD0iMzAiIGN5PSIzMCIgcng9IjEwIiByeT0iMTUiIGZpbGw9IiNmZmZmZmYiLz4KICAgIDxlbGxpc2UgY3g9IjcwIiBjeT0iMzAiIHJ4PSIxMCIgc3k9IjE1IiBmaWxsPSIjZmZmZmZmIi8+CiAgICA8IS0tIEZlYXR1cmVzIC0tPgogICAgPGNpcmNsZSBjeD0iNDMiIGN5PSI1MCIgcj0iMyIgZmlsbD0iIzAwMDAwMCIvPgogICAgPGNpcmNsZSBjeD0iNTciIGN5PSI1MCIgcj0iMyIgZmlsbD0iIzAwMDAwMCIvPgogICAgPGVsbGlwc2UgY3g9IjUwIiBjeT0iNjAiIHJ4PSI2IiByeT0iNCIgZmlsbD0iIzAwMDAwMCIvPgogIDwvZz4KPC9zdmc+'); /* Leichter Grauton als Base für Koala */
+            background-size: contain; /* Bild an Div anpassen */
+            background-repeat: no-repeat;
+            background-position: center;
+            top: 50px;
+            left: 50px;
+            transition: top 0.5s ease-in-out, left 0.5s ease-in-out; /* Sanfte Bewegung */
+            z-index: 10; /* Über Blumen und Hindernissen */
+        }
+
+        .flower {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            /* Farben werden jetzt durch JS gesetzt */
+            border-radius: 50% 50% 0 0 / 60% 60% 0 0; /* Einfache Blütenform oben */
+            transform: rotate(45deg);
+            cursor: default;
+            z-index: 5;
+            transition: background-color 0.3s, border-color 0.3s; /* Sanfter Farbwechsel bei Levelstart */
+        }
+        .flower::before {
+            content: '';
+            position: absolute;
+            width: 5px;
+            height: 20px;
+            background-color: #388e3c; /* Stiel bleibt grün */
+            bottom: -18px; /* Unterhalb der Blüte */
+            left: 50%;
+            transform: translateX(-50%) rotate(-45deg); /* Zurückdrehen und zentrieren */
+            z-index: -1;
+        }
+
+        #enemy {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            background-color: #f44336; /* Rot (Standard) */
+            border: 2px solid #c62828; /* Dunkleres Rot */
+            border-radius: 50%; /* Rundes Monster */
+            box-shadow: 0 0 5px rgba(0,0,0,0.5);
+            z-index: 7; /* Unter Held, über Blumen/Hindernissen */
+             /* Feindbewegung ist schrittweise, keine lange CSS-Transition hier */
+            transition: background-color 0.3s ease; /* Für Farbwechsel beim Einfrieren */
+        }
+
+        #enemy.enemy-frozen {
+            background-color: #42a5f5; /* Blau (Eingefroren) */
+            border-color: #1e88e5;
+        }
+
+        #inventory {
+            position: fixed; /* Bleibt beim Scrollen sichtbar (obwohl Scrollen deaktiviert ist) */
+            top: 10px;
+            right: 10px;
+            padding: 10px 15px;
+            background-color: rgba(255, 255, 255, 0.8); /* Halbtransparent weiß */
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: clamp(1em, 2.5vw, 1.5em); /* Responsive Schriftgröße */
+            z-index: 20; /* Über allem */
+        }
+
+        /* Pop-up für Aufgaben */
+        #quiz-modal {
+            display: none; /* Standardmäßig versteckt */
+            position: fixed;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            /* Breite anpassen für NumPad */
+            width: clamp(280px, 80vw, 400px); /* Responsive Breite */
+            padding: 20px;
+            background-color: white;
+            border: 2px solid #4CAF50; /* Grün */
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            z-index: 30; /* Über allem */
+            text-align: center;
+        }
+
+        #quiz-modal h3 {
+            margin-top: 0;
+            margin-bottom: 15px;
+            color: #4CAF50;
+            font-size: clamp(1.1em, 3vw, 1.6em);
+        }
+
+        #quiz-question {
+            font-size: clamp(1.3em, 4vw, 1.8em); /* Größere Schrift für Lesbarkeit */
+            margin-bottom: 15px;
+            color: #333;
+            min-height: 1.5em; /* Platzhalterhöhe */
+        }
+
+        /* Anzeige für NumPad-Eingabe */
+        #quiz-input-display {
+            width: 80%;
+            margin: 0 auto 15px auto;
+            padding: 10px;
+            font-size: clamp(1.2em, 3.5vw, 1.7em);
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            min-height: 1.5em; /* Höhe wie bei einem Textfeld */
+            background-color: #f8f8f8;
+            color: #333;
+            text-align: center;
+            letter-spacing: 2px; /* Bessere Lesbarkeit der Zahlen */
+        }
+
+        /* Container für NumPad */
+        #numpad-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr); /* 3 Spalten */
+            gap: 8px; /* Abstand zwischen Tasten */
+            margin-top: 15px;
+        }
+
+        #numpad-container button {
+            padding: 12px 0; /* Mehr Höhe */
+            font-size: clamp(1.1em, 3.5vw, 1.6em); /* Größere Tastenbeschriftung */
+            background-color: #e0e0e0;
+            border: 1px solid #bdbdbd;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+             -webkit-tap-highlight-color: transparent; /* Verhindert blauen Kasten bei Tap */
+        }
+
+        #numpad-container button:hover:not(:active) {
+             background-color: #d5d5d5;
+        }
+         #numpad-container button:active {
+             background-color: #cccccc;
+         }
+
+        /* Spezialtasten (Letzte Reihe) */
+        #numpad-clear {
+            background-color: #ffcdd2; /* Hellrot */
+            border-color: #ef9a9a;
+        }
+         #numpad-clear:hover:not(:active) { background-color: #ef9a9a; }
+         #numpad-clear:active { background-color: #e57373; }
+
+        #numpad-zero {
+            /* Nimmt den Platz in der Mitte ein */
+        }
+
+        #numpad-submit {
+            background-color: #a5d6a7; /* Hellgrün */
+            border-color: #81c784;
+        }
+         #numpad-submit:hover:not(:active) { background-color: #81c784; }
+         #numpad-submit:active { background-color: #66bb6a; }
+
+        #quiz-message {
+            margin-top: 15px;
+            font-weight: bold;
+            min-height: 1.2em; /* Platzhalter, vermeidet Layout-Sprünge */
+            font-size: clamp(0.9em, 2.5vw, 1.2em);
+        }
+        .correct { color: green; }
+        .incorrect { color: red; }
+        .hidden { display: none !important; }
+
+        /* NEU: End Screen Styles */
+        #end-screen {
+            position: fixed;
+            inset: 0; /* top, right, bottom, left = 0 */
+            background-color: rgba(0, 80, 0, 0.85); /* Dunkelgrün, halbtransparent */
+            color: white;
+            display: flex; /* Flexbox für Zentrierung */
+            justify-content: center;
+            align-items: center;
+            z-index: 100; /* Über allem */
+            text-align: center;
+            padding: 20px;
+            font-size: clamp(1em, 3vw, 1.4em);
+            flex-direction: column; /* Inhalt untereinander */
+            overflow-y: auto; /* Scrollen, falls Inhalt zu lang */
+        }
+        #end-screen h2 {
+            color: #ffd700; /* Gold */
+            margin-bottom: 20px;
+        }
+        #end-screen p {
+            margin: 8px 0;
+        }
+        #end-screen ul {
+            list-style: none;
+            padding: 0;
+            margin: 10px 0 20px 0;
+            max-width: 400px;
+            text-align: left;
+        }
+         #end-screen ul li {
+            background-color: rgba(255, 255, 255, 0.1);
+            padding: 5px 10px;
+            margin-bottom: 5px;
+            border-radius: 4px;
+            font-family: monospace; /* Für Zeit-Ausrichtung */
+        }
+         #end-screen h3 {
+            margin-top: 25px;
+            margin-bottom: 10px;
+            color: #ffcc80; /* Helles Orange */
+        }
+        #end-screen #wrong-answers-list li {
+             font-family: sans-serif; /* Zurück zu Standard für Aufgaben */
+             background-color: rgba(255, 100, 100, 0.15); /* Leicht rötlich */
+        }
+        #play-again-button {
+            margin-top: 30px;
+            padding: 12px 25px;
+            font-size: 1.1em;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        #play-again-button:hover {
+            background-color: #45a049;
+        }
+
+        @media (min-width: 600px) {
+            #numpad-container button {
+                 padding: 15px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Spielbereich -->
+    <div id="game-area">
+        <!-- Held (Koala) -->
+        <div id="hero"></div>
+        <!-- Feind -->
+        <div id="enemy" class="hidden"></div>
+        <!-- Blumen werden hier durch JavaScript hinzugefügt -->
+    </div>
+
+    <!-- Inventar-Anzeige -->
+    <div id="inventory">Blumen: 0</div>
+
+    <!-- Pop-up für die Aufgaben -->
+    <div id="quiz-modal">
+        <h3 id="quiz-title">Multiplikations-Aufgabe!</h3>
+        <div id="quiz-question">Frage lädt...</div>
+        <!-- Anzeige für NumPad-Eingabe -->
+        <div id="quiz-input-display" aria-live="polite"></div>
+        <!-- On-Screen NumPad -->
+        <div id="numpad-container">
+             <button data-digit="1">1</button>
+            <button data-digit="2">2</button>
+            <button data-digit="3">3</button>
+            <button data-digit="4">4</button>
+            <button data-digit="5">5</button>
+            <button data-digit="6">6</button>
+            <button data-digit="7">7</button>
+            <button data-digit="8">8</button>
+            <button data-digit="9">9</button>
+            <button id="numpad-clear">C</button> <!-- Löschen -->
+            <button data-digit="0" id="numpad-zero">0</button>
+            <button id="numpad-submit">OK</button> <!-- Bestätigen -->
+        </div>
+        <div id="quiz-message"></div>
+    </div>
+
+    <!-- NEU: End Screen -->
+    <div id="end-screen" class="hidden">
+        <h2>Geschafft!</h2>
+        <p id="final-time">Deine Zeit: 00:00.000</p>
+        <h3>Beste Zeiten:</h3>
+        <ul id="fastest-times-list">
+            <li>-</li>
+            <li>-</li>
+            <li>-</li>
+            <li>-</li>
+            <li>-</li>
+        </ul>
+        <h3>Fehlerhafte Aufgaben:</h3>
+        <ul id="wrong-answers-list">
+            <li>Keine Fehler gemacht!</li>
+        </ul>
+        <button id="play-again-button">Nochmal spielen?</button>
+    </div>
+
     <script>
         // --- DOM Elemente ---
         const gameArea = document.getElementById('game-area');
@@ -17,147 +336,543 @@
         const playAgainButton = document.getElementById('play-again-button');
 
         // --- Audio Context & Sounds ---
-        let audioCtx; let levelUpSound;
+        let audioCtx; // Wird bei erster Interaktion initialisiert
+        let levelUpSound; // Für Base64-Sound
+
+        // Platzhalter Base64 für einen kurzen Sound (z.B. ein kurzes MP3 "Level Up" Jingle)
+        // Ersetze dies durch deinen eigenen Base64-Sound!
+        // Beispiel (sehr kurzer, generischer Ton):
         const levelUpSoundBase64 = 'data:audio/mpeg;base64,SUQzBAAAAAABEVRYWFgAAAAtAAADY29tbWVudABCaWdTb3VuZEJhbmsuY29tIC8gTGliAvUMAAAAEAAAAAAAAAAAAAAAAAAAAAAA//MkxAAAANIAAAAAExBTUUzLjk4LjIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
-        function initAudio() { if(!audioCtx){try{audioCtx=new(window.AudioContext||window.webkitAudioContext)();levelUpSound=new Audio(levelUpSoundBase64);levelUpSound.preload='auto';console.log("AudioContext initialized.");}catch(e){console.error("Web Audio API is not supported or initialization failed.",e);}}}
-        function playTone(f=440,d=0.1,t='sine',v=0.5){if(!audioCtx)return;try{const o=audioCtx.createOscillator();const g=audioCtx.createGain();o.type=t;o.frequency.setValueAtTime(f,audioCtx.currentTime);g.gain.setValueAtTime(v,audioCtx.currentTime);g.gain.exponentialRampToValueAtTime(0.001,audioCtx.currentTime+d);o.connect(g);g.connect(audioCtx.destination);o.start(audioCtx.currentTime);o.stop(audioCtx.currentTime+d+0.05);}catch(e){console.error("Error playing tone:",e);}}
-        function playClickSound(){playTone(880,0.05,'triangle',0.3);}
-        function playInteractSound(){playTone(660,0.08,'sine',0.4);}
-        function playCorrectSound(){playTone(523.25,0.1,'sine',0.5);setTimeout(()=>playTone(659.25,0.15,'sine',0.5),100);}
-        function playWrongSound(){playTone(349.23,0.15,'square',0.4);setTimeout(()=>playTone(261.63,0.2,'square',0.4),150);}
-        function playCollectSound(){playTone(783.99,0.08,'triangle',0.6);setTimeout(()=>playTone(1046.50,0.08,'triangle',0.6),80);setTimeout(()=>playTone(1318.51,0.1,'triangle',0.6),160);}
-        function playFreezeSound(){playTone(440,0.3,'sawtooth',0.4);}
-        function playUnfreezeSound(){playTone(587.33,0.2,'sine',0.4);}
-        function playEnemySpawnSound(){playTone(110,0.3,'sawtooth',0.5);}
-        function playEnemyHitSound(){playTone(220,0.2,'square',0.6);}
-        function playLevelUpJingle(){if(levelUpSound&&audioCtx){levelUpSound.play().catch(e=>console.error("Error playing level up sound:",e));}else{playTone(523,0.1);setTimeout(()=>playTone(783,0.1),100);setTimeout(()=>playTone(1046,0.2),200);}}
-        function playGameOverSound(){playTone(1046,0.2);setTimeout(()=>playTone(783,0.2),200);setTimeout(()=>playTone(523,0.3),400);}
+
+        function initAudio() {
+            if (!audioCtx) {
+                try {
+                    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                    // Erstelle das Audio-Objekt für den Base64-Sound erst jetzt
+                     levelUpSound = new Audio(levelUpSoundBase64);
+                     levelUpSound.preload = 'auto';
+                    console.log("AudioContext initialized.");
+                } catch (e) {
+                    console.error("Web Audio API is not supported in this browser or initialization failed.", e);
+                }
+            }
+        }
+
+        // Funktion zum Abspielen einfacher Töne
+        function playTone(frequency = 440, duration = 0.1, type = 'sine', volume = 0.5) {
+            if (!audioCtx) return; // Nicht spielen, wenn Context nicht initialisiert
+            try {
+                const oscillator = audioCtx.createOscillator();
+                const gainNode = audioCtx.createGain();
+
+                oscillator.type = type;
+                oscillator.frequency.setValueAtTime(frequency, audioCtx.currentTime);
+
+                gainNode.gain.setValueAtTime(volume, audioCtx.currentTime);
+                // Kurzes Fade-out am Ende
+                gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+
+                oscillator.connect(gainNode);
+                gainNode.connect(audioCtx.destination);
+
+                oscillator.start(audioCtx.currentTime);
+                oscillator.stop(audioCtx.currentTime + duration + 0.05); // Etwas länger stoppen als die Dauer
+            } catch (e) {
+                 console.error("Error playing tone:", e);
+            }
+        }
+         // Spezifische Sound-Funktionen
+        function playClickSound() { playTone(880, 0.05, 'triangle', 0.3); }
+        function playInteractSound() { playTone(660, 0.08, 'sine', 0.4); }
+        function playCorrectSound() {
+            playTone(523.25, 0.1, 'sine', 0.5); // C5
+            setTimeout(() => playTone(659.25, 0.15, 'sine', 0.5), 100); // E5 nach 100ms
+        }
+        function playWrongSound() {
+            playTone(349.23, 0.15, 'square', 0.4); // F4
+             setTimeout(() => playTone(261.63, 0.2, 'square', 0.4), 150); // C4 nach 150ms
+        }
+        function playCollectSound() {
+            playTone(783.99, 0.08, 'triangle', 0.6); // G5
+            setTimeout(() => playTone(1046.50, 0.08, 'triangle', 0.6), 80); // C6
+            setTimeout(() => playTone(1318.51, 0.1, 'triangle', 0.6), 160); // E6
+        }
+        function playFreezeSound() { playTone(440, 0.3, 'sawtooth', 0.4); /* A4 fallend wäre besser, aber einfach halten */ }
+        function playUnfreezeSound() { playTone(587.33, 0.2, 'sine', 0.4); /* D5 */ }
+        function playEnemySpawnSound() { playTone(110, 0.3, 'sawtooth', 0.5); /* A2 */ }
+        function playEnemyHitSound() { playTone(220, 0.2, 'square', 0.6); /* A3 */ }
+        function playLevelUpJingle() {
+             if (levelUpSound && audioCtx) { // Sicherstellen, dass beide existieren
+                 // Lautstärke anpassen, falls gewünscht
+                 // levelUpSound.volume = 0.7;
+                 levelUpSound.play().catch(e => console.error("Error playing level up sound:", e));
+            } else {
+                 // Fallback-Ton, wenn Base64 nicht geladen/funktioniert
+                 playTone(523, 0.1); setTimeout(() => playTone(783, 0.1), 100); setTimeout(() => playTone(1046, 0.2), 200);
+             }
+         }
+         function playGameOverSound() {
+            playTone(1046, 0.2); // C6
+            setTimeout(()=>playTone(783, 0.2), 200); // G5
+            setTimeout(()=>playTone(523, 0.3), 400); // C5
+         }
+
 
         // --- Spielzustand ---
         let currentLevel = 1;
-        let flowersCollected = 0;
-        let flowers = [];
-        let activeItem = null;
-        let activeItemType = null;
-        let currentQuestions = [];
-        let currentQuestionIndex = 0;
-        let heroIsMoving = false;
-        let gameIsOver = false;
-        let startTime = 0;
-        let wrongAnswersLog = {};
-        let fastestTimes = [];
+        let flowersCollected = 0; // Wird über Level hinweg beibehalten
+        let flowers = []; // Blumen des AKTUELLEN Levels
+        let activeItem = null; // Die Blume ODER das Monster, mit der/dem interagiert wird
+        let activeItemType = null; // 'flower' oder 'enemy'
+        let currentQuestions = []; // Aktuelle Quizfragen
+        let currentQuestionIndex = 0; // Index der aktuellen Frage im Quiz
+        let heroIsMoving = false; // Flag, ob der Held sich gerade bewegt
+        let gameIsOver = false; // NEU: Flag, ob das Spiel beendet ist
+        let startTime = 0; // NEU: Zeitstempel des Spielstarts
+        let wrongAnswersLog = {}; // NEU: Zähler für falsch beantwortete Aufgaben
+        let fastestTimes = []; // NEU: Array für die 5 schnellsten Zeiten
 
         // --- Konfiguration ---
-        const FLOWER_GOAL = 20;
-        const NUM_FLOWERS_PER_LEVEL = 5;
-        const NUM_QUESTIONS_PER_ITEM = 5;
-        const flowerColors = [ { bg: '#f48fb1', border: '#ad1457' }, { bg: '#90caf9', border: '#1e88e5' }, { bg: '#ffe082', border: '#ffab00' }, { bg: '#a5d6a7', border: '#388e3c' }, { bg: '#b39ddb', border: '#5e35b1' } ];
-        const BASE_ENEMY_STEP_SIZE = 10;
-        const BASE_ENEMY_MOVE_INTERVAL = 200;
-        const ENEMY_RANDOM_FACTOR = 4;
-        const ENEMY_FREEZE_DURATION = 10000;
-        const ENEMY_SPAWN_DELAY = 5000;
-        let currentEnemyStepSize = BASE_ENEMY_STEP_SIZE;
-        let currentEnemyMoveInterval = BASE_ENEMY_MOVE_INTERVAL;
-        let enemyData = { element: enemyElement, position: { x: -100, y: -100 }, active: false, frozen: false, freezeTimeoutId: null, moveIntervalId: null };
+        const FLOWER_GOAL = 20; // NEU: Die Gesamtzahl der Blumen, die gesammelt werden müssen, um zu gewinnen
+        const NUM_FLOWERS_PER_LEVEL = 5; // Anzahl der Blumen pro Level
+        const NUM_QUESTIONS_PER_ITEM = 5; // Anzahl der Fragen pro Interaktion (Blume oder Feind)
+        const flowerColors = [ // Farben für verschiedene Level
+            { bg: '#f48fb1', border: '#ad1457' }, // Level 1: Pink
+            { bg: '#90caf9', border: '#1e88e5' }, // Level 2: Blau
+            { bg: '#ffe082', border: '#ffab00' }, // Level 3: Gelb
+            { bg: '#a5d6a7', border: '#388e3c' }, // Level 4: Grün
+            { bg: '#b39ddb', border: '#5e35b1' }  // Level 5: Lila (Farbwiederholung danach)
+        ];
+
+        // --- Feind Konfiguration & Zustand ---
+        const BASE_ENEMY_STEP_SIZE = 10; // War 5, jetzt verdoppelt für initialen Speed in Level 1
+        const BASE_ENEMY_MOVE_INTERVAL = 200; // ms - Wie oft der Feind seine Position aktualisiert (bleibt konstant)
+        const ENEMY_RANDOM_FACTOR = 4; // Pixel - Max. zufällige Abweichung pro Intervall
+        const ENEMY_FREEZE_DURATION = 10000; // 10 Sekunden in ms
+        const ENEMY_SPAWN_DELAY = 5000; // ms - Wann der Feind zum ersten Mal erscheint
+
+        let currentEnemyStepSize = BASE_ENEMY_STEP_SIZE; // Aktuelle Schrittgröße des Feinds
+        let currentEnemyMoveInterval = BASE_ENEMY_MOVE_INTERVAL; // Aktuelles Bewegungsintervall
+
+        let enemyData = { // Datenstruktur für den Feind
+            element: enemyElement,
+            position: { x: -100, y: -100 }, // Start außerhalb des sichtbaren Bereichs
+            active: false, // Ob der Feind aktiv ist
+            frozen: false, // Ob der Feind eingefroren ist
+            freezeTimeoutId: null, // Timer ID für das Auftauen
+            moveIntervalId: null // Timer ID für die Bewegung
+        };
 
         // --- Initialisierung ---
         function initGame() {
-            gameIsOver = false; startTime = Date.now(); wrongAnswersLog = {}; flowersCollected = 0; currentLevel = 1;
-            currentEnemyStepSize = BASE_ENEMY_STEP_SIZE; currentEnemyMoveInterval = BASE_ENEMY_MOVE_INTERVAL;
-            loadFastestTimes(); updateInventory(); updateTitle(); setupLevel();
-            // Event Listener (keep handleFirstClick for audio init)
-            gameArea.removeEventListener('click', handleGameAreaClick); // Remove old listener if exists
-            gameArea.removeEventListener('click', handleFirstClick); // Remove old listener if exists
-            gameArea.addEventListener('click', handleFirstClick);
-            hero.addEventListener('transitionend', onHeroMovementEnd);
-            numpadContainer.addEventListener('click', handleNumpadClick);
-            playAgainButton.addEventListener('click', () => location.reload());
-            startEnemyLogic(); endScreen.classList.add('hidden');
+            gameIsOver = false;
+            startTime = Date.now(); // Timer starten
+            wrongAnswersLog = {}; // Log zurücksetzen
+            flowersCollected = 0; // Zähler zurücksetzen, wenn ein neues Spiel gestartet wird
+            currentLevel = 1; // Level zurücksetzen
+            // Feindgeschwindigkeit für Level 1 setzen
+            currentEnemyStepSize = BASE_ENEMY_STEP_SIZE;
+            currentEnemyMoveInterval = BASE_ENEMY_MOVE_INTERVAL;
+
+            loadFastestTimes(); // Beste Zeiten aus dem Cache laden
+
+            updateInventory(); // Inventar Anzeige aktualisieren
+            updateTitle(); // Titel mit Level setzen
+            setupLevel(); // Erstes Level aufbauen
+
+            // Event Listener einrichten
+            // Special Listener für den ERSTEN Klick (wegen AudioContext Policy)
+            gameArea.removeEventListener('click', handleGameAreaClick); // Entferne alte Listener zur Sicherheit
+            gameArea.removeEventListener('click', handleFirstClick);
+            gameArea.addEventListener('click', handleFirstClick); // Füge den speziellen Listener hinzu
+
+            hero.addEventListener('transitionend', onHeroMovementEnd); // Listener für Ende der Heldenbewegung
+            numpadContainer.addEventListener('click', handleNumpadClick); // Listener für NumPad Klicks
+
+            // Listener für den "Nochmal spielen" Button
+            playAgainButton.removeEventListener('click', () => location.reload()); // Entferne alte Listener zur Sicherheit
+            playAgainButton.addEventListener('click', () => location.reload()); // Läd die Seite neu
+
+            // Feind-Logik starten
+            startEnemyLogic();
+
+            // End Screen verstecken (falls von vorherigem Spiel sichtbar)
+            endScreen.classList.add('hidden');
         }
 
-        // --- Spezieller Handler für den ersten Klick ---
+        // --- Spezieller Handler für den ersten Klick (zum Initialisieren von Audio) ---
         function handleFirstClick(event) {
-            if (gameIsOver) return; initAudio(); handleGameAreaClick(event);
+            if (gameIsOver) return; // Keine Interaktion nach Spielende
+            initAudio(); // Audio Context initialisieren
+            // Jetzt den Klick wie einen normalen Klick auf die Spiel area behandeln
+            handleGameAreaClick(event);
+            // Ersetze den speziellen Listener durch den normalen
             gameArea.removeEventListener('click', handleFirstClick);
             gameArea.addEventListener('click', handleGameAreaClick);
         }
 
+
         // --- Level Management ---
-        function setupLevel() { if(gameIsOver) return; clearOldFlowers(); createFlowers(); }
-        function startNewLevel() { /* ... unverändert ... */ if(gameIsOver)return;currentLevel++;updateTitle();playLevelUpJingle();currentEnemyStepSize*=1.20;console.log(`Starte Level ${currentLevel}. Feind Schrittgröße: ${currentEnemyStepSize.toFixed(2)}, Intervall: ${currentEnemyMoveInterval}`);setTimeout(()=>{setupLevel();if(enemyData.active){despawnEnemy();}spawnEnemy();},1500); }
-        function updateTitle() { document.title = `Koalas Multiplikations-Abenteuer Lvl. ${currentLevel}`; }
+        function setupLevel() {
+            if(gameIsOver) return; // Nichts tun, wenn Spiel vorbei
+            clearOldFlowers(); // Alte Blumen entfernen
+            createFlowers();   // Neue Blumen für das aktuelle Level erstellen
+            // Optional: Heldenposition zurücksetzen? hero.style.left = '50px'; hero.style.top = '50px';
+        }
+
+        function startNewLevel() {
+            if(gameIsOver) return; // Nichts tun, wenn Spiel vorbei
+            currentLevel++; // Level erhöhen
+            updateTitle(); // Titel aktualisieren
+            playLevelUpJingle(); // Sound für Level Up!
+
+            // Feindgeschwindigkeit erhöhen: Schrittgröße um 20% basierend auf VORHERIGER Schrittgröße erhöhen
+            currentEnemyStepSize = currentEnemyStepSize * 1.20;
+
+            // Das Bewegungsintervall (moveEnemy wird alle x ms aufgerufen) behalten wir konstant,
+            // die Geschwindigkeit steigt nur durch die größere Schrittgröße.
+            // Wenn man das Intervall auch verringern wollte (z.B. um 5% schneller), wäre das:
+            // currentEnemyMoveInterval = Math.max(50, currentEnemyMoveInterval * 0.95); // Nicht unter 50ms
+
+            console.log(`Starte Level ${currentLevel}. Feind Schrittgröße: ${currentEnemyStepSize.toFixed(2)}, Intervall: ${currentEnemyMoveInterval}`);
+
+            // Kurze Pause geben, dann nächstes Level aufbauen
+            setTimeout(() => {
+                 setupLevel();
+                 // Feind neu spawnen lassen für das neue Level
+                 if (enemyData.active) {
+                    despawnEnemy(); // Alten Feind entfernen
+                 }
+                 spawnEnemy(); // Neuen, schnelleren Feind spawnen
+            }, 1500); // 1.5 Sekunden warten nach der Meldung
+        }
+
+        function updateTitle() {
+            document.title = `Koalas Multiplikations-Abenteuer Lvl. ${currentLevel}`;
+        }
 
         // --- Blumen Management ---
-        function clearOldFlowers() { flowers.forEach(f => { if(f.element&&f.element.parentNode===gameArea){gameArea.removeChild(f.element);} }); flowers = []; }
-        function createFlowers() { const aR=gameArea.getBoundingClientRect();const c=flowerColors[(currentLevel-1)%flowerColors.length];for(let i=0;i<NUM_FLOWERS_PER_LEVEL;i++){const f=document.createElement('div');f.classList.add('flower');f.id=`flower-${currentLevel}-${i}`;f.style.backgroundColor=c.bg;f.style.borderColor=c.border;let p,t;let a=0;do{t=false;p=getRandomPosition(aR,60);for(const w of flowers){const d=Math.sqrt(Math.pow(p.x-w.position.x,2)+Math.pow(p.y-w.position.y,2));if(d<50){t=true;break;}}a++;}while(t&&a<100);if(a>=100){console.warn("Konnte keine geeignete Position für Blume finden.");}f.style.left=`${p.x}px`;f.style.top=`${p.y}px`;gameArea.appendChild(f);flowers.push({id:f.id,element:f,collected:false,position:p});}}
+        function clearOldFlowers() {
+            flowers.forEach(flower => {
+                // Prüfen, ob das Element noch existiert und ein Elternteil hat (im DOM ist)
+                if (flower.element && flower.element.parentNode === gameArea) {
+                    gameArea.removeChild(flower.element);
+                }
+            });
+            flowers = []; // Array leeren
+        }
+
+        function createFlowers() {
+            const areaRect = gameArea.getBoundingClientRect();
+             // Farben basierend auf dem aktuellen Level holen (mit Modulo für Wiederholung)
+            const colors = flowerColors[(currentLevel - 1) % flowerColors.length];
+
+            for (let i = 0; i < NUM_FLOWERS_PER_LEVEL; i++) {
+                const flowerElement = document.createElement('div');
+                flowerElement.classList.add('flower');
+                flowerElement.id = `flower-${currentLevel}-${i}`; // Eindeutige ID pro Level
+
+                // Setze Farben
+                flowerElement.style.backgroundColor = colors.bg;
+                flowerElement.style.borderColor = colors.border;
+
+                let pos;
+                let tooClose;
+                let attempts = 0; // Verhindere Endlosschleife
+                do {
+                    tooClose = false;
+                    pos = getRandomPosition(areaRect, 60); // Mindestabstand zum Rand und anderen Elementen
+                    // Prüfe Abstand zu anderen Blumen im Aufbau
+                    for (const flw of flowers) {
+                         const dist = Math.sqrt(Math.pow(pos.x - flw.position.x, 2) + Math.pow(pos.y - flw.position.y, 2));
+                         if (dist < 50) { // Mindestabstand zwischen Blumen
+                             tooClose = true;
+                            break;
+                        }
+                    }
+                    attempts++;
+                } while (tooClose && attempts < 100); // Gib nach 100 Versuchen auf, falls keine Position gefunden wird
+
+                 if (attempts >= 100) {
+                    console.warn(`Konnte keine geeignete Position für Blume ${i} in Level ${currentLevel} finden, platziere zufällig.`);
+                 }
+
+                flowerElement.style.left = `${pos.x}px`;
+                flowerElement.style.top = `${pos.y}px`;
+
+                gameArea.appendChild(flowerElement);
+                // Speichere die Blume im Array
+                flowers.push({
+                    id: flowerElement.id,
+                    element: flowerElement,
+                    collected: false,
+                    position: pos // Speichere die Position für Kollisionsprüfung beim Platzieren neuer Blumen
+                });
+            }
+        }
 
         // --- Heldenbewegung & Klick-Handling ---
-        function handleGameAreaClick(event) { if(gameIsOver||heroIsMoving||quizModal.style.display==='block'){return;}playClickSound();const aR=gameArea.getBoundingClientRect();const tX=event.clientX-aR.left;const tY=event.clientY-aR.top;moveHero(tX,tY); }
-        function moveHero(tX,tY){heroIsMoving=true;const hR=hero.getBoundingClientRect();const hW=hero.offsetWidth||50;const hH=hero.offsetHeight||50;let fX=tX-hW/2;let fY=tY-hH/2;const aR=gameArea.getBoundingClientRect();fX=Math.max(0,Math.min(fX,aR.width-hW));fY=Math.max(0,Math.min(fY,aR.height-hH));hero.style.left=`${fX}px`;hero.style.top=`${fY}px`;}
-        function onHeroMovementEnd() { if (gameIsOver) return; heroIsMoving = false; checkCollision(); }
+        function handleGameAreaClick(event) {
+             // Verhindere Bewegung/Interaktion, wenn Spiel vorbei ist, Held sich bewegt oder Quiz aktiv ist
+            if (gameIsOver || heroIsMoving || quizModal.style.display === 'block') {
+                return;
+            }
+            playClickSound(); // Klick-Sound abspielen
+
+             // Klickposition relativ zum gameArea bekommen
+            const areaRect = gameArea.getBoundingClientRect();
+            const targetX = event.clientX - areaRect.left;
+            const targetY = event.clientY - areaRect.top;
+
+            moveHero(targetX, targetY);
+        }
+
+        function moveHero(targetX, targetY) {
+            heroIsMoving = true; // Bewegung beginnt
+
+            // Zielposition für die obere linke Ecke des Helden setzen, zentriert am Klick
+            const heroRect = hero.getBoundingClientRect();
+            const heroWidth = hero.offsetWidth || 50; // Standardgröße, falls offsetWidth 0 ist
+            const heroHeight = hero.offsetHeight || 50;
+
+            // Berechne die Zielkoordinaten für top/left
+            let finalX = targetX - heroWidth / 2;
+            let finalY = targetY - heroHeight / 2;
+
+            // Randbegrenzung (verhindert, dass der Held den Bildschirm verlässt)
+            const areaRect = gameArea.getBoundingClientRect();
+            finalX = Math.max(0, Math.min(finalX, areaRect.width - heroWidth));
+            finalY = Math.max(0, Math.min(finalY, areaRect.height - heroHeight));
+
+            // Heldenposition aktualisieren (CSS Transition macht die Animation)
+            hero.style.left = `${finalX}px`;
+            hero.style.top = `${finalY}px`;
+        }
+
+        // Wird aufgerufen, wenn die CSS-Transition des Helden endet
+        function onHeroMovementEnd() {
+            if (gameIsOver) return; // Nichts tun, wenn Spiel vorbei
+            heroIsMoving = false; // Bewegung beendet
+            checkCollision(); // Kollision prüfen
+        }
 
         // --- Kollisionserkennung ---
-        function checkCollision() { if(gameIsOver)return;if(enemyData.active&&!enemyData.frozen&&quizModal.style.display!=='block'){const hR=hero.getBoundingClientRect();const eR=enemyData.element.getBoundingClientRect();if(checkRectOverlap(hR,eR)){playEnemyHitSound();triggerEnemyQuiz();return;}}if(heroIsMoving||quizModal.style.display==='block')return;const hR=hero.getBoundingClientRect();for(let f of flowers){if(!f.collected){const fR=f.element.getBoundingClientRect();if(checkRectOverlap(hR,fR)){playInteractSound();activeItem=f;activeItemType='flower';startQuiz();return;}}}}
-        function checkRectOverlap(r1,r2){return!(r1.right<r2.left||r1.left>r2.right||r1.bottom<r2.top||r1.top>r2.bottom);}
+        function checkCollision() {
+            if (gameIsOver) return; // Nichts tun, wenn Spiel vorbei
+             // Priorität: Feind zuerst prüfen, da er sich aktiv bewegt und gefährlich ist
+            if (enemyData.active && !enemyData.frozen && quizModal.style.display !== 'block') {
+                const heroRect = hero.getBoundingClientRect();
+                const enemyRect = enemyData.element.getBoundingClientRect();
+                 if (checkRectOverlap(heroRect, enemyRect)) {
+                    console.log("KOLLISION mit Feind!");
+                    playEnemyHitSound(); // Feind getroffen Sound
+                    triggerEnemyQuiz(); // Starte das Feind-Quiz
+                    return; // Wichtig: Feindinteraktion hat Vorrang und beendet weitere Kollisionsprüfung
+                }
+            }
+
+             // Nur weiter prüfen, wenn Held sich nicht bewegt und kein Quiz aktiv ist
+            if (heroIsMoving || quizModal.style.display === 'block') return;
+
+            const heroRect = hero.getBoundingClientRect();
+
+            // Blumen prüfen
+            for (let flower of flowers) {
+                if (!flower.collected) { // Nur prüfen, wenn die Blume noch nicht gesammelt ist
+                    const flowerRect = flower.element.getBoundingClientRect();
+                    if (checkRectOverlap(heroRect, flowerRect)) {
+                        console.log("KOLLISION mit Blume!", flower.id);
+                        playInteractSound(); // Blume erreicht Sound
+                        activeItem = flower; // Diese Blume ist jetzt das aktive Interaktionsobjekt
+                        activeItemType = 'flower';
+                        startQuiz(); // Starte das Quiz für die Blume
+                        return; // Nur eine Interaktion auf einmal behandeln
+                    }
+                }
+            }
+        }
+
+        // Hilfsfunktion für einfache Rechteck-Überlappungsprüfung
+        function checkRectOverlap(rect1, rect2) {
+            // Prüft, ob die Rechtecke NICHT überlappen
+            return !(
+                rect1.right < rect2.left ||
+                rect1.left > rect2.right ||
+                rect1.bottom < rect2.top ||
+                rect1.top > rect2.bottom
+            );
+        }
 
         // --- NumPad-Logik ---
-        function handleNumpadClick(event) { if(gameIsOver)return;const t=event.target;if(t.tagName!=='BUTTON')return;playClickSound();if(t.hasAttribute('data-digit')){const d=t.getAttribute('data-digit');if(quizInputDisplay.textContent.length<4){quizInputDisplay.textContent+=d;}}else if(t.id==='numpad-clear'){quizInputDisplay.textContent='';}else if(t.id==='numpad-submit'){checkAnswer();}}
+        function handleNumpadClick(event) {
+            if (gameIsOver) return; // Keine Eingabe nach Spielende
+            const target = event.target;
+            if (target.tagName !== 'BUTTON') return; // Nur auf Button-Klicks reagieren
+
+            playClickSound(); // Sound für Tastendruck
+
+            if (target.hasAttribute('data-digit')) {
+                const digit = target.getAttribute('data-digit');
+                // Begrenze die Eingabelänge (z.B. auf 4 Ziffern für Ergebnisse bis 100)
+                if (quizInputDisplay.textContent.length < 4) {
+                    quizInputDisplay.textContent += digit;
+                }
+            } else if (target.id === 'numpad-clear') {
+                quizInputDisplay.textContent = ''; // Löschen
+            } else if (target.id === 'numpad-submit') {
+                checkAnswer(); // Prüfen
+            }
+        }
 
         // --- Quiz-Logik ---
-        function startQuiz() { if(gameIsOver||!activeItem)return;quizTitle.textContent="Blumen-Aufgabe!";currentQuestions=generateQuestions(NUM_QUESTIONS_PER_ITEM);currentQuestionIndex=0;quizMessage.textContent='';quizMessage.className='';quizInputDisplay.textContent='';displayQuestion();quizModal.style.display='block';}
-        function triggerEnemyQuiz() { if(gameIsOver||!enemyData.active||enemyData.frozen)return;if(enemyData.moveIntervalId){clearInterval(enemyData.moveIntervalId);enemyData.moveIntervalId=null;}activeItem=enemyData;activeItemType='enemy';quizTitle.textContent="Monster-Aufgabe!";currentQuestions=generateQuestions(NUM_QUESTIONS_PER_ITEM);currentQuestionIndex=0;quizMessage.textContent='';quizMessage.className='';quizInputDisplay.textContent='';displayQuestion();quizModal.style.display='block';}
-        function generateQuestions(count) { const qs=[];for(let i=0;i<count;i++){const n1=Math.floor(Math.random()*10)+1;const n2=Math.floor(Math.random()*10)+1;qs.push({text:`${n1} x ${n2} = ?`,answer:n1*n2,num1:n1,num2:n2});}return qs;}
-        function displayQuestion() { if(currentQuestionIndex<currentQuestions.length){quizQuestion.textContent=currentQuestions[currentQuestionIndex].text;}else{console.error("Versucht, Frage außerhalb des Bereichs anzuzeigen.");}}
+        function startQuiz() { // Wird für Blumen aufgerufen
+            if (!activeItem || gameIsOver) return; // Nur starten, wenn ein aktives Item da ist und Spiel nicht vorbei
+            quizTitle.textContent = "Blumen-Aufgabe!"; // Titel anpassen
+            currentQuestions = generateQuestions(NUM_QUESTIONS_PER_ITEM); // Neue Fragen generieren
+            currentQuestionIndex = 0; // Mit der ersten Frage starten
+            quizMessage.textContent = ''; // Nachrichtenbereich leeren
+            quizMessage.className = ''; // Klassen zurücksetzen
+            quizInputDisplay.textContent = ''; // NumPad-Anzeige leeren
+            displayQuestion(); // Erste Frage anzeigen
+            quizModal.style.display = 'block'; // Modal anzeigen
+            // Da wir kein Input-Feld haben, brauchen wir keinen .focus() Aufruf
+        }
+
+        function triggerEnemyQuiz() { // Spezifische Funktion für Feind-Quiz
+            if (!enemyData.active || enemyData.frozen || gameIsOver) return; // Nur wenn Feind aktiv, nicht gefroren und Spiel nicht vorbei
+            console.log("Starte Feind-Quiz");
+            // Feindbewegung stoppen WÄHREND des Quiz
+            if (enemyData.moveIntervalId) {
+                clearInterval(enemyData.moveIntervalId);
+                enemyData.moveIntervalId = null;
+            }
+
+            activeItem = enemyData; // Referenz auf den Feind speichern
+            activeItemType = 'enemy'; // Typ festlegen
+            quizTitle.textContent = "Monster-Aufgabe!"; // Titel anpassen
+            currentQuestions = generateQuestions(NUM_QUESTIONS_PER_ITEM); // Eigene Fragen für Feind (oder gleiche, je nach Wunsch)
+            currentQuestionIndex = 0; // Mit der ersten Frage starten
+            quizMessage.textContent = ''; quizMessage.className = '';
+            quizInputDisplay.textContent = ''; // NumPad-Anzeige leeren
+            displayQuestion(); // Erste Frage anzeigen
+            quizModal.style.display = 'block'; // Modal anzeigen
+        }
+
+
+        function generateQuestions(count) {
+            const questions = [];
+            for (let i = 0; i < count; i++) {
+                const num1 = Math.floor(Math.random() * 10) + 1; // Zahlen von 1 bis 10
+                const num2 = Math.floor(Math.random() * 10) + 1;
+                questions.push({
+                    text: `${num1} x ${num2} = ?`,
+                    answer: num1 * num2,
+                    num1: num1, // NEU: Speichere die Originalzahlen für das Fehler-Logging
+                    num2: num2
+                 });
+            }
+            return questions;
+        }
+
+        function displayQuestion() {
+            if (currentQuestionIndex < currentQuestions.length) {
+                quizQuestion.textContent = currentQuestions[currentQuestionIndex].text;
+            } else {
+                // Dieser Fall sollte durch checkAnswer korrekt behandelt werden
+                console.error("Versucht, Frage außerhalb des Bereichs anzuzeigen.", currentQuestionIndex, currentQuestions.length);
+            }
+        }
 
         function checkAnswer() {
-            if (gameIsOver) return;
+            if (gameIsOver) return; // Keine Prüfung nach Spielende
             const userAnswerText = quizInputDisplay.textContent;
-            if(userAnswerText===''){quizMessage.textContent="Bitte gib eine Antwort über die Tasten ein!";quizMessage.className='incorrect';return;}
-            const userAnswer=parseInt(userAnswerText,10);
-            const currentQ=currentQuestions[currentQuestionIndex];
-            const correctAnswer=currentQ.answer;
-            if(isNaN(userAnswer)){quizMessage.textContent="Ungültige Eingabe.";quizMessage.className='incorrect';quizInputDisplay.textContent='';return;}
+
+            if (userAnswerText === '') {
+                 quizMessage.textContent = "Bitte gib eine Antwort über die Tasten ein!";
+                 quizMessage.className = 'incorrect';
+                 return;
+            }
+
+            const userAnswer = parseInt(userAnswerText, 10);
+            const currentQ = currentQuestions[currentQuestionIndex]; // Hol dir das aktuelle Fragenobjekt
+            const correctAnswer = currentQ.answer;
+
+            // isNaN check (sollte durch NumPad selten passieren, aber sicherheitshalber)
+            if (isNaN(userAnswer)) {
+                quizMessage.textContent = "Ungültige Eingabe.";
+                quizMessage.className = 'incorrect';
+                quizInputDisplay.textContent = ''; // Anzeige leeren
+                return;
+            }
 
             if (userAnswer === correctAnswer) {
-                playCorrectSound(); quizMessage.textContent="Richtig!"; quizMessage.className='correct'; currentQuestionIndex++;
-                setTimeout(() => { if(currentQuestionIndex>=currentQuestions.length){handleQuizSuccess();}else{quizMessage.textContent='';quizMessage.className='';quizInputDisplay.textContent='';displayQuestion();}}, 800);
+                playCorrectSound(); // Richtig Sound
+                quizMessage.textContent = "Richtig!";
+                quizMessage.className = 'correct';
+                currentQuestionIndex++; // Nächste Frage
+
+                // Kurze Verzögerung, um "Richtig!" zu sehen, dann nächste Aktion
+                setTimeout(() => {
+                     if (currentQuestionIndex >= currentQuestions.length) {
+                        // Alle Fragen richtig beantwortet!
+                        handleQuizSuccess();
+                    } else {
+                        // Nächste Frage anzeigen
+                        quizMessage.textContent = ''; // Nachricht löschen
+                        quizMessage.className = '';
+                        quizInputDisplay.textContent = ''; // Anzeige für nächste Frage leeren
+                        displayQuestion();
+                    }
+                }, 800); // 0.8 Sekunden warten
+
             } else {
-                playWrongSound(); logWrongAnswer(currentQ.num1, currentQ.num2);
-                quizMessage.textContent=`Leider falsch. Die richtige Antwort war ${correctAnswer}. Versuche die Frage erneut!`;
-                quizMessage.className='incorrect'; quizInputDisplay.textContent='';
+                playWrongSound(); // Falsch Sound
+                // NEU: Falsche Antwort loggen
+                logWrongAnswer(currentQ.num1, currentQ.num2);
+                quizMessage.textContent = `Leider falsch. Die richtige Antwort war ${correctAnswer}. Versuche die Frage erneut!`;
+                quizMessage.className = 'incorrect';
+                // Frage bleibt gleich, Spieler muss es erneut versuchen
+                quizInputDisplay.textContent = ''; // Anzeige leeren für neuen Versuch
             }
         }
 
         // --- **** MODIFIED handleQuizSuccess **** ---
         function handleQuizSuccess() {
-            if (gameIsOver) return;
-            quizModal.style.display = 'none'; // Quiz immer schließen
+            if (gameIsOver) return; // Nichts tun, wenn Spiel vorbei
+            quizModal.style.display = 'none'; // Quiz-Modal immer schließen
 
-            const itemJustProcessed = activeItem; // Kopiere die Referenz, bevor sie unten genullt wird
+            // Kopiere die Referenz und den Typ des gerade bearbeiteten Items
+            const itemJustProcessed = activeItem;
             const itemTypeProcessed = activeItemType;
 
              // DEBUGGING: Log what item is being processed
             console.log("handleQuizSuccess triggered for:", itemTypeProcessed, itemJustProcessed);
 
+            // Verarbeitung basierend auf dem Typ des Items
             if (itemTypeProcessed === 'flower') {
-                 // WICHTIG: Prüfen ob das Item noch gültig ist
+                 // WICHTIG: Prüfen ob das Item noch gültig ist und nicht schon gesammelt
                  if (itemJustProcessed && itemJustProcessed.element && !itemJustProcessed.collected) {
                     console.log("Processing valid flower:", itemJustProcessed.id);
-                    playCollectSound();
-                    itemJustProcessed.element.classList.add('hidden'); // Hide the flower
-                    itemJustProcessed.collected = true;              // Mark as collected in data
-                    flowersCollected++;
-                    updateInventory();
+                    playCollectSound(); // Blume gesammelt Sound
+                    itemJustProcessed.element.classList.add('hidden'); // Blume verstecken
+                    itemJustProcessed.collected = true;              // Blume im Daten-Array als gesammelt markieren
+                    flowersCollected++;                              // Gesamtzähler erhöhen
+                    updateInventory();                               // Inventar Anzeige aktualisieren
 
-                    // Check for game end or level change
+                    // NEU: Nach jeder gesammelten Blume das Spielende prüfen
                     if (flowersCollected >= FLOWER_GOAL) {
-                        endGame(); // End the game if goal reached
-                    } else if (flowers.every(f => f.collected)) { // Check if all flowers OF CURRENT LEVEL are collected
-                         setTimeout(() => {
+                        console.log("Blumen-Ziel erreicht!");
+                        endGame(); // Spiel beenden
+                        return; // Wichtig: Beende die Funktion hier, wenn das Spiel vorbei ist
+                    }
+
+                    // MODIFIED: Levelwechsel nur, wenn Spiel NICHT vorbei ist und alle Blumen DIESES Levels gesammelt sind
+                    if (flowers.every(f => f.collected)) { // Prüfe, ob alle Blumen IM AKTUellen 'flowers' Array gesammelt sind
+                         console.log(`Alle Blumen in Level ${currentLevel} gesammelt.`);
+                         setTimeout(() => { // Kurze Verzögerung nach dem Sammelsound
                             alert(`Super! Level ${currentLevel} geschafft! ${flowersCollected} von ${FLOWER_GOAL} Blumen insgesamt gesammelt.`);
-                            startNewLevel();
-                        }, 300); // Delay after sound
+                            startNewLevel(); // Nächstes Level vorbereiten und starten
+                        }, 300); // 0.3 Sekunden warten
                     }
                 } else {
                      console.warn("Skipping flower processing in handleQuizSuccess - item invalid or already collected:", itemJustProcessed);
@@ -165,54 +880,364 @@
 
             } else if (itemTypeProcessed === 'enemy') {
                 console.log("Processing enemy freeze");
-                playFreezeSound();
-                freezeEnemy();
+                playFreezeSound(); // Feind eingefroren Sound
+                freezeEnemy(); // Feind einfrieren
+                // Die Logik zum Wiederstarten der Feindbewegung ist jetzt in unfreezeEnemy() und wird dort geprüft
             } else {
+                 // Dieser Fall sollte nicht auftreten, ist aber gut zu loggen
                  console.warn("handleQuizSuccess called with unknown item type:", itemTypeProcessed);
             }
 
-            // Reset active item AFTER processing
+            // Setze aktive Item Referenzen ZULETZT zurück
+            // Das ist wichtig, damit der Code oben mit der korrekten Referenz arbeiten kann
             activeItem = null;
             activeItemType = null;
 
-             // Check if enemy movement needs restarting AFTER quiz modal is closed and processing is done
+             // NEU: Spezialfall: Wenn es ein Feind-Quiz war UND der Feind nicht eingefroren wurde (sollte nicht passieren, aber sicher ist sicher) UND das Quiz geschlossen ist, Bewegung wieder starten.
+             // Die Hauptlogik zum Wiederstarten ist aber in unfreezeEnemy().
+             // Dieser Block ist eher ein Fallback oder Debug-Helfer.
              if (itemTypeProcessed === 'enemy' && !enemyData.frozen && quizModal.style.display !== 'block') {
-                console.log("Restarting enemy movement after enemy quiz success (not frozen)");
-                 if (enemyData.moveIntervalId) clearInterval(enemyData.moveIntervalId);
-                 enemyData.moveIntervalId = setInterval(moveEnemy, currentEnemyMoveInterval);
+                console.log("Checking enemy movement restart after enemy quiz (should be handled by unfreezeEnemy).");
+                 // if (enemyData.moveIntervalId) clearInterval(enemyData.moveIntervalId); // Sollte schon gestoppt sein
+                 // enemyData.moveIntervalId = setInterval(moveEnemy, currentEnemyMoveInterval); // Wird von unfreezeEnemy gestartet
              }
         }
         // --- **** END MODIFIED handleQuizSuccess **** ---
 
 
         // --- Inventar aktualisieren ---
-        function updateInventory() { inventoryDisplay.textContent = `Blumen: ${flowersCollected} / ${FLOWER_GOAL}`; }
-
-        // --- Feind-Logik ---
-        function startEnemyLogic() { if(gameIsOver)return;setTimeout(spawnEnemy,ENEMY_SPAWN_DELAY); }
-        function spawnEnemy() { if(gameIsOver||enemyData.active)return;playEnemySpawnSound();const aR=gameArea.getBoundingClientRect();const e=Math.floor(Math.random()*4);const s=40;let sX,sY;switch(e){case 0:sX=Math.random()*(aR.width-s);sY=-s;break;case 1:sX=aR.width;sY=Math.random()*(aR.height-s);break;case 2:sX=Math.random()*(aR.width-s);sY=aR.height;break;case 3:sX=-s;sY=Math.random()*(aR.height-s);break;}enemyData.position={x:sX,y:sY};enemyData.element.style.left=`${sX}px`;enemyData.element.style.top=`${sY}px`;enemyData.element.classList.remove('hidden','enemy-frozen');enemyData.active=true;enemyData.frozen=false;if(enemyData.moveIntervalId)clearInterval(enemyData.moveIntervalId);enemyData.moveIntervalId=setInterval(moveEnemy,currentEnemyMoveInterval);console.log(`Feind gespawnt (Level ${currentLevel})`); }
-        function despawnEnemy() { if(!enemyData.active)return;if(enemyData.moveIntervalId)clearInterval(enemyData.moveIntervalId);if(enemyData.freezeTimeoutId)clearTimeout(enemyData.freezeTimeoutId);enemyData.element.classList.add('hidden');enemyData.active=false;enemyData.frozen=false;enemyData.moveIntervalId=null;enemyData.freezeTimeoutId=null;enemyData.position={x:-100,y:-100};console.log("Feind despawned"); }
-        function moveEnemy() { if(gameIsOver||quizModal.style.display==='block'||!enemyData.active||enemyData.frozen){return;}const eX=enemyData.position.x;const eY=enemyData.position.y;const hR=hero.getBoundingClientRect();const aR=gameArea.getBoundingClientRect();const hCX=(hR.left-aR.left)+hR.width/2;const hCY=(hR.top-aR.top)+hR.height/2;const dX=hCX-(eX+enemyData.element.offsetWidth/2);const dY=hCY-(eY+enemyData.element.offsetHeight/2);const dist=Math.sqrt(dX*dX+dY*dY);if(dist<5){checkCollision();return;}const nX=dX/dist;const nY=dY/dist;let sX=nX*currentEnemyStepSize;let sY=nY*currentEnemyStepSize;sX+=(Math.random()-0.5)*2*ENEMY_RANDOM_FACTOR;sY+=(Math.random()-0.5)*2*ENEMY_RANDOM_FACTOR;let nXp=eX+sX;let nYp=eY+sY;const eW=enemyData.element.offsetWidth||40;const eH=enemyData.element.offsetHeight||40;nXp=Math.max(0,Math.min(nXp,aR.width-eW));nYp=Math.max(0,Math.min(nYp,aR.height-eH));enemyData.position={x:nXp,y:nYp};enemyData.element.style.left=`${nXp}px`;enemyData.element.style.top=`${nYp}px`;checkCollision(); }
-        function freezeEnemy() { if(gameIsOver||!enemyData.active)return;if(enemyData.moveIntervalId){clearInterval(enemyData.moveIntervalId);enemyData.moveIntervalId=null;}if(enemyData.freezeTimeoutId){clearTimeout(enemyData.freezeTimeoutId);}enemyData.frozen=true;enemyData.element.classList.add('enemy-frozen');enemyData.freezeTimeoutId=setTimeout(unfreezeEnemy,ENEMY_FREEZE_DURATION); }
-        function unfreezeEnemy() { if(gameIsOver||!enemyData.active||!enemyData.frozen)return;playUnfreezeSound();enemyData.frozen=false;enemyData.element.classList.remove('enemy-frozen');enemyData.freezeTimeoutId=null;if(quizModal.style.display!=='block'){if(enemyData.moveIntervalId)clearInterval(enemyData.moveIntervalId);enemyData.moveIntervalId=setInterval(moveEnemy,currentEnemyMoveInterval);}}
-
-        // --- Zeit- und Speicherfunktionen ---
-        function formatTime(ms){if(typeof ms!=='number'||isNaN(ms))return 'Ungültig';const s=Math.floor(ms/1000);const m=Math.floor(s/60);const sec=s%60;const mil=Math.floor(ms%1000);return `${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}.${String(mil).padStart(3,'0')}`; }
-        function loadFastestTimes(){try{const s=localStorage.getItem('koalaMultiplyFastestTimes');if(s){fastestTimes=JSON.parse(s);if(!Array.isArray(fastestTimes))fastestTimes=[];fastestTimes=fastestTimes.filter(t=>typeof t==='number'&&!isNaN(t));}else{fastestTimes=[];}}catch(e){console.error("Konnte Bestzeiten nicht laden:",e);fastestTimes=[];}fastestTimes.sort((a,b)=>a-b);}
-        function saveFastestTimes(){try{localStorage.setItem('koalaMultiplyFastestTimes',JSON.stringify(fastestTimes));}catch(e){console.error("Konnte Bestzeiten nicht speichern:",e);}}
-        function updateFastestTimes(t){if(typeof t!=='number'||isNaN(t))return;fastestTimes.push(t);fastestTimes.sort((a,b)=>a-b);fastestTimes=fastestTimes.slice(0,5);saveFastestTimes();}
-        function logWrongAnswer(n1,n2){const k=`${Math.min(n1,n2)}x${Math.max(n1,n2)}`;wrongAnswersLog[k]=(wrongAnswersLog[k]||0)+1;}
-        function formatWrongAnswersForDisplay(){const f=[];const k=Object.keys(wrongAnswersLog);if(k.length===0){return["<li>Keine Fehler gemacht!</li>"];}k.sort();for(const key of k){const c=wrongAnswersLog[key];f.push(`<li>${c}x falsch: ${key.replace('x',' x ')}</li>`);}return f;}
-
-        // --- Spielende Funktion ---
-        function endGame() {
-            if(gameIsOver)return;gameIsOver=true;console.log("Spiel beendet!");playGameOverSound();const eT=Date.now()-startTime;despawnEnemy();gameArea.removeEventListener('click',handleGameAreaClick);gameArea.removeEventListener('click',handleFirstClick);quizModal.style.display='none';updateFastestTimes(eT);finalTimeDisplay.textContent=`Deine Zeit: ${formatTime(eT)}`;fastestTimesList.innerHTML='';if(fastestTimes.length>0){fastestTimes.forEach((t,i)=>{const l=document.createElement('li');l.textContent=`${i+1}. ${formatTime(t)}`;fastestTimesList.appendChild(l);});for(let i=fastestTimes.length;i<5;i++){const l=document.createElement('li');l.textContent=`${i+1}. -`;fastestTimesList.appendChild(l);}}else{fastestTimesList.innerHTML='<li>Noch keine Zeiten gespeichert.</li>';}const wA=formatWrongAnswersForDisplay();wrongAnswersList.innerHTML=wA.join('');endScreen.classList.remove('hidden');
+        function updateInventory() {
+            inventoryDisplay.textContent = `Blumen: ${flowersCollected} / ${FLOWER_GOAL}`; // Zeige Ziel an
         }
 
-        // Hilfsfunktion für zufällige Position
-        function getRandomPosition(bounds,margin){const w=bounds.width||window.innerWidth;const h=bounds.height||window.innerHeight;const s=40;const x=Math.random()*(w-margin*2-s)+margin;const y=Math.random()*(h-margin*2-s)+margin;return {x,y};}
+        // --- Feind-Logik ---
+        function startEnemyLogic() {
+             if (gameIsOver) return; // Nichts tun, wenn Spiel vorbei
+            // Warte kurz, bevor der Feind zum ersten Mal oder im neuen Level erscheint
+            setTimeout(spawnEnemy, ENEMY_SPAWN_DELAY);
+        }
+
+        function spawnEnemy() {
+             if (gameIsOver || enemyData.active) return; // Nicht spawnen, wenn Spiel vorbei oder Feind schon aktiv
+
+            playEnemySpawnSound(); // Feind erscheint Sound
+
+            const areaRect = gameArea.getBoundingClientRect();
+            const edge = Math.floor(Math.random() * 4); // 0: top, 1: right, 2: bottom, 3: left
+            const enemySize = enemyElement.offsetWidth || 40; // Nutze die tatsächliche Größe oder 40px
+            let startX, startY;
+
+            // Bestimme Startposition knapp außerhalb des Spielbereichs am zufälligen Rand
+            switch (edge) {
+                case 0: // top
+                    startX = Math.random() * (areaRect.width - enemySize);
+                    startY = -enemySize; // Start knapp außerhalb oben
+                    break;
+                case 1: // right
+                    startX = areaRect.width; // Start knapp außerhalb rechts
+                    startY = Math.random() * (areaRect.height - enemySize);
+                    break;
+                case 2: // bottom
+                    startX = Math.random() * (areaRect.width - enemySize);
+                    startY = areaRect.height; // Start knapp außerhalb unten
+                    break;
+                case 3: // left
+                    startX = -enemySize; // Start knapp außerhalb links
+                    startY = Math.random() * (areaRect.height - enemySize);
+                    break;
+            }
+
+            enemyData.position = { x: startX, y: startY };
+            enemyData.element.style.left = `${startX}px`;
+            enemyData.element.style.top = `${startY}px`;
+            enemyData.element.classList.remove('hidden', 'enemy-frozen'); // Sichtbar machen, falls vorher versteckt/gefroren
+            enemyData.active = true;
+            enemyData.frozen = false;
+
+            // Bewegung starten mit aktueller Geschwindigkeit
+            if (enemyData.moveIntervalId) clearInterval(enemyData.moveIntervalId); // Sicherstellen, dass kein alter Timer läuft
+            enemyData.moveIntervalId = setInterval(moveEnemy, currentEnemyMoveInterval); // Nutzt aktuelle Intervallzeit
+            console.log(`Feind gespawnt bei (${startX.toFixed(0)}, ${startY.toFixed(0)}) (Level ${currentLevel})`);
+        }
+
+        // Entfernt den Feind (visuell und logisch)
+        function despawnEnemy() {
+             if (!enemyData.active) return; // Nur despawnen, wenn aktiv
+             console.log("Feind despawned");
+
+            // Timer stoppen
+            if (enemyData.moveIntervalId) clearInterval(enemyData.moveIntervalId);
+            if (enemyData.freezeTimeoutId) clearTimeout(enemyData.freezeTimeoutId);
+
+            // Visuell verstecken
+            enemyData.element.classList.add('hidden');
+
+            // Zustand zurücksetzen
+            enemyData.active = false;
+            enemyData.frozen = false;
+            enemyData.moveIntervalId = null;
+            enemyData.freezeTimeoutId = null;
+            enemyData.position = { x: -100, y: -100 }; // Position zurücksetzen (optional, aber sauber)
+        }
+
+
+        function moveEnemy() {
+             // WICHTIG: Bewegung pausieren, wenn Spiel vorbei, Quiz offen, Feind inaktiv oder gefroren
+            if (gameIsOver || quizModal.style.display === 'block' || !enemyData.active || enemyData.frozen) {
+                return;
+            }
+
+            // Aktuelle Positionen des Feinds
+            const enemyX = enemyData.position.x;
+            const enemyY = enemyData.position.y;
+
+            // Aktuelle Position des Helden (getBoundingClientRect ist relativ zum Viewport)
+            const heroRect = hero.getBoundingClientRect();
+            const areaRect = gameArea.getBoundingClientRect(); // Referenz für Koordinatenumrechnung
+
+            // Ziel: Mittelpunkt des Helden (relativ zum gameArea)
+            // Koordinatenumrechnung: Viewport-Koordinate - gameArea-Offset = gameArea-Koordinate
+            const heroCenterX = (heroRect.left - areaRect.left) + heroRect.width / 2;
+            const heroCenterY = (heroRect.top - areaRect.top) + heroRect.height / 2;
+
+            // Vektor vom Feind zum Helden
+            const dx = heroCenterX - (enemyX + (enemyData.element.offsetWidth || 40) / 2);
+            const dy = heroCenterY - (enemyY + (enemyData.element.offsetHeight || 40) / 2);
+            const distance = Math.sqrt(dx * dx + dy * dy);
+
+            // Wenn der Feind sehr nah am Helden ist, stoppe die Bewegung, um Zittern zu vermeiden
+            // und führe eine Kollisionsprüfung durch.
+            if (distance < (heroRect.width / 2 + (enemyData.element.offsetWidth || 40) / 2) * 0.8) { // Z.B. wenn sie sich fast berühren
+                 // Feind ist nah genug am Helden, um als Kollision zu gelten.
+                 // checkCollision() wird am Ende von moveEnemy() sowieso aufgerufen,
+                 // was das Quiz triggert, wenn sie sich berühren.
+                 // Wir können hier einfach aufhören, den Schritt zu berechnen, wenn sie schon fast übereinander sind.
+                return;
+            }
+
+
+            // Normalisierter Richtungsvektor (Länge 1)
+            const normDx = dx / distance;
+            const normDy = dy / distance;
+
+            // Grundbewegung (Richtung Held mit aktueller Schrittgröße)
+            let stepX = normDx * currentEnemyStepSize;
+            let stepY = normDy * currentEnemyStepSize;
+
+            // Zufällige Abweichung hinzufügen (macht die Bewegung "wackeliger")
+            stepX += (Math.random() - 0.5) * 2 * ENEMY_RANDOM_FACTOR;
+            stepY += (Math.random() - 0.5) * 2 * ENEMY_RANDOM_FACTOR;
+
+            // Neue Position berechnen
+            let newX = enemyX + stepX;
+            let newY = enemyY + stepY;
+
+            // Randbegrenzung (innerhalb des Spielbereichs halten)
+            const enemyWidth = enemyData.element.offsetWidth || 40;
+            const enemyHeight = enemyData.element.offsetHeight || 40;
+            newX = Math.max(0, Math.min(newX, areaRect.width - enemyWidth));
+            newY = Math.max(0, Math.min(newY, areaRect.height - enemyHeight));
+
+            // Position im Datenobjekt und im DOM aktualisieren
+            enemyData.position = { x: newX, y: newY };
+            enemyData.element.style.left = `${newX}px`;
+            enemyData.element.style.top = `${newY}px`;
+
+             // Kollision nach Bewegung prüfen (kann das Quiz triggern)
+             checkCollision();
+        }
+
+        function freezeEnemy() {
+             if (gameIsOver || !enemyData.active) return; // Nichts tun, wenn Spiel vorbei oder Feind nicht aktiv
+             console.log("Feind wird eingefroren!");
+
+            // Bewegung stoppen (falls noch nicht geschehen, z.B. durch Quiz)
+            if (enemyData.moveIntervalId) {
+                clearInterval(enemyData.moveIntervalId);
+                enemyData.moveIntervalId = null;
+            }
+            // Alten Unfreeze-Timer löschen, falls vorhanden
+            if (enemyData.freezeTimeoutId) {
+                clearTimeout(enemyData.freezeTimeoutId);
+            }
+
+            enemyData.frozen = true; // Zustand setzen
+            enemyData.element.classList.add('enemy-frozen'); // Visuelles Feedback (Farbe)
+
+            // Timer zum Auftauen starten
+            enemyData.freezeTimeoutId = setTimeout(unfreezeEnemy, ENEMY_FREEZE_DURATION);
+        }
+
+        function unfreezeEnemy() {
+            if (gameIsOver || !enemyData.active || !enemyData.frozen) return; // Nur wenn Feind aktiv, gefroren und Spiel nicht vorbei
+
+            console.log("Feind taut auf!");
+            playUnfreezeSound(); // Auftau-Sound
+
+            enemyData.frozen = false; // Zustand zurücksetzen
+            enemyData.element.classList.remove('enemy-frozen'); // Visuelles Feedback entfernen
+            enemyData.freezeTimeoutId = null; // Timer ID zurücksetzen
+
+            // Bewegung wieder starten, aber nur wenn kein Quiz aktiv ist (sonst wartet moveEnemy von selbst)
+            if (quizModal.style.display !== 'block') {
+                 if (enemyData.moveIntervalId) clearInterval(enemyData.moveIntervalId); // Sicherstellen
+                 enemyData.moveIntervalId = setInterval(moveEnemy, currentEnemyMoveInterval); // Nutzt aktuelle Intervallzeit
+            } else {
+                console.log("Feind bleibt pausiert, da Quiz aktiv ist.");
+                // moveEnemy wird bei jedem Tick des Intervalls aufgerufen,
+                // aber pausiert am Anfang, solange das Quiz offen ist.
+                // Sobald das Quiz schließt, wird moveEnemy wieder richtig ausgeführt.
+            }
+        }
+
+        // --- NEU: Zeit- und Speicherfunktionen ---
+
+        // Formatiert Millisekunden in "MM:SS.sss"
+        function formatTime(milliseconds) {
+            if (typeof milliseconds !== 'number' || isNaN(milliseconds)) return 'Ungültig';
+            const totalSeconds = Math.floor(milliseconds / 1000);
+            const minutes = Math.floor(totalSeconds / 60);
+            const seconds = totalSeconds % 60;
+            const millis = Math.floor(milliseconds % 1000); // Restliche Millisekunden
+            return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}.${String(millis).padStart(3, '0')}`;
+        }
+
+        // Lädt die Bestzeiten aus localStorage
+        function loadFastestTimes() {
+            try {
+                const storedTimes = localStorage.getItem('koalaMultiplyFastestTimes');
+                if (storedTimes) {
+                    fastestTimes = JSON.parse(storedTimes);
+                    // Sicherheitsprüfung: Ist es ein Array? Enthält es nur Zahlen?
+                    if (!Array.isArray(fastestTimes)) fastestTimes = [];
+                    fastestTimes = fastestTimes.filter(t => typeof t === 'number' && !isNaN(t) && t > 0); // Nur gültige positive Zahlen behalten
+                } else {
+                    fastestTimes = []; // Wenn nichts gespeichert ist
+                }
+            } catch (e) {
+                console.error("Konnte Bestzeiten nicht laden:", e);
+                fastestTimes = []; // Bei Fehler leeres Array setzen
+            }
+            // Zeiten sortieren (schnellste zuerst)
+            fastestTimes.sort((a, b) => a - b);
+             // Nur die Top 5 behalten (falls mehr gespeichert waren)
+            fastestTimes = fastestTimes.slice(0, 5);
+        }
+
+        // Speichert die aktuellen Bestzeiten in localStorage
+        function saveFastestTimes() {
+            try {
+                localStorage.setItem('koalaMultiplyFastestTimes', JSON.stringify(fastestTimes));
+            } catch (e) {
+                console.error("Konnte Bestzeiten nicht speichern:", e);
+                // Informiere den Benutzer optional, dass Speicherplatz voll sein könnte etc.
+            }
+        }
+
+        // Fügt eine neue Zeit hinzu, sortiert und behält nur die Top 5
+        function updateFastestTimes(newTime) {
+            if (typeof newTime !== 'number' || isNaN(newTime) || newTime <= 0) return; // Nur gültige Zeiten
+            fastestTimes.push(newTime); // Neue Zeit hinzufügen
+            fastestTimes.sort((a, b) => a - b); // Aufsteigend sortieren (schnellste zuerst)
+            fastestTimes = fastestTimes.slice(0, 5); // Nur die Top 5 behalten
+            saveFastestTimes(); // Speichern
+        }
+
+        // Loggt eine falsch beantwortete Aufgabe
+        function logWrongAnswer(num1, num2) {
+            // Schlüssel erstellen: Kleinere Zahl zuerst, dann 'x', dann größere Zahl für Eindeutigkeit (z.B. "3x7" statt "7x3")
+            const key = `${Math.min(num1, num2)}x${Math.max(num1, num2)}`;
+            wrongAnswersLog[key] = (wrongAnswersLog[key] || 0) + 1; // Zähler für diese Aufgabe erhöhen
+            console.log(`Falsch gelöst: ${num1} x ${num2}. Log:`, wrongAnswersLog);
+        }
+
+        // Formatiert das Log der falschen Antworten für die Anzeige im End-Screen
+        function formatWrongAnswersForDisplay() {
+            const formatted = [];
+            const keys = Object.keys(wrongAnswersLog);
+
+            if (keys.length === 0) {
+                return ["<li>Keine Fehler gemacht!</li>"];
+            }
+
+            // Optional: Schlüssel sortieren (z.B. alphabetisch oder numerisch)
+            keys.sort(); // Alphabetische Sortierung (z.B. "2x3", "2x4", "3x3")
+
+            for (const key of keys) {
+                const count = wrongAnswersLog[key];
+                // key ist z.B. "6x7", ersetze 'x' durch ' x ' für bessere Lesbarkeit "6 x 7"
+                formatted.push(`<li>${count}x falsch: ${key.replace('x', ' x ')}</li>`);
+            }
+            return formatted; // Gibt ein Array von HTML-String-Listenelementen zurück
+        }
+
+        // --- NEU: Spielende Funktion ---
+        function endGame() {
+            if (gameIsOver) return; // Verhindert mehrfachen Aufruf, falls z.B. Feind und letzte Blume gleichzeitig getroffen werden
+            gameIsOver = true;
+            console.log("Spiel beendet!");
+            playGameOverSound(); // Spielende Sound
+
+            // Spielzeit berechnen
+            const elapsedTime = Date.now() - startTime;
+            console.log(`Gesamtspielzeit: ${elapsedTime} ms`);
+
+            // Alle laufenden Timer stoppen und Feind entfernen
+            despawnEnemy(); // Stoppt Feindbewegung und Auftau-Timer
+
+            // Heldenbewegung stoppen (entferne Event Listener von der gameArea)
+            gameArea.removeEventListener('click', handleGameAreaClick);
+            gameArea.removeEventListener('click', handleFirstClick); // Auch den initialen Listener entfernen
+
+            // Quiz schließen, falls offen
+            quizModal.style.display = 'none';
+
+            // Beste Zeiten aktualisieren und speichern
+            updateFastestTimes(elapsedTime);
+
+            // End Screen Daten vorbereiten
+            finalTimeDisplay.textContent = `Deine Zeit: ${formatTime(elapsedTime)}`;
+
+            // Beste Zeiten Liste füllen
+            fastestTimesList.innerHTML = ''; // Liste leeren
+            if (fastestTimes.length > 0) {
+                fastestTimes.forEach((time, index) => {
+                    const li = document.createElement('li');
+                    li.textContent = `${index + 1}. ${formatTime(time)}`;
+                    fastestTimesList.appendChild(li);
+                });
+                // Leere Plätze mit Bindestrichen auffüllen, falls weniger als 5 Zeiten gespeichert sind
+                for (let i = fastestTimes.length; i < 5; i++) {
+                     const li = document.createElement('li');
+                    li.textContent = `${i + 1}. -`;
+                    fastestTimesList.appendChild(li);
+                }
+            } else {
+                fastestTimesList.innerHTML = '<li>Noch keine Zeiten gespeichert.</li>';
+            }
+
+
+            // Falsche Antworten Liste füllen
+            const wrongAnswersFormatted = formatWrongAnswersForDisplay();
+            wrongAnswersList.innerHTML = wrongAnswersFormatted.join(''); // Array von Strings zusammenfügen und setzen
+
+            // End Screen anzeigen
+            endScreen.classList.remove('hidden');
+        }
+
+
+        // Hilfsfunktion für zufällige Position innerhalb der Spiel area (mit Rand und Objektgröße)
+        function getRandomPosition(bounds, margin) {
+            const width = bounds.width || window.innerWidth;
+            const height = bounds.height || window.innerHeight;
+            const objSize = 40; // Annahme einer typischen Objektgröße (Blume/Feind) für Randberechnung
+            const x = Math.random() * (width - margin * 2 - objSize) + margin;
+            const y = Math.random() * (height - margin * 2 - objSize) + margin;
+            return { x, y };
+        }
 
         // --- Spielstart ---
+        // Warte bis das DOM vollständig geladen ist, bevor das Spiel initialisiert wird
         document.addEventListener('DOMContentLoaded', initGame);
 
     </script>
