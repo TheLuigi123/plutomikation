@@ -78,12 +78,24 @@
         console.log("SCRIPT START");
 
         // --- Firebase Konfiguration ---
-        var firebaseConfig = { /* ... */ }; // Keep config
+        var firebaseConfig = {
+            apiKey: "AIzaSyAJWO7g9Xgy-c2nX8ovNpSlqmuFp_EZy9Q", // Verify if needed
+            authDomain: "blumen-b5bac.firebaseapp.com",       // Verify if needed
+            // *** VERIFY AND PASTE EXACT VALUE FROM FIREBASE CONSOLE BELOW ***
+            projectId: "blumen-b5bac",                       // <-- VERIFY THIS
+            storageBucket: "blumen-b5bac.firebasestorage.app",// Verify if needed
+            messagingSenderId: "699410546284",             // Verify if needed
+            appId: "1:699410546284:web:5be1a7fd826d324f95a249", // Verify if needed
+            measurementId: "G-1LPR6QT9GR",                   // Verify if needed
+            // *** VERIFY AND PASTE EXACT VALUE FROM FIREBASE CONSOLE BELOW ***
+            databaseURL: "https://blumen-b5bac-default-rtdb.europe-west1.firebasedatabase.app/" // <-- VERIFY THIS
+        };
         try {
             firebase.initializeApp(firebaseConfig);
-            var database = firebase.database();
+            var database = firebase.database(); // This line might implicitly cause the error if config is wrong
             console.log("Firebase Initialized");
         } catch (e) {
+            // Log the error object which contains more details
             console.error("FIREBASE INIT FAILED:", e);
         }
 
@@ -133,15 +145,15 @@
                 }
                 console.log("High score functions skipped");
                 if (startGameButton) {
-                    // *** SIMPLIFY BUTTON CLICK LISTENER ***
+                    // Click listener simplified
                     startGameButton.addEventListener('click', function() {
                         console.log("Start Game Button Clicked (inner logic commented)");
-                        /* // Keep logic commented for now
+                        /*
                         var name = "";
                         if(playerNameInput) { name = playerNameInput.value.trim(); }
                         if (!name) { console.log("Player name missing"); return; }
                         window.currentPlayerName = name;
-                        localStorage.setItem('lastPlayerName', name); // Line where error previously occurred
+                        localStorage.setItem('lastPlayerName', name);
                         if(startScreen) { startScreen.classList.add('hidden'); }
                         console.log("Starting game setup (calling initGame)");
                         initGame();
