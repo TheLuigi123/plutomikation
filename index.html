@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Koalas Multiplikations-Abenteuer</title>
     <style>
-        /* CSS */
+        /* CSS (Keep all styles for now, they shouldn't cause JS errors) */
         html, body { height: 100%; margin: 0; overflow: hidden; font-family: sans-serif; background-color: #e0f7fa; }
         #start-screen { position: fixed; inset: 0; background-color: #a2d5ab; color: #333; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 110; padding: 20px; text-align: center; overflow-y: auto; }
         #start-screen h2 { color: #2e7d32; margin-bottom: 25px; font-size: clamp(1.5em, 4vw, 2.2em); }
@@ -109,7 +109,7 @@
     <div id="inventory" class="hidden">Blumen: 0</div>
 
     <!-- Pop-up für die Aufgaben -->
-    <div id="quiz-modal">
+    <div id="quiz-modal" class="hidden"> <!-- Keep hidden initially -->
         <h3 id="quiz-title">Multiplikations-Aufgabe!</h3>
         <div id="quiz-question">Frage lädt...</div>
         <div id="quiz-input-display" aria-live="polite"></div>
@@ -145,7 +145,10 @@
     </div>
 
     <script>
+        console.log("SCRIPT START"); // Log script start
+
         // --- Firebase Konfiguration ---
+        // Keep this section active
         var firebaseConfig = {
             apiKey: "AIzaSyAJWO7g9Xgy-c2nX8ovNpSlqmuFp_EZy9Q",
             authDomain: "blumen-b5bac.firebaseapp.com",
@@ -156,10 +159,17 @@
             measurementId: "G-1LPR6QT9GR",
             databaseURL: "https://blumen-b5bac-default-rtdb.europe-west1.firebasedatabase.app/"
         };
-        firebase.initializeApp(firebaseConfig);
-        var database = firebase.database();
+        try {
+            firebase.initializeApp(firebaseConfig);
+            var database = firebase.database();
+            console.log("Firebase Initialized");
+        } catch (e) {
+            console.error("FIREBASE INIT FAILED:", e);
+        }
+
 
         // --- DOM Elemente ---
+        // Keep these declarations
         var startScreen = document.getElementById('start-screen');
         var playerNameInput = document.getElementById('player-name');
         var startGameButton = document.getElementById('start-game-button');
@@ -180,83 +190,47 @@
         var localEndHighscoreBody = document.getElementById('local-end-highscore-body');
         var wrongAnswersList = document.getElementById('wrong-answers-list');
         var playAgainButton = document.getElementById('play-again-button');
+        console.log("DOM Elements Referenced");
 
         // --- Audio Context & Sounds ---
+        // Commented Out
+        /*
         var audioCtx;
         var levelUpSound;
         var levelUpSoundBase64 = 'data:audio/mpeg;base64,SUQzBAAAAAABEVRYWFgAAAAtAAADY29tbWVudABCaWdTb3VuZEJhbmsuY29tIC8gTGliAvUMAAAAEAAAAAAAAAAAAAAAAAAAAAAA//MkxAAAANIAAAAAExBTUUzLjk4LjIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
 
         function initAudio() {
-            if (!audioCtx) {
-                try {
-                    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-                    levelUpSound = new Audio(levelUpSoundBase64);
-                    levelUpSound.preload = 'auto';
-                    console.log("AudioContext initialized.");
-                } catch (e) {
-                    console.error("AudioContext init failed.", e);
-                }
-            }
+            // ... content commented ...
         }
-
         function playTone(frequency, duration, type, volume) {
-            var freq = (typeof frequency !== 'undefined') ? frequency : 440;
-            var dur = (typeof duration !== 'undefined') ? duration : 0.1;
-            var waveType = (typeof type !== 'undefined') ? type : 'sine';
-            var vol = (typeof volume !== 'undefined') ? volume : 0.5;
-            if (!audioCtx) { return; }
-            try {
-                var oscillator = audioCtx.createOscillator();
-                var gainNode = audioCtx.createGain();
-                oscillator.type = waveType;
-                oscillator.frequency.setValueAtTime(freq, audioCtx.currentTime);
-                gainNode.gain.setValueAtTime(vol, audioCtx.currentTime);
-                gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + dur);
-                oscillator.connect(gainNode);
-                gainNode.connect(audioCtx.destination);
-                oscillator.start(audioCtx.currentTime);
-                oscillator.stop(audioCtx.currentTime + dur + 0.05);
-            } catch (e) {
-                console.error("Error playing tone:", e);
-            }
+            // ... content commented ...
         }
-
-        function playClickSound() { playTone(880, 0.05, 'triangle', 0.3); }
-        function playInteractSound() { playTone(660, 0.08, 'sine', 0.4); }
+        function playClickSound() { /* playTone(880, 0.05, 'triangle', 0.3); * / }
+        function playInteractSound() { /* playTone(660, 0.08, 'sine', 0.4); * / }
         function playCorrectSound() {
-            playTone(523.25, 0.1, 'sine', 0.5);
-            setTimeout(function(){ playTone(659.25, 0.15, 'sine', 0.5); }, 100);
+            // ... content commented ...
         }
         function playWrongSound() {
-            playTone(349.23, 0.15, 'square', 0.4);
-            setTimeout(function(){ playTone(261.63, 0.2, 'square', 0.4); }, 150);
+            // ... content commented ...
         }
         function playCollectSound() {
-            playTone(783.99, 0.08, 'triangle', 0.6);
-            setTimeout(function(){ playTone(1046.50, 0.08, 'triangle', 0.6); }, 80);
-            setTimeout(function(){ playTone(1318.51, 0.1, 'triangle', 0.6); }, 160);
+            // ... content commented ...
         }
-        function playFreezeSound() { playTone(440, 0.3, 'sawtooth', 0.4); }
-        function playUnfreezeSound() { playTone(587.33, 0.2, 'sine', 0.4); }
-        function playEnemySpawnSound() { playTone(110, 0.3, 'sawtooth', 0.5); }
-        function playEnemyHitSound() { playTone(220, 0.2, 'square', 0.6); }
+        function playFreezeSound() { /* playTone(440, 0.3, 'sawtooth', 0.4); * / }
+        function playUnfreezeSound() { /* playTone(587.33, 0.2, 'sine', 0.4); * / }
+        function playEnemySpawnSound() { /* playTone(110, 0.3, 'sawtooth', 0.5); * / }
+        function playEnemyHitSound() { /* playTone(220, 0.2, 'square', 0.6); * / }
         function playLevelUpJingle() {
-            if (levelUpSound && audioCtx) {
-                levelUpSound.play().catch(function(e){ console.error("Error playing level up sound:", e); });
-            } else {
-                playTone(523, 0.1);
-                setTimeout(function(){ playTone(783, 0.1); }, 100);
-                setTimeout(function(){ playTone(1046, 0.2); }, 200);
-            }
+            // ... content commented ...
         }
         function playGameOverSound() {
-            playTone(1046, 0.2);
-            setTimeout(function(){ playTone(783, 0.2); }, 200);
-            setTimeout(function(){ playTone(523, 0.3); }, 400);
+            // ... content commented ...
         }
+        */
 
 
         // --- Spielzustand (using var) ---
+        // Keep declarations, maybe simplify initializations
         var currentPlayerName = "Anonym";
         var currentLevel = 1;
         var flowersCollected = 0;
@@ -271,22 +245,18 @@
         var startTime = 0;
         var wrongAnswersLog = {};
         var monsterEncounters = 0;
-        var localHighScores = [];
+        var localHighScores = []; // Keep for structure
 
         // --- Konfiguration (using var) ---
+        // Keep
         var FLOWER_GOAL = 20;
         var CORRECT_ANSWERS_NEEDED_FOR_FLOWER = 3;
         var NUM_QUESTIONS_PER_ENEMY = 5;
         var NUM_QUESTIONS_TO_GENERATE = 5;
-        var flowerColors = [
-            { bg: '#f48fb1', border: '#ad1457' },
-            { bg: '#90caf9', border: '#1e88e5' },
-            { bg: '#ffe082', border: '#ffab00' },
-            { bg: '#a5d6a7', border: '#388e3c' },
-            { bg: '#b39ddb', border: '#5e35b1' }
-        ];
+        var flowerColors = [ { bg: '#f48fb1', border: '#ad1457' }, { bg: '#90caf9', border: '#1e88e5' }, { bg: '#ffe082', border: '#ffab00' }, { bg: '#a5d6a7', border: '#388e3c' }, { bg: '#b39ddb', border: '#5e35b1' } ];
 
         // --- Feind Konfiguration & Zustand (using var) ---
+        // Keep declarations
         var BASE_ENEMY_STEP_SIZE = 10;
         var BASE_ENEMY_MOVE_INTERVAL = 200;
         var ENEMY_RANDOM_FACTOR = 4;
@@ -296,8 +266,12 @@
         var currentEnemyMoveInterval = BASE_ENEMY_MOVE_INTERVAL;
         var enemyData = { element: enemyElement, position: { x: -100, y: -100 }, active: false, frozen: false, freezeTimeoutId: null, moveIntervalId: null };
 
+
         // --- Initialisierung ---
+        // Comment out content
         function initGame() {
+            console.log("initGame called (but content is commented out)");
+            /*
             gameIsOver = false; startTime = Date.now(); wrongAnswersLog = {}; monsterEncounters = 0; flowersCollected = 0; currentLevel = 1; currentEnemyStepSize = BASE_ENEMY_STEP_SIZE; currentEnemyMoveInterval = BASE_ENEMY_MOVE_INTERVAL;
             updateInventory(); updateTitle(); setupLevel();
             gameArea.removeEventListener('click', handleGameAreaClick); gameArea.removeEventListener('click', handleFirstClick); gameArea.addEventListener('click', handleFirstClick);
@@ -305,152 +279,137 @@
             playAgainButton.removeEventListener('click', function(){ location.reload(); }); playAgainButton.addEventListener('click', function(){ location.reload(); });
             startEnemyLogic();
             gameArea.classList.remove('hidden'); inventory.classList.remove('hidden'); endScreen.classList.add('hidden');
+            */
         }
 
         // --- Start Screen Logic ---
+        // Keep structure, comment out most actions
         document.addEventListener('DOMContentLoaded', function() {
-            var savedName = localStorage.getItem('lastPlayerName'); if (savedName) { playerNameInput.value = savedName; }
-            loadLocalHighScores(); displayLocalHighScores(); fetchAndDisplayGlobalHighScores();
-            startGameButton.addEventListener('click', function() {
-                var name = playerNameInput.value.trim(); if (!name) { alert("Bitte gib deinen Namen ein!"); return; }
-                currentPlayerName = name; localStorage.setItem('lastPlayerName', name);
-                startScreen.classList.add('hidden'); initGame();
-            });
+            console.log("DOMContentLoaded event fired");
+            try {
+                var savedName = localStorage.getItem('lastPlayerName');
+                if (savedName && playerNameInput) {
+                    playerNameInput.value = savedName;
+                    console.log("Player name loaded from localStorage");
+                }
+
+                //loadLocalHighScores(); // Commented out
+                //displayLocalHighScores(); // Commented out
+                //fetchAndDisplayGlobalHighScores(); // Commented out
+                console.log("High score functions skipped");
+
+
+                if (startGameButton) {
+                    startGameButton.addEventListener('click', function() {
+                        console.log("Start Game Button Clicked");
+                        var name = "";
+                        if(playerNameInput) {
+                            name = playerNameInput.value.trim();
+                        }
+                        if (!name) {
+                            // Use console log instead of alert for testing
+                            console.log("Player name missing");
+                            // alert("Bitte gib deinen Namen ein!");
+                            return;
+                        }
+                        currentPlayerName = name;
+                        localStorage.setItem('lastPlayerName', name);
+                        if(startScreen) {
+                            startScreen.classList.add('hidden');
+                        }
+                        console.log("Starting game setup (calling initGame)");
+                        initGame(); // Call the (empty) initGame
+                    });
+                    console.log("Start button listener added");
+                } else {
+                     console.error("Start game button not found!");
+                }
+            } catch(e) {
+                console.error("Error in DOMContentLoaded:", e);
+            }
         });
 
         // --- Spezieller Handler für den ersten Klick (Audio) ---
-        function handleFirstClick(event) { if (gameIsOver) return; initAudio(); handleGameAreaClick(event); gameArea.removeEventListener('click', handleFirstClick); gameArea.addEventListener('click', handleGameAreaClick); }
+        // Comment out content
+        function handleFirstClick(event) {
+            console.log("handleFirstClick called (content commented)");
+            /*
+            if (gameIsOver) return;
+            // initAudio(); // Audio commented out
+            handleGameAreaClick(event);
+            gameArea.removeEventListener('click', handleFirstClick);
+            gameArea.addEventListener('click', handleGameAreaClick);
+            */
+        }
 
         // --- Level Management ---
-        function setupLevel() { if(gameIsOver) return; clearOldFlowers(); createFlowers(); }
-        function replenishFlowers() { if(gameIsOver) return; currentLevel++; updateTitle(); playLevelUpJingle(); currentEnemyStepSize = BASE_ENEMY_STEP_SIZE * (1 + Math.floor(flowersCollected / 5) * 0.2); console.log('Replenishing flowers. Total collected: ' + flowersCollected + '. Enemy Speed: ' + currentEnemyStepSize.toFixed(2)); setTimeout(function() { setupLevel(); if (enemyData.active) despawnEnemy(); spawnEnemy(); }, 1500); }
-        function updateTitle() { document.title = 'Koalas Multiplikations-Abenteuer'; }
+        // Comment out content
+        function setupLevel() { /* if(gameIsOver) return; clearOldFlowers(); createFlowers(); */ }
+        function replenishFlowers() { /* ... */ }
+        function updateTitle() { /* document.title = 'Koalas Multiplikations-Abenteuer'; */ }
 
         // --- Blumen Management ---
-        function clearOldFlowers() { flowers.forEach(function(flower){ if (flower.element && flower.element.parentNode === gameArea) { gameArea.removeChild(flower.element); } }); flowers = []; }
-        function createFlowers() {
-            var areaRect = gameArea.getBoundingClientRect(); var colors = flowerColors[(currentLevel - 1) % flowerColors.length]; var numToCreate = 5;
-            for (var i = 0; i < numToCreate; i++) {
-                var fEl = document.createElement('div'); fEl.classList.add('flower'); fEl.id = 'flower-' + (flowersCollected + i); fEl.style.backgroundColor = colors.bg; fEl.style.borderColor = colors.border;
-                var pos, tooClose, attempts = 0;
-                do { tooClose = false; pos = getRandomPosition(areaRect, 60);
-                     for (var j = 0; j < flowers.length; j++) {
-                         var flw = flowers[j];
-                         if (Math.sqrt(Math.pow(pos.x - flw.position.x, 2) + Math.pow(pos.y - flw.position.y, 2)) < 50) { tooClose = true; break; }
-                     }
-                     attempts++;
-                 } while (tooClose && attempts < 100);
-                if (attempts >= 100) console.warn('Keine Position für Blume ' + i + '.');
-                fEl.style.left = pos.x + 'px'; fEl.style.top = pos.y + 'px'; gameArea.appendChild(fEl); flowers.push({ id: fEl.id, element: fEl, collected: false, position: pos });
-            }
-        }
+        // Comment out content
+        function clearOldFlowers() { /* ... */ }
+        function createFlowers() { /* ... */ }
 
         // --- Heldenbewegung & Klick-Handling ---
-        function handleGameAreaClick(event) { if (gameIsOver || heroIsMoving || quizModal.style.display === 'block') return; playClickSound(); var r = gameArea.getBoundingClientRect(); moveHero(event.clientX - r.left, event.clientY - r.top); }
-        function moveHero(tX, tY) { heroIsMoving = true; var hW = hero.offsetWidth || 50; var hH = hero.offsetHeight || 50; var fX = tX - hW / 2; var fY = tY - hH / 2; var aR = gameArea.getBoundingClientRect(); fX = Math.max(0, Math.min(fX, aR.width - hW)); fY = Math.max(0, Math.min(fY, aR.height - hH)); hero.style.left = fX + 'px'; hero.style.top = fY + 'px'; }
-        function onHeroMovementEnd() { if (gameIsOver) return; heroIsMoving = false; checkCollision(); }
+        // Comment out content
+        function handleGameAreaClick(event) { /* ... */ }
+        function moveHero(tX, tY) { /* ... */ }
+        function onHeroMovementEnd() { /* if (gameIsOver) return; heroIsMoving = false; checkCollision(); */ }
 
         // --- Kollisionserkennung ---
-        function checkCollision() {
-            if (gameIsOver) return;
-            if (enemyData.active && !enemyData.frozen && quizModal.style.display !== 'block') { var hR = hero.getBoundingClientRect(); var eR = enemyData.element.getBoundingClientRect(); if (checkRectOverlap(hR, eR)) { console.log("KOLLISION mit Feind!"); playEnemyHitSound(); triggerEnemyQuiz(); return; } }
-            if (heroIsMoving || quizModal.style.display === 'block') return;
-            var heroRect = hero.getBoundingClientRect();
-            for (var i = 0; i < flowers.length; i++) {
-                 var flower = flowers[i];
-                 if (!flower.collected) { var fR = flower.element.getBoundingClientRect(); if (checkRectOverlap(heroRect, fR)) { console.log("KOLLISION mit Blume!", flower.id); playInteractSound(); activeItem = flower; activeItemType = 'flower'; startQuiz(); return; } }
-            }
-        }
-        function checkRectOverlap(r1, r2) { return !(r1.right < r2.left || r1.left > r2.right || r1.bottom < r2.top || r1.top > r2.bottom); }
+        // Comment out content
+        function checkCollision() { /* ... */ }
+        function checkRectOverlap(r1, r2) { /* return !(r1.right < r2.left || r1.left > r2.right || r1.bottom < r2.top || r1.top > r2.bottom); */ }
 
         // --- NumPad-Logik ---
-        function handleNumpadClick(event) { if (gameIsOver) return; var t = event.target; if (t.tagName !== 'BUTTON') return; playClickSound(); if (t.hasAttribute('data-digit')) { if (quizInputDisplay.textContent.length < 4) quizInputDisplay.textContent += t.getAttribute('data-digit'); } else if (t.id === 'numpad-clear') { quizInputDisplay.textContent = ''; } else if (t.id === 'numpad-submit') { checkAnswer(); } }
+        // Comment out content
+        function handleNumpadClick(event) { /* ... */ }
 
         // --- Quiz-Logik ---
-        function startQuiz() { if (!activeItem || gameIsOver) return; correctAnswersForItem = 0; currentQuestionIndex = 0; quizMessage.textContent = ''; quizMessage.className = ''; quizInputDisplay.textContent = ''; if (activeItemType === 'flower') { quizTitle.textContent = "Blumen-Aufgabe!"; currentQuestions = generateQuestions(NUM_QUESTIONS_TO_GENERATE); } else if (activeItemType === 'enemy') { quizTitle.textContent = "Monster-Aufgabe!"; currentQuestions = generateQuestions(NUM_QUESTIONS_PER_ENEMY); } displayQuestion(); quizModal.style.display = 'block'; }
-        function triggerEnemyQuiz() { if (!enemyData.active || enemyData.frozen || gameIsOver) return; monsterEncounters++; console.log("Starte Feind-Quiz, Begegnung #", monsterEncounters); if (enemyData.moveIntervalId) { clearInterval(enemyData.moveIntervalId); enemyData.moveIntervalId = null; } activeItem = enemyData; activeItemType = 'enemy'; startQuiz(); }
-        function generateQuestions(count) { var qs = []; var used = new Set(); while (qs.length < count) { var n1 = Math.floor(Math.random() * 10) + 1; var n2 = Math.floor(Math.random() * 10) + 1; var key = Math.min(n1,n2) + 'x' + Math.max(n1,n2); if (!used.has(key)) { qs.push({ text: n1 + ' x ' + n2 + ' = ?', answer: n1 * n2, num1: n1, num2: n2 }); used.add(key); } } return qs; }
-        function displayQuestion() { if (currentQuestionIndex < currentQuestions.length) { quizQuestion.textContent = currentQuestions[currentQuestionIndex].text; if(activeItemType === 'flower') { quizMessage.textContent = '(' + correctAnswersForItem + ' / ' + CORRECT_ANSWERS_NEEDED_FOR_FLOWER + ' richtig)'; quizMessage.className = ''; } } else { console.error("Versucht, Frage außerhalb des Bereichs anzuzeigen.", currentQuestionIndex, currentQuestions.length); quizModal.style.display = 'none'; activeItem = null; activeItemType = null; } }
-        function checkAnswer() {
-            if (gameIsOver || !activeItem) return; var uAnsTxt = quizInputDisplay.textContent; if (uAnsTxt === '') { quizMessage.textContent = "Bitte gib eine Antwort ein!"; quizMessage.className = 'incorrect'; return; }
-            var uAns = parseInt(uAnsTxt, 10); var currQ = currentQuestions[currentQuestionIndex]; var corrAns = currQ.answer;
-            if (isNaN(uAns)) { quizMessage.textContent = "Ungültige Eingabe."; quizMessage.className = 'incorrect'; quizInputDisplay.textContent = ''; return; }
-            if (uAns === corrAns) {
-                playCorrectSound(); correctAnswersForItem++; var success = false;
-                if (activeItemType === 'flower' && correctAnswersForItem >= CORRECT_ANSWERS_NEEDED_FOR_FLOWER) { quizMessage.textContent = 'Richtig! (' + correctAnswersForItem + '/' + CORRECT_ANSWERS_NEEDED_FOR_FLOWER + ')'; quizMessage.className = 'correct'; success = true; }
-                else if (activeItemType === 'enemy' && currentQuestionIndex + 1 >= NUM_QUESTIONS_PER_ENEMY) { quizMessage.textContent = "Richtig!"; quizMessage.className = 'correct'; success = true; }
-                else { quizMessage.textContent = (activeItemType === 'flower') ? 'Richtig! (' + correctAnswersForItem + '/' + CORRECT_ANSWERS_NEEDED_FOR_FLOWER + ')' : "Richtig!"; quizMessage.className = 'correct'; }
-                setTimeout(function() { if (success) { handleQuizSuccess(); } else { currentQuestionIndex++; quizInputDisplay.textContent = ''; displayQuestion(); } }, 800);
-            } else { playWrongSound(); logWrongAnswer(currQ.num1, currQ.num2); quizMessage.textContent = 'Leider falsch. Richtig war ' + corrAns + '. Nochmal!'; quizMessage.className = 'incorrect'; quizInputDisplay.textContent = ''; }
-        }
-        function handleQuizSuccess() {
-            if (gameIsOver) return; quizModal.style.display = 'none'; var itemProc = activeItem; var typeProc = activeItemType; console.log("handleQuizSuccess triggered for:", typeProc);
-            if (typeProc === 'flower') {
-                if (itemProc && itemProc.element && !itemProc.collected) {
-                    console.log("Processing valid flower:", itemProc.id); playCollectSound(); itemProc.element.classList.add('hidden'); itemProc.collected = true; flowersCollected++; updateInventory();
-                    if (flowersCollected >= FLOWER_GOAL) { console.log("Blumen-Ziel erreicht!"); endGame(); return; }
-                    var allFlowersCollected = true;
-                    for (var i = 0; i < flowers.length; i++) { if (!flowers[i].collected) { allFlowersCollected = false; break; } }
-                    if (allFlowersCollected) { console.log('Alle sichtbaren Blumen gesammelt. Nachschub!'); replenishFlowers(); }
-                } else { console.warn("Skipping flower processing - item invalid/collected:", itemProc); }
-            }
-            else if (typeProc === 'enemy') { console.log("Processing enemy freeze"); playFreezeSound(); freezeEnemy(); }
-            else { console.warn("handleQuizSuccess called with unknown item type:", typeProc); }
-            activeItem = null; activeItemType = null; correctAnswersForItem = 0;
-        }
+        // Comment out content
+        function startQuiz() { /* ... */ }
+        function triggerEnemyQuiz() { /* ... */ }
+        function generateQuestions(count) { /* return []; // Return empty array */ }
+        function displayQuestion() { /* ... */ }
+        function checkAnswer() { /* ... */ }
+        function handleQuizSuccess() { /* ... */ }
 
         // --- Inventar ---
-        function updateInventory() { inventoryDisplay.textContent = 'Blumen: ' + flowersCollected + ' / ' + FLOWER_GOAL; }
+        // Comment out content
+        function updateInventory() { /* inventoryDisplay.textContent = 'Blumen: ' + flowersCollected + ' / ' + FLOWER_GOAL; */ }
 
         // --- Feind-Logik ---
-        function startEnemyLogic() { if (gameIsOver) return; setTimeout(spawnEnemy, ENEMY_SPAWN_DELAY); }
-        function spawnEnemy() {
-             if (gameIsOver || enemyData.active) return; playEnemySpawnSound(); var r=gameArea.getBoundingClientRect(); var edge=Math.floor(Math.random()*4); var sz=enemyElement.offsetWidth||40; var sX, sY;
-             switch(edge){ case 0:sX=Math.random()*(r.width-sz);sY=-sz;break; case 1:sX=r.width;sY=Math.random()*(r.height-sz);break; case 2:sX=Math.random()*(r.width-sz);sY=r.height;break; case 3:sX=-sz;sY=Math.random()*(r.height-sz);break; }
-             enemyData.position={x:sX,y:sY}; enemyData.element.style.left= sX + 'px'; enemyData.element.style.top= sY + 'px'; enemyData.element.classList.remove('hidden','enemy-frozen'); enemyData.active=true; enemyData.frozen=false;
-             if(enemyData.moveIntervalId)clearInterval(enemyData.moveIntervalId); enemyData.moveIntervalId=setInterval(moveEnemy, currentEnemyMoveInterval); console.log('Feind gespawnt bei (' + sX.toFixed(0) + ', ' + sY.toFixed(0) + ') Speed Factor: ' + (currentEnemyStepSize/BASE_ENEMY_STEP_SIZE));
-        }
-        function despawnEnemy() { if (!enemyData.active) return; console.log("Feind despawned"); if (enemyData.moveIntervalId) clearInterval(enemyData.moveIntervalId); if (enemyData.freezeTimeoutId) clearTimeout(enemyData.freezeTimeoutId); enemyData.element.classList.add('hidden'); enemyData.active=false; enemyData.frozen=false; enemyData.moveIntervalId=null; enemyData.freezeTimeoutId=null; enemyData.position={x:-100,y:-100}; }
-        function moveEnemy() {
-            if (gameIsOver || quizModal.style.display === 'block' || !enemyData.active || enemyData.frozen) return;
-            var eX=enemyData.position.x; var eY=enemyData.position.y; var hR=hero.getBoundingClientRect(); var aR=gameArea.getBoundingClientRect(); var hCX=(hR.left-aR.left)+hR.width/2; var hCY=(hR.top-aR.top)+hR.height/2;
-            var eW=enemyData.element.offsetWidth||40; var eH=enemyData.element.offsetHeight||40; var dx=hCX-(eX+eW/2); var dy=hCY-(eY+eH/2); var dist=Math.sqrt(dx*dx+dy*dy);
-            if (dist < (hR.width/2 + eW/2) * 0.8) { checkCollision(); return; }
-            var nDx=dx/dist; var nDy=dy/dist; var sX=nDx*currentEnemyStepSize; var sY=nDy*currentEnemyStepSize; sX+=(Math.random()-0.5)*2*ENEMY_RANDOM_FACTOR; sY+=(Math.random()-0.5)*2*ENEMY_RANDOM_FACTOR;
-            var nX=eX+sX; var nY=eY+sY; nX=Math.max(0, Math.min(nX, aR.width - eW)); nY=Math.max(0, Math.min(nY, aR.height - eH));
-            enemyData.position={x:nX, y:nY}; enemyData.element.style.left= nX + 'px'; enemyData.element.style.top= nY + 'px'; checkCollision();
-        }
-        function freezeEnemy() { if (gameIsOver || !enemyData.active) return; console.log("Feind wird eingefroren!"); if (enemyData.moveIntervalId) { clearInterval(enemyData.moveIntervalId); enemyData.moveIntervalId = null; } if (enemyData.freezeTimeoutId) clearTimeout(enemyData.freezeTimeoutId); enemyData.frozen=true; enemyData.element.classList.add('enemy-frozen'); enemyData.freezeTimeoutId = setTimeout(unfreezeEnemy, ENEMY_FREEZE_DURATION); }
-        function unfreezeEnemy() { if (gameIsOver || !enemyData.active || !enemyData.frozen) return; console.log("Feind taut auf!"); playUnfreezeSound(); enemyData.frozen=false; enemyData.element.classList.remove('enemy-frozen'); enemyData.freezeTimeoutId = null; if (quizModal.style.display !== 'block') { if (enemyData.moveIntervalId) clearInterval(enemyData.moveIntervalId); enemyData.moveIntervalId = setInterval(moveEnemy, currentEnemyMoveInterval); } else { console.log("Feind bleibt pausiert, da Quiz aktiv."); } }
+        // Comment out content
+        function startEnemyLogic() { /* if (gameIsOver) return; setTimeout(spawnEnemy, ENEMY_SPAWN_DELAY); */ }
+        function spawnEnemy() { /* ... */ }
+        function despawnEnemy() { /* ... */ }
+        function moveEnemy() { /* ... */ }
+        function freezeEnemy() { /* ... */ }
+        function unfreezeEnemy() { /* ... */ }
 
         // --- Zeit- und Speicherfunktionen ---
-        function formatTime(milliseconds) {
-            if (typeof milliseconds !== 'number' || isNaN(milliseconds)) return 'Ungültig';
-            var totalSeconds = milliseconds / 1000; var minutes = Math.floor(totalSeconds / 60); var seconds = Math.floor(totalSeconds % 60); var tenths = Math.floor((totalSeconds - Math.floor(totalSeconds)) * 10);
-            var minutesStr = minutes < 10 ? '0' + minutes : String(minutes); var secondsStr = seconds < 10 ? '0' + seconds : String(seconds);
-            return minutesStr + ':' + secondsStr + '.' + tenths;
-        }
+        // Comment out content
+        function formatTime(milliseconds) { /* ... return "00:00.0"; */ }
 
         // --- Lokale Highscore Verwaltung ---
-        function loadLocalHighScores() { try { var sS = localStorage.getItem('koalaMultiplyLocalScores'); if (sS) { localHighScores = JSON.parse(sS); if (!Array.isArray(localHighScores)) localHighScores = []; localHighScores = localHighScores.filter(function(s){ return typeof s==='object'&&s!==null&&typeof s.name==='string'&&typeof s.time==='number'&&!isNaN(s.time)&&s.time>0&&typeof s.encounters==='number'&&!isNaN(s.encounters); }); } else { localHighScores = []; } } catch (e) { console.error("Konnte lokale Highscores nicht laden:", e); localHighScores = []; } localHighScores.sort(function(a, b){ return a.time - b.time; }); localHighScores = localHighScores.slice(0, 10); }
-        function saveLocalHighScores() { try { localStorage.setItem('koalaMultiplyLocalScores', JSON.stringify(localHighScores)); } catch (e) { console.error("Konnte lokale Highscores nicht speichern:", e); } }
-        function updateLocalHighScores(newScore) { if (!newScore || typeof newScore.time !== 'number' || isNaN(newScore.time) || newScore.time <= 0) return; localHighScores.push(newScore); localHighScores.sort(function(a, b){ return a.time - b.time; }); localHighScores = localHighScores.slice(0, 10); saveLocalHighScores(); displayLocalHighScores(); displayLocalHighScoresEndScreen(); }
+        // Comment out content
+        function loadLocalHighScores() { /* ... */ }
+        function saveLocalHighScores() { /* ... */ }
+        function updateLocalHighScores(newScore) { /* ... */ }
 
         // --- Highscore Table Display ---
-        function populateScoreTable(tbodyEl, scores) {
-             tbodyEl.innerHTML = '';
-             if (!scores || scores.length === 0) { var msg = (tbodyEl.id === "local-end-highscore-body" || tbodyEl.id === "local-highscore-body") ? "Keine lokalen Highscores." : "Keine Klasse Highscores."; tbodyEl.innerHTML = '<tr class="loading-msg"><td colspan="4">' + msg + '</td></tr>'; return; }
-             for (var index = 0; index < scores.length; index++) {
-                 var score = scores[index];
-                 var row = tbodyEl.insertRow(); var name = score.name ? escapeHtml(score.name) : 'Unbekannt'; var time = (score.time && typeof score.time === 'number') ? formatTime(score.time) : 'Ungültig'; var enc = (score.encounters !== undefined && typeof score.encounters === 'number') ? score.encounters : '?';
-                 row.innerHTML = '<td>' + (index + 1) + '</td><td>' + name + '</td><td>' + time + '</td><td>' + enc + '</td>';
-            }
-        }
-        function displayLocalHighScores() { populateScoreTable(localHighscoreBody, localHighScores); }
-        function displayLocalHighScoresEndScreen() { populateScoreTable(localEndHighscoreBody, localHighScores); }
+        // Comment out content
+        function populateScoreTable(tbodyEl, scores) { /* ... */ }
+        function displayLocalHighScores() { /* populateScoreTable(localHighscoreBody, localHighScores); */ }
+        function displayLocalHighScoresEndScreen() { /* populateScoreTable(localEndHighscoreBody, localHighScores); */ }
 
         // --- Globale Highscore Verwaltung ---
+        // Comment out content
         function fetchAndDisplayGlobalHighScores() {
+            /*
             var scoresRef = database.ref('scores').orderByChild('time').limitToFirst(10);
             globalHighscoreBody.innerHTML = '<tr class="loading-msg"><td colspan="4">Lade Klasse Top 10...</td></tr>';
             scoresRef.get().then(function(snapshot) {
@@ -461,15 +420,20 @@
                 console.error("Error getting global high scores: ", error);
                 globalHighscoreBody.innerHTML = '<tr class="loading-msg"><td colspan="4">Fehler beim Laden der Highscores.</td></tr>';
             });
+            */
         }
 
         // --- Fehler Logging ---
-        function logWrongAnswer(num1, num2) { var key = Math.min(num1, num2) + 'x' + Math.max(num1, num2); wrongAnswersLog[key] = (wrongAnswersLog[key] || 0) + 1; }
-        function formatWrongAnswersForDisplay() { var fmt = []; var keys = Object.keys(wrongAnswersLog); if (keys.length === 0) return ["<li>Keine Fehler gemacht!</li>"]; keys.sort(); keys.forEach(function(key){ fmt.push('<li>' + wrongAnswersLog[key] + 'x falsch: ' + key.replace('x', ' x ') + '</li>'); }); return fmt; }
+        // Comment out content
+        function logWrongAnswer(num1, num2) { /* ... */ }
+        function formatWrongAnswersForDisplay() { /* return ["<li>Keine Fehler gemacht!</li>"]; */ }
 
         // --- Spielende ---
+        // Comment out content
         function endGame() {
-            if (gameIsOver) return; gameIsOver = true; console.log("Spiel beendet!"); playGameOverSound();
+             console.log("endGame called (content commented out)");
+            /*
+            if (gameIsOver) return; gameIsOver = true; console.log("Spiel beendet!"); // playGameOverSound();
             var elapsedTime = Date.now() - startTime; console.log('Gesamtspielzeit: ' + elapsedTime + ' ms, Monsterbegegnungen: ' + monsterEncounters);
             despawnEnemy(); gameArea.removeEventListener('click', handleGameAreaClick); gameArea.removeEventListener('click', handleFirstClick); quizModal.style.display = 'none';
             var currentScoreData = { name: currentPlayerName, time: elapsedTime, encounters: monsterEncounters, timestamp: firebase.database.ServerValue.TIMESTAMP };
@@ -482,12 +446,15 @@
             finalTimeDisplay.textContent = 'Deine Zeit: ' + formatTime(elapsedTime);
             var wrongAnswersFormatted = formatWrongAnswersForDisplay(); wrongAnswersList.innerHTML = wrongAnswersFormatted.join('');
             gameArea.classList.add('hidden'); inventory.classList.add('hidden'); endScreen.classList.remove('hidden');
+            */
         }
 
         // --- Hilfsfunktionen ---
-        function getRandomPosition(bounds, margin) { var w = bounds.width || window.innerWidth; var h = bounds.height || window.innerHeight; var sz = 40; var x = Math.random() * (w - margin * 2 - sz) + margin; var y = Math.random() * (h - margin * 2 - sz) + margin; return { x: x, y: y }; }
-        function escapeHtml(unsafe) { if (!unsafe) return ""; return unsafe.replace(/&/g,"&").replace(/</g,"<").replace(/>/g,">").replace(/"/g,""").replace(/'/g,"'"); }
+        // Comment out content
+        function getRandomPosition(bounds, margin) { /* return { x: 50, y: 50 }; */ }
+        function escapeHtml(unsafe) { if (!unsafe) return ""; return unsafe.replace(/&/g,"&").replace(/</g,"<").replace(/>/g,">").replace(/"/g,""").replace(/'/g,"'"); } // Keep escapeHtml
 
+        console.log("SCRIPT END"); // Log script end
     </script>
 </body>
 </html>
