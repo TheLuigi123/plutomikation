@@ -123,7 +123,8 @@
         console.log("Audio section deleted.");
 
         // --- Spielzustand (using var) ---
-        // Keep uncommented
+        // *** Keep commented out ***
+        /*
         var currentPlayerName = "Anonym";
         var currentLevel = 1;
         var flowersCollected = 0;
@@ -139,7 +140,8 @@
         var wrongAnswersLog = {};
         var monsterEncounters = 0;
         var localHighScores = [];
-        console.log("Game state variables DECLARED.");
+        */
+        console.log("Game state variables SKIPPED for now.");
 
         // --- Konfiguration (using var) ---
         var FLOWER_GOAL = 20;
@@ -176,13 +178,14 @@
                 }
                 console.log("High score functions skipped");
                 if (startGameButton) {
+                    // *** Keep inner logic commented out ***
                     startGameButton.addEventListener('click', function() {
                         console.log("Start Game Button Clicked (inner logic commented)");
-                        /* // Inner logic still commented
+                        /*
                         var name = "";
                         if(playerNameInput) { name = playerNameInput.value.trim(); }
                         if (!name) { console.log("Player name missing"); return; }
-                        currentPlayerName = name; // Assign to variable from restored state block
+                        window.currentPlayerName = name;
                         localStorage.setItem('lastPlayerName', name);
                         if(startScreen) { startScreen.classList.add('hidden'); }
                         console.log("Starting game setup (calling initGame)");
@@ -194,6 +197,9 @@
             } catch(e) { console.error("Error in DOMContentLoaded:", e); }
         });
 
+        // Minimal global declaration
+        var currentPlayerName = "Anonym";
+
 
         // --- ALL GAME LOGIC FUNCTIONS COMMENTED OUT OR EMPTY ---
         // ... function stubs ...
@@ -201,46 +207,13 @@
         function setupLevel() { /* ... */ }
         // ... other functions ...
 
-        // *** UNCOMMENT formatTime function (Ultra-Conservative) ***
-        // Retyped manually, explicit semicolons, basic structure.
+        // *** Keep formatTime function commented out ***
+        /*
         function formatTime(milliseconds) {
-            var timeValue = milliseconds; // Assign to new var
-            var minutes; // Declare vars separately
-            var seconds;
-            var tenths;
-            var totalSeconds;
-            var minutesStr;
-            var secondsStr;
-
-            // Explicit type check and NaN check first
-            if (typeof timeValue !== 'number') {
-                return 'Ungültig';
-            }
-            if (isNaN(timeValue)) {
-                 return 'Ungültig';
-            }
-
-            totalSeconds = timeValue / 1000; // Perform calculations
-            minutes = Math.floor(totalSeconds / 60);
-            seconds = Math.floor(totalSeconds % 60);
-            tenths = Math.floor((totalSeconds - Math.floor(totalSeconds)) * 10);
-
-            // Manual padding
-            if (minutes < 10) {
-                minutesStr = '0' + minutes;
-            } else {
-                minutesStr = String(minutes);
-            }
-            if (seconds < 10) {
-                secondsStr = '0' + seconds;
-            } else {
-                secondsStr = String(seconds);
-            }
-
-            // Basic string concatenation for return
-            return minutesStr + ':' + secondsStr + '.' + tenths;
+            // ... content ...
         }
-        console.log("formatTime function defined (conservative).");
+        */
+        console.log("formatTime function skipped.");
 
 
         function loadLocalHighScores() { /* ... */ }
