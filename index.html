@@ -78,24 +78,21 @@
         console.log("SCRIPT START");
 
         // --- Firebase Konfiguration ---
-        var firebaseConfig = {
-            apiKey: "AIzaSyAJWO7g9Xgy-c2nX8ovNpSlqmuFp_EZy9Q", // Verify if needed
-            authDomain: "blumen-b5bac.firebaseapp.com",       // Verify if needed
-            // *** VERIFY AND PASTE EXACT VALUE FROM FIREBASE CONSOLE BELOW ***
-            projectId: "blumen-b5bac",                       // <-- VERIFY THIS
-            storageBucket: "blumen-b5bac.firebasestorage.app",// Verify if needed
-            messagingSenderId: "699410546284",             // Verify if needed
-            appId: "1:699410546284:web:5be1a7fd826d324f95a249", // Verify if needed
-            measurementId: "G-1LPR6QT9GR",                   // Verify if needed
-            // *** VERIFY AND PASTE EXACT VALUE FROM FIREBASE CONSOLE BELOW ***
-            databaseURL: "https://blumen-b5bac-default-rtdb.europe-west1.firebasedatabase.app/" // <-- VERIFY THIS
-        };
+        var firebaseConfig = { /* ... verified config ... */
+             apiKey: "AIzaSyAJWO7g9Xgy-c2nX8ovNpSlqmuFp_EZy9Q",
+             authDomain: "blumen-b5bac.firebaseapp.com",
+             projectId: "blumen-b5bac",
+             storageBucket: "blumen-b5bac.firebasestorage.app",
+             messagingSenderId: "699410546284",
+             appId: "1:699410546284:web:5be1a7fd826d324f95a249",
+             measurementId: "G-1LPR6QT9GR",
+             databaseURL: "https://blumen-b5bac-default-rtdb.europe-west1.firebasedatabase.app/"
+         };
         try {
             firebase.initializeApp(firebaseConfig);
-            var database = firebase.database(); // This line might implicitly cause the error if config is wrong
+            var database = firebase.database();
             console.log("Firebase Initialized");
         } catch (e) {
-            // Log the error object which contains more details
             console.error("FIREBASE INIT FAILED:", e);
         }
 
@@ -103,13 +100,22 @@
         var startScreen = document.getElementById('start-screen');
         var playerNameInput = document.getElementById('player-name');
         var startGameButton = document.getElementById('start-game-button');
-        // ... (other DOM elements) ...
+        var globalHighscoreBody = document.getElementById('global-highscore-body');
+        var localHighscoreBody = document.getElementById('local-highscore-body');
         var gameArea = document.getElementById('game-area');
         var hero = document.getElementById('hero');
         var inventoryDisplay = document.getElementById('inventory');
         var quizModal = document.getElementById('quiz-modal');
+        var quizTitle = document.getElementById('quiz-title');
+        var quizQuestion = document.getElementById('quiz-question');
+        var quizInputDisplay = document.getElementById('quiz-input-display');
+        var quizMessage = document.getElementById('quiz-message');
+        var numpadContainer = document.getElementById('numpad-container');
         var enemyElement = document.getElementById('enemy');
         var endScreen = document.getElementById('end-screen');
+        var finalTimeDisplay = document.getElementById('final-time');
+        var localEndHighscoreBody = document.getElementById('local-end-highscore-body');
+        var wrongAnswersList = document.getElementById('wrong-answers-list');
         var playAgainButton = document.getElementById('play-again-button');
         console.log("DOM Elements Referenced");
 
@@ -117,21 +123,47 @@
         console.log("Audio section deleted.");
 
         // --- Spielzustand (using var) ---
-        /* ... commented out ... */
-        console.log("Game state variables SKIPPED for now.");
+        // *** UNCOMMENTED ***
+        var currentPlayerName = "Anonym";
+        var currentLevel = 1;
+        var flowersCollected = 0;
+        var flowers = [];
+        var activeItem = null;
+        var activeItemType = null;
+        var currentQuestions = [];
+        var currentQuestionIndex = 0;
+        var correctAnswersForItem = 0;
+        var heroIsMoving = false;
+        var gameIsOver = false;
+        var startTime = 0;
+        var wrongAnswersLog = {};
+        var monsterEncounters = 0;
+        var localHighScores = [];
+        console.log("Game state variables DECLARED."); // Changed log message
 
         // --- Konfiguration (using var) ---
-        var FLOWER_GOAL = 20; /* ... */
+        var FLOWER_GOAL = 20;
+        var CORRECT_ANSWERS_NEEDED_FOR_FLOWER = 3;
+        var NUM_QUESTIONS_PER_ENEMY = 5;
+        var NUM_QUESTIONS_TO_GENERATE = 5;
+        var flowerColors = [ { bg: '#f48fb1', border: '#ad1457' }, { bg: '#90caf9', border: '#1e88e5' }, { bg: '#ffe082', border: '#ffab00' }, { bg: '#a5d6a7', border: '#388e3c' }, { bg: '#b39ddb', border: '#5e35b1' } ];
         console.log("Config variables declared.");
 
         // --- Feind Konfiguration & Zustand (using var) ---
-        var BASE_ENEMY_STEP_SIZE = 10; /* ... */
-        var enemyData = { element: enemyElement, /* ... */ };
+        var BASE_ENEMY_STEP_SIZE = 10;
+        var BASE_ENEMY_MOVE_INTERVAL = 200;
+        var ENEMY_RANDOM_FACTOR = 4;
+        var ENEMY_FREEZE_DURATION = 10000;
+        var ENEMY_SPAWN_DELAY = 5000;
+        var currentEnemyStepSize = BASE_ENEMY_STEP_SIZE;
+        var currentEnemyMoveInterval = BASE_ENEMY_MOVE_INTERVAL;
+        var enemyData = { element: enemyElement, position: { x: -100, y: -100 }, active: false, frozen: false, freezeTimeoutId: null, moveIntervalId: null };
         console.log("Enemy config declared.");
 
         // --- Initialisierung ---
         function initGame() {
             console.log("initGame called (empty)");
+            // Content remains commented out
         }
 
         // --- Start Screen Logic ---
@@ -145,14 +177,14 @@
                 }
                 console.log("High score functions skipped");
                 if (startGameButton) {
-                    // Click listener simplified
+                    // Inner logic still commented
                     startGameButton.addEventListener('click', function() {
                         console.log("Start Game Button Clicked (inner logic commented)");
                         /*
                         var name = "";
                         if(playerNameInput) { name = playerNameInput.value.trim(); }
                         if (!name) { console.log("Player name missing"); return; }
-                        window.currentPlayerName = name;
+                        // currentPlayerName = name; // Assign to variable from restored state block
                         localStorage.setItem('lastPlayerName', name);
                         if(startScreen) { startScreen.classList.add('hidden'); }
                         console.log("Starting game setup (calling initGame)");
@@ -164,8 +196,8 @@
             } catch(e) { console.error("Error in DOMContentLoaded:", e); }
         });
 
-        // Minimal global declaration if main state block is commented
-        var currentPlayerName = "Anonym";
+        // Minimal global declaration (now redundant if state block is active)
+        // var currentPlayerName = "Anonym";
 
 
         // --- ALL GAME LOGIC FUNCTIONS COMMENTED OUT OR EMPTY ---
@@ -173,13 +205,45 @@
         function handleFirstClick(event) { /* ... */ }
         function setupLevel() { /* ... */ }
         // ... other functions ...
+
+        // *** UNCOMMENT formatTime function ***
+        function formatTime(milliseconds) {
+            if (typeof milliseconds !== 'number' || isNaN(milliseconds)) return 'Ungültig';
+            var totalSeconds = milliseconds / 1000;
+            var minutes = Math.floor(totalSeconds / 60);
+            var seconds = Math.floor(totalSeconds % 60);
+            var tenths = Math.floor((totalSeconds - Math.floor(totalSeconds)) * 10);
+            var minutesStr = minutes < 10 ? '0' + minutes : String(minutes);
+            var secondsStr = seconds < 10 ? '0' + seconds : String(seconds);
+            return minutesStr + ':' + secondsStr + '.' + tenths;
+        }
+        console.log("formatTime function defined.");
+
+        function loadLocalHighScores() { /* ... */ }
+        function saveLocalHighScores() { /* ... */ }
+        function updateLocalHighScores(newScore) { /* ... */ }
+        function populateScoreTable(tbodyEl, scores) { /* ... */ }
+        function displayLocalHighScores() { /* ... */ }
+        function displayLocalHighScoresEndScreen() { /* ... */ }
+        function fetchAndDisplayGlobalHighScores() { /* ... */ }
+        function logWrongAnswer(num1, num2) { /* ... */ }
+        function formatWrongAnswersForDisplay() { return ["<li>Keine Fehler gemacht!</li>"]; }
         function endGame() { /* ... */ }
 
         // --- Hilfsfunktionen ---
         // Keep uncommented
-        function getRandomPosition(bounds, margin) { /* ... */ }
-        function escapeHtml(unsafe) { /* ... */ }
+        function getRandomPosition(bounds, margin) {
+             var w = bounds.width || window.innerWidth;
+             var h = bounds.height || window.innerHeight;
+             var sz = 40; var x = Math.random() * (w - margin * 2 - sz) + margin; var y = Math.random() * (h - margin * 2 - sz) + margin;
+             return { x: x, y: y };
+        }
+        function escapeHtml(unsafe) {
+             if (!unsafe) return "";
+             return unsafe.replace(/&/g, "&").replace(/</g, "<").replace(/>/g, ">").replace(/"/g, """).replace(/'/g, "'");
+        }
         console.log("Helper functions defined.");
+
 
         console.log("SCRIPT END");
     </script>
