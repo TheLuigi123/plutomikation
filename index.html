@@ -65,9 +65,8 @@
         // --- Audio Context & Sounds --- DELETED
         console.log("Audio section deleted.");
 
-
         // --- Spielzustand (using var) ---
-        // *** UNCOMMENTED - Remember to retype the first few lines manually ***
+        // Keep uncommented
         var currentPlayerName = "Anonym";
         var currentLevel = 1;
         var flowersCollected = 0;
@@ -83,18 +82,18 @@
         var wrongAnswersLog = {};
         var monsterEncounters = 0;
         var localHighScores = [];
-        console.log("Game state variables DECLARED."); // Check if this log appears without error
+        console.log("Game state variables DECLARED.");
 
 
         // --- Konfiguration (using var) ---
-        // *** Keep commented out ***
-        /*
+        // *** UNCOMMENTED - Retype first line if possible ***
         var FLOWER_GOAL = 20;
         var CORRECT_ANSWERS_NEEDED_FOR_FLOWER = 3;
-        // ... etc ...
-        var flowerColors = [ ... ];
-        */
-        console.log("Config variables SKIPPED.");
+        var NUM_QUESTIONS_PER_ENEMY = 5;
+        var NUM_QUESTIONS_TO_GENERATE = 5;
+        var flowerColors = [ { bg: '#f48fb1', border: '#ad1457' }, { bg: '#90caf9', border: '#1e88e5' }, { bg: '#ffe082', border: '#ffab00' }, { bg: '#a5d6a7', border: '#388e3c' }, { bg: '#b39ddb', border: '#5e35b1' } ];
+        console.log("Config variables DECLARED."); // Check log
+
 
         // --- Feind Konfiguration & Zustand (using var) ---
         // *** Keep commented out ***
@@ -128,7 +127,7 @@
                         var name = "";
                         if(playerNameInput) { name = playerNameInput.value.trim(); }
                         if (!name) { console.log("Player name missing"); return; }
-                        currentPlayerName = name; // Now assigns to the active state variable
+                        currentPlayerName = name; // Assigns to the active state variable
                         localStorage.setItem('lastPlayerName', name);
                         if(startScreen) { startScreen.classList.add('hidden'); }
                         console.log("Starting game setup (calling initGame)");
@@ -140,16 +139,19 @@
             } catch(e) { console.error("Error in DOMContentLoaded:", e); }
         });
 
-        // Minimal global declaration (now redundant as state block is active)
-        // var currentPlayerName = "Anonym";
-
 
         // --- ALL GAME LOGIC FUNCTIONS COMMENTED OUT OR EMPTY ---
         // ... function stubs ...
         function handleFirstClick(event) { /* ... */ }
         function setupLevel() { /* ... */ }
         // ... other functions ...
-        function formatTime(milliseconds) { return "00:00.0"; } // Keep stub
+
+        // *** Keep formatTime function commented out ***
+        /*
+        function formatTime(milliseconds) { // ... }
+        */
+        console.log("formatTime function skipped.");
+
         function loadLocalHighScores() { /* ... */ }
         // ... other function stubs ...
         function endGame() { /* ... */ }
