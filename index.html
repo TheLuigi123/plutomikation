@@ -183,19 +183,22 @@
         console.log("getRandomPosition defined.");
 
         // *** UNCOMMENT escapeHtml AGAIN - RETYPE MANUALLY ***
-        // Use simple chained version
+        // *** ADD EXPLICIT SEMICOLON ***
         function escapeHtml(unsafe) {
             if (!unsafe) {
                 return "";
             }
             // Make sure NO weird characters are in these strings/regex
+            // Retype this whole return statement carefully
             return unsafe.replace(/&/g, "&")
                          .replace(/</g, "<")
                          .replace(/>/g, ">")
                          .replace(/"/g, """)
                          .replace(/'/g, "'");
-        }
-        console.log("escapeHtml function DEFINED (chained).");
+        }; // <<< ADDED EXPLICIT SEMICOLON HERE
+
+        // *** Ensure clean transition to console.log (retype if needed) ***
+        console.log("escapeHtml function DEFINED (semicolon added).");
 
 
         console.log("SCRIPT END");
