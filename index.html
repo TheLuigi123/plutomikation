@@ -10,7 +10,32 @@
         #start-screen { position: fixed; inset: 0; background-color: #a2d5ab; color: #333; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 110; padding: 20px; text-align: center; overflow-y: auto; }
         #start-screen h2 { color: #2e7d32; margin-bottom: 25px; font-size: clamp(1.5em, 4vw, 2.2em); }
         #start-screen label { display: block; margin-bottom: 8px; font-weight: bold; font-size: clamp(1em, 2.5vw, 1.3em); }
+        #start-screen input[type="text"] { padding: 10px 12px; margin-bottom: 20px; width: clamp(200px, the parser.
+
+**`index.html` (Simplified Audio Definitions):**
+
+```html
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Koalas Multiplikations-Abenteuer</title>
+    <style>
+        /* CSS (Keep all styles) */
+        html, body { height: 100%; margin: 0; overflow: hidden; font-family: sans-serif; background-color: #e0f7fa; }
+        #start-screen { position: fixed; inset: 0; background-color: #a2d5ab; color: #333; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 110; padding: 20px; text-align: center; overflow-y: auto; }
+        #start-screen h2 { color: #2e7d32; margin-bottom: 25px; font-size: clamp(1.5em, 4vw, 2.2em); }
+        #start-screen label { display: block; margin-bottom: 8px; font-weight: bold; font-size: clamp(1em, 2.5vw, 1.3em); }
         #start-screen input[type="text"] { padding: 10px 12px; margin-bottom: 20px; width: clamp(200px, 60vw, 300px); border: 2px solid #ccc; border-radius: 5px; font-size: clamp(1em, 2.5vw, 1.2em); text-align: center; }
+        #start-game-button { padding: 12px 30px; font-size: clamp(1.1em, 3vw, 1.4em); background-color: #4CAF50; color: white; border: none; border-radius: 8px; cursor: pointer; transition: background-color 0.3s; margin-bottom: 30px; }
+        #start-game-button:hover { background-color: #45a049; }
+        #start-screen .highscore-section { margin-top: 20px; width: 100%; max-width: 600px; }
+        #start-screen h3 { color: #388e3c; margin-bottom: 10px; font-size: clamp(1.2em, 3vw, 1.6em); }
+        .highscore-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; background-color: rgba(255, 255, 255, 0.7); border-radius: 5px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); font-size: clamp(0.8em, 2vw, 1em); }
+        .highscore-table th, .highscore-table td { border: 1px solid #ccc; padding: 6px 8px; text-align: left; }
+        .highscore-table th { background-color: #c8e6c9; color: #333; }
+        .highscore-table td:nth-child(1), .highscore-table td:nth-child(3), .highscore-table td:nth-child(4), .highscore-table th:nth-child(1), .highscore-table th:nth-child(3), .highscore-table th:nth-child(4) { text 60vw, 300px); border: 2px solid #ccc; border-radius: 5px; font-size: clamp(1em, 2.5vw, 1.2em); text-align: center; }
         #start-game-button { padding: 12px 30px; font-size: clamp(1.1em, 3vw, 1.4em); background-color: #4CAF50; color: white; border: none; border-radius: 8px; cursor: pointer; transition: background-color 0.3s; margin-bottom: 30px; }
         #start-game-button:hover { background-color: #45a049; }
         #start-screen .highscore-section { margin-top: 20px; width: 100%; max-width: 600px; }
@@ -22,143 +47,246 @@
         #start-screen .loading-msg, #end-screen .loading-msg { font-style: italic; color: #555; }
         #start-screen .loading-msg td { text-align: center !important; }
         #end-screen .loading-msg td { text-align: center !important; color: #ddd; }
+        #game-area { position: relative; width: 100vw; height: 10-align: center; }
+        #start-screen .loading-msg, #end-screen .loading-msg { font-style: italic; color: #555; }
+        #start-screen .loading-msg td { text-align: center !important; }
+        #end-screen .loading-msg td { text-align: center !important; color: #ddd; }
         #game-area { position: relative; width: 100vw; height: 100vh; background-color: #c8e6c9; cursor: pointer; overflow: hidden; }
-        #hero { position: absolute; width: 50px; height: 50px; background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj4KICA8ZyBmaWxsPSIjODg4Ij4KICAgIDwhLS0gQm9keSAtLT4KICAgIDxlbGxpcHNlIGN4PSI1MCIgY3k9IjcwIiByeD0iMzAiIHJ5PSIyNSIgZmlsbD0iI2NjY2NjIi8+CiAgICA8Y2lyY2xlIGN4PSI1MCIgY3k9IjUwIiByPSIyNSIgZmlsbD0iI2NjY2NjIi8+CiAgICA8IS0tIEVhcnMgLS0+CiAgICA8ZWxsaXBzZSBjeD0iMzAiIGN5PSIzMCIgcng9IjE1IiByeT0iMjAiIGZpbGw9IiNjY2NjY2MiLz4KICAgIDxlbGxpcHNlIGN4PSI3MCIgY3k9IjMwIiByeD0iMTUiIHJ5PSIyMCIgZmlsbD0iI2NjY2NjIi8+CiAgICA8ZWxsaXBzZSBjeD0iMzAiIGN5PSIzMCIgcng9IjEwIiByeT0iMTUiIGZpbGw9IiNmZmZmZmYiLz4KICAgIDxlbGxpc2UgY3g9IjcwIiBjeT0iMzAiIHJ4PSIxMCIgc3k9IjE1IiBmaWxsPSIjZmZmZmZmIi8+CiAgICA8IS0tIEZlYXR1cmVzIC0tPgogICAgPGNpcmNsZSBjeD0iNDMiIGN5PSI1MCIgcj0iMyIgZmlsbD0iIzAwMDAwMCIvPgogICAgPGNpcmNsZSBjeD0iNTciIGN5PSI1MCIgcj0iMyIgZmlsbD0iIzAwMDAwMCIvPgogICAgPGVsbGlwc2UgY3g9IjUwIiBjeT0iNjAiIHJ4PSI2IiByeT0iNCIgZmlsbD0iIzAwMDAwMCIvPgogIDwvZz4KPC9zdmc+'); background-size: contain; background-repeat: no-repeat; background-position: center; top: 50px; left: 50px; transition: top 0.5s ease-in-out, left 0.5s ease-in-out; z-index: 10; }
+        #hero { position: absolute; width: 50px; height: 50px; background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj4KICA8ZyBmaWxsPSIjODg4Ij4KICAgIDwhLS0gQm9keSAtLT4KICAgIDxlbGxpcHNlIGN4PSI1MCIgY3k9IjcwIiByeD0iMzAiIHJ5PSIyNSIgZmlsbD0iI2NjY2NjIi8+CiAgICA8Y2lyY2xlIGN4PSI1MCIgY3k9IjUwIiByPSIyNSIgZmlsbD0iI2NjY2NjIi8+CiAgICA8IS0tIEVhcnMgLS0+CiAgICA8ZWxsaXBzZSBjeD0i0vh; background-color: #c8e6c9; cursor: pointer; overflow: hidden; }
+        #hero { position: absolute; width: 50px; height: 50px; background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj4KICA8ZyBmaWxsPSIjODg4Ij4KICAgIDwhLS0gQm9keSAtLT4KICAgIDxlbGxpcHNlIGN4PSI1MCIgY3k9IjcwIiByeD0iMzAiIHJ5PSIyNSIgZmlsbD0iI2NjY2NjIi8+CiAgICA8Y2lyY2xlIGN4PSI1MCIgY3k9IjUwIiByPSIyNSIgZmlsbD0iI2NjY2NjIi8+CiAgICA8IS0tIEVhcnMgLS0+CiAgICA8ZWxsaXBzZSBjeD0iMzAiIGN5PSIzMCIgcng9IjE1IiByeT0iMjAiIGZpbGw9IiNjY2NjY2MiLz4KICAgIDxlbGxpcHNlIGN4PSI3MCIgY3k9IjMwIiByeD0iMTUiIHJ5PSIyMCIgZmlsbD0iI2NjY2NjIi8+CiAgICA8ZWxsaXBzZSBjeD0iMzAiIGN5PSIzMCIgcng9IjEwIiByeT0iMTUiIGZpbGw9IiNmZmZmZmYiLz4KICAgIDxlbGxpc2UgY3g9IjcwIiBjeT0iMzAiIHMzAiIGN5PSIzMCIgcng9IjE1IiByeT0iMjAiIGZpbGw9IiNjY2NjY2MiLz4KICAgIDxlbGxpcHNlIGN4PSI3MCIgY3k9IjMwIiByeD0iMTUiIHJ5PSIyMCIgZmlsbD0iI2NjY2NjIi8+CiAgICA8ZWxsaXBzZSBjeD0iMzAiIGN5PSIzMCIgcng9IjEwIiByeT0iMTUiIGZpbGw9IiNmZmZmZmYiLz4KICAgIDxlbGxpc2UgY3g9IjcwIiBjeT0iMzAiIHJ4PSIxMCIgc3k9IjE1IiBmaWxsPSIjZmZmZmZmIi8+CiAgICA8IS0tIEZlYXR1cmVzIC0tPgogICAgPGNpcmNsZSBjeD0iNDMiIGN5PSI1MCIgcj0iMyIgZmlsbD0iIzAwMDAwMCIvPgogICAgPGNpcmNsZSBjeD0iNTciIGN5PSI1MCIgcj0iMyIgZmlsbD0iIzAwMDAwMCIvPgogICAgPGVsbGlwc2UgY3g9IjUwIiBjeT0iNjAiIHJ4J4PSIxMCIgc3k9IjE1IiBmaWxsPSIjZmZmZmZmIi8+CiAgICA8IS0tIEZlYXR1cmVzIC0tPgogICAgPGNpcmNsZSBjeD0iNDMiIGN5PSI1MCIgcj0iMyIgZmlsbD0iIzAwMDAwMCIvPgogICAgPGNpcmNsZSBjeD0iNTciIGN5PSI1MCIgcj0iMyIgZmlsbD0iIzAwMDAwMCIvPgogICAgPGVsbGlwc2UgY3g9IjUwIiBjeT0iNjAiIHJ4PSI2IiByeT0iNCIgZmlsbD0iIzAwMDAwMCIvPgogIDwvZz4KPC9zdmc+'); background-size: contain; background-repeat: no-repeat; background-position: center; top: 50px; left: 50px; transition: top 0.5s ease-in-out, left 0.5s ease-in-out; z-index: 10; }
+        .flower { position: absolute; width: 40px; height: 40px; border-radius: 50% 50% 0 0 / 60% 60% 0 0; transform: rotate(45deg); cursor: default; z-index: PSI2IiByeT0iNCIgZmlsbD0iIzAwMDAwMCIvPgogIDwvZz4KPC9zdmc+'); background-size: contain; background-repeat: no-repeat; background-position: center; top: 50px; left: 50px; transition: top 0.5s ease-in-out, left 0.5s ease-in-out; z-index: 10; }
         .flower { position: absolute; width: 40px; height: 40px; border-radius: 50% 50% 0 0 / 60% 60% 0 0; transform: rotate(45deg); cursor: default; z-index: 5; transition: background-color 0.3s, border-color 0.3s; }
         .flower::before { content: ''; position: absolute; width: 5px; height: 20px; background-color: #388e3c; bottom: -18px; left: 50%; transform: translateX(-50%) rotate(-45deg); z-index: -1; }
-        #enemy { position: absolute; width: 40px; height: 40px; background-color: #f44336; border: 2px solid #c62828; border-radius: 50%; box-shadow: 0 0 5px rgba(0,0,0,0.5); z-index: 7; transition: background-color 0.3s ease; }
+        #enemy { position: absolute; width: 40px; height: 40px; background-color:5; transition: background-color 0.3s, border-color 0.3s; }
+        .flower::before { content: ''; position: absolute; width: 5px; height: 20px; background-color: #388e3c; bottom: -18px; left: 50%; transform: translateX(-50%) rotate(-45deg); z-index: -1; }
+        #enemy { position: absolute; width: 40px; height: 40px; background-color: #f44336; border: 2px solid #c62828; border-radius: 50%; box-shadow: 0 0 5px rgba(0,0,0,0.5); z-index: 7; transition: background- #f44336; border: 2px solid #c62828; border-radius: 50%; box-shadow: 0 0 5px rgba(0,0,0,0.5); z-index: 7; transition: background-color 0.3s ease; }
         #enemy.enemy-frozen { background-color: #42a5f5; border-color: #1e88e5; }
-        #inventory { position: fixed; top: 10px; right: 10px; padding: 10px 15px; background-color: rgba(255, 255, 255, 0.8); border: 1px solid #ccc; border-radius: 5px; font-size: clamp(1em, 2.5vw, 1.5em); z-index: 20; }
-        #quiz-modal { display: none; position: fixed; left: 50%; top: 50%; transform: translate(-50%, -50%); width: clamp(280px, 80vw, 400px); padding: 20px; background-color: white; border: 2px solid #4CAF50; border-radius: 10px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); z-index: 30; text-align: center; }
-        #quiz-modal h3 { margin-top: 0; margin-bottom: 15px; color: #4CAF50; font-size: clamp(1.1em, 3vw, 1.6em); }
-        #quiz-question { font-size: clamp(1.3em, 4vw, 1.8em); margin-bottom: 15px; color: #333; min-height: 1.5em; }
-        #quiz-input-display { width: 80%; margin: 0 auto 15px auto; padding: 10px; font-size: clamp(1.2em, 3.5vw, 1.7em); border: 1px solid #ccc; border-radius: 4px; min-height: 1.5em; background-color: #f8f8f8; color: #333; text-align: center; letter-spacing: 2px; }
-        #numpad-container { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 15px; }
-        #numpad-container button { padding: 12px 0; font-size: clamp(1.1em, 3.5vw, 1.6em); background-color: #e0e0e0; border: 1px solid #bdbdbd; border-radius: 5px; cursor: pointer; transition: background-color 0.2s; -webkit-tap-highlight-color: transparent; }
-        #numpad-container button:hover:not(:active) { background-color: #d5d5d5; }
-        #numpad-container button:active { background-color: #cccccc; }
+        #inventory { position: fixed; top: 10px; right: 10px; padding: 10px 15px; background-color: rgba(255, 255, color 0.3s ease; }
+        #enemy.enemy-frozen { background-color: #42a5f5; border-color: #1e88e5; }
+        #inventory { position: fixed; top: 10px; right: 10px; padding: 10px 15px; background-color: rgba(255, 255, 255, 0.8); border: 1255, 0.8); border: 1px solid #ccc; border-radius: 5px; font-size: clamp(1em, 2.5vw, 1.5em); z-index: 20; }
+        #quiz-modal { display: none; position: fixed; leftpx solid #ccc; border-radius: 5px; font-size: clamp(1em, 2.5vw, 1.5em); z-index: 20; }
+        #quiz-modal { display: none; position: fixed; left: 50%; top: 50%; transform: translate(-50%, -50%); width: clamp(280px: 50%; top: 50%; transform: translate(-50%, -50%); width: clamp(280px, 80vw, 400px); padding: 20px; background-color: white, 80vw, 400px); padding: 20px; background-color: white; border: 2px solid #4CAF50; border-radius: 10px; box-shadow: 0 ; border: 2px solid #4CAF50; border-radius: 10px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); z-index:4px 8px rgba(0, 0, 0, 0.2); z-index: 30; text-align: center; }
+        #quiz-modal h3 { margin-top: 30; text-align: center; }
+        #quiz-modal h3 { margin-top: 0; margin-bottom: 15px; color: #4CAF50; font-size: 0; margin-bottom: 15px; color: #4CAF50; font-size: clamp(1.1em, 3vw, 1.6em); }
+        #quiz-question clamp(1.1em, 3vw, 1.6em); }
+        #quiz-question { font-size: clamp(1.3em, 4vw, 1.8em); margin-bottom: 1 { font-size: clamp(1.3em, 4vw, 1.8em); margin-bottom: 15px; color: #333; min-height: 1.5em; }
+        #quiz-5px; color: #333; min-height: 1.5em; }
+        #quiz-input-display { width: 80%; margin: 0 auto 15px auto; padding: 10px; font-size: clamp(1.input-display { width: 80%; margin: 0 auto 15px auto; padding: 10px;2em, 3.5vw, 1.7em); border: 1px solid #ccc; font-size: clamp(1.2em, 3.5vw, 1.7em); border border-radius: 4px; min-height: 1.5em; background-color: #f: 1px solid #ccc; border-radius: 4px; min-height: 1.58f8f8; color: #333; text-align: center; letter-spacing: em; background-color: #f8f8f8; color: #333; text-align2px; }
+        #numpad-container { display: grid; grid-template-columns: repeat: center; letter-spacing: 2px; }
+        #numpad-container { display: grid(3, 1fr); gap: 8px; margin-top: 15px; }
+; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top        #numpad-container button { padding: 12px 0; font-size: clamp(: 15px; }
+        #numpad-container button { padding: 12px 1.1em, 3.5vw, 1.6em); background-color: #e0e0e0; border: 1px solid #bdbdbd; border-radius: 5px; cursor: pointer; transition: background-color 0.2s; -webkit-tap-highlight-color: transparent; }
+        0; font-size: clamp(1.1em, 3.5vw, 1.6em#numpad-container button:hover:not(:active) { background-color: #d5d5); background-color: #e0e0e0; border: 1px solid #bdbdbd; border-radius: 5px; cursor: pointer; transition: background-color 0.2s; -webkit-tap-highlight-colord5; }
+        #numpad-container button:active { background-color: #cccccc; }: transparent; }
+        #numpad-container button:hover:not(:active) { background-color
         #numpad-clear { background-color: #ffcdd2; border-color: #ef9a9a; }
+        #numpad-clear:hover:not(:active) { background-color: #ef9a9a; }
+        : #d5d5d5; }
+        #numpad-container button:active { background-#numpad-clear:active { background-color: #e57373; }
+        color: #cccccc; }
+        #numpad-clear { background-color: #ffcdd2#numpad-zero { }
+        #numpad-submit { background-color: #a5; border-color: #ef9a9a; }
         #numpad-clear:hover:not(:active) { background-color: #ef9a9a; }
         #numpad-clear:active { background-color: #e57373; }
         #numpad-zero { }
-        #numpad-submit { background-color: #a5d6a7; border-color: #81c784; }
+        #nd6a7; border-color: #81c784; }
         #numpad-submit:hover:not(:active) { background-color: #81c784; }
-        #numpad-submit:active { background-color: #66bb6a; }
-        #quiz-message { margin-top: 15px; font-weight: bold; min-height: 1.2em; font-size: clamp(0.9em, 2.5vw, 1.2em); }
-        .correct { color: green; } .incorrect { color: red; } .hidden { display: none !important; }
-        #end-screen { position: fixed; inset: 0; background-color: rgba(0, 80, 0, 0.85); color: white; display: flex; justify-content: center; align-items: center; z-index: 100; text-align: center; padding: 20px; font-size: clamp(1em, 3vw, 1.4em); flex-direction: column; overflow-y: auto; }
-        #end-screen h2 { color: #ffd700; margin-bottom: 20px; }
+        #numpad-submit:umpad-submit { background-color: #a5d6a7; border-color: #81c784; }
+active { background-color: #66bb6a; }
+        #quiz-message { margin-top        #numpad-submit:hover:not(:active) { background-color: #81c7: 15px; font-weight: bold; min-height: 1.2em; font-size: clamp84; }
+        #numpad-submit:active { background-color: #66bb6(0.9em, 2.5vw, 1.2em); }
+        .correct {a; }
+        #quiz-message { margin-top: 15px; font-weight: bold; min-height:  color: green; } .incorrect { color: red; } .hidden { display: none !important; }
+1.2em; font-size: clamp(0.9em, 2.5vw, 1.2em);        #end-screen { position: fixed; inset: 0; background-color: rgba(0,  }
+        .correct { color: green; } .incorrect { color: red; } .hidden { display:80, 0, 0.85); color: white; display: flex; justify-content: center; align-items: center none !important; }
+        #end-screen { position: fixed; inset: 0; background-color; z-index: 100; text-align: center; padding: 20px; font-size: clamp(1em, 3vw, 1.4em); flex-direction: column; overflow-y: rgba(0, 80, 0, 0.85); color: white; display: flex; justify-content: center; align-items: center; z-index: 100; text-align: center; padding: 20px; font-: auto; }
+        #end-screen h2 { color: #ffd700; margin-bottomsize: clamp(1em, 3vw, 1.4em); flex-direction: column; overflow: 20px; }
         #end-screen p { margin: 8px 0; }
-        #end-screen h3 { margin-top: 25px; margin-bottom: 10px; color: #ffcc80; }
-        #end-screen .highscore-section { margin-top: 20px; width: 100%; max-width: 600px; }
-        #end-screen .highscore-table { background-color: rgba(255, 255, 255, 0.1); color: #eee; }
+-y: auto; }
+        #end-screen h2 { color: #ffd700; margin        #end-screen h3 { margin-top: 25px; margin-bottom: 10px; color: #ffcc80; }
+        #end-screen .highscore-section { margin-top: 20px;-bottom: 20px; }
+        #end-screen p { margin: 8px 0; }
+        #end-screen h3 { margin-top: 25px; margin-bottom: 10px; color: #ffcc width: 100%; max-width: 600px; }
+        #end-screen80; }
+        #end-screen .highscore-section { margin-top: 20px; .highscore-table { background-color: rgba(255, 255, 255 width: 100%; max-width: 600px; }
+        #end-screen, 0.1); color: #eee; }
+        #end-screen .highscore-table th { .highscore-table { background-color: rgba(255, 255, 255, 0.1); color: #eee; }
         #end-screen .highscore-table th { background-color: rgba(0, 0, 0, 0.3); color: #ffcc80; }
-        #end-screen .highscore-table td { border-color: rgba(255, 255, 255, 0.2); }
-        #end-screen #wrong-answers-list { list-style: none; padding: 0; margin: 10px 0 20px 0; max-width: 400px; text-align: left; }
-        #end-screen #wrong-answers-list li { background-color: rgba(255, 100, 100, 0.15); padding: 5px 10px; margin-bottom: 5px; border-radius: 4px; font-family: sans-serif; }
-        #play-again-button { margin-top: 30px; padding: 12px 25px; font-size: 1.1em; background-color: #4CAF50; color: white; border: none; border-radius: 5px; cursor: pointer; transition: background-color 0.3s; }
-        #play-again-button:hover { background-color: #45a049; }
-        @media (min-width: 600px) { #numpad-container button { padding: 15px 0; } }
-    </style>
+        #end-screen .highscore-table td { border-color: rgba(255, 255, 255,  background-color: rgba(0, 0, 0, 0.3); color: #ffcc80; }
+        #0.2); }
+        #end-screen #wrong-answers-list { list-style: none;end-screen .highscore-table td { border-color: rgba(255, 255, 255,  padding: 0; margin: 10px 0 20px 0; max-width:0.2); }
+        #end-screen #wrong-answers-list { list-style: none; padding: 0 400px; text-align: left; }
+        #end-screen #wrong-answers-list li { background-color: rgba(255, 100, 100, ; margin: 10px 0 20px 0; max-width: 4000.15); padding: 5px 10px; margin-bottom: 5px; border-radius: 4px; font-family: sans-serif; }
+        #play-again-buttonpx; text-align: left; }
+        #end-screen #wrong-answers-list li { background-color: rgba(255, 100, 100, 0.15 { margin-top: 30px; padding: 12px 25px; font-size: 1.1em;); padding: 5px 10px; margin-bottom: 5px; border-radius: 4px; font-family: background-color: #4CAF50; color: white; border: none; border-radius: 5px; cursor: pointer; transition: background-color 0.3s; }
+        #play-again-button:hover { background- sans-serif; }
+        #play-again-button { margin-top: 30px; paddingcolor: #45a049; }
+        @media (min-width: 600: 12px 25px; font-size: 1.1em; background-color:px) { #numpad-container button { padding: 15px 0; } }
+     #4CAF50; color: white; border: none; border-radius: 5px; cursor:</style>
 
     <!-- Firebase SDKs -->
-    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6 pointer; transition: background-color 0.3s; }
+        #play-again-button:hover.10/firebase-app-compat.js"></script>
+    <script src="https://www. { background-color: #45a049; }
+        @media (min-width: gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>600px) { #numpad-container button { padding: 15px 0; }
 
 </head>
 <body>
     <!-- HTML Structure remains the same -->
-    <div id="start-screen"><h2>Willkommen...</h2>...</div>
+    <div id="start-screen"><h2>Will }
+    </style>
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatickommen...</h2>...</div>
     <div id="game-area" class="hidden">...</div>
-    <div id="inventory" class="hidden">...</div>
+    <div id="inventory.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+" class="hidden">...</div>
     <div id="quiz-modal" class="hidden">...</div>
     <div id="end-screen" class="hidden">...</div>
 
     <script>
+        // *** Perform code cleaning (copy/paste via plain text editor, save UTF-8 w/o BOM) ***
+        console.log("SCRIPT START    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
+
+</head>
+<body>
+    <!-- HTML Structure remains the same -->
+    <div");
+
+        // --- Firebase Konfiguration ---
+        var firebaseConfig = { apiKey: "...", databaseURL: "..." id="start-screen"><h2>Willkommen...</h2>...</div>
+    <div id="game-area" class /* Add other keys */ };
+        try {
+            firebase.initializeApp(firebaseConfig);
+            var database = firebase.database="hidden">...</div>
+    <div id="inventory" class="hidden">...</div>
+    <div id="quiz-modal();
+            console.log("Firebase Initialized");
+        } catch (e) { console.error("FIRE" class="hidden">...</div>
+    <div id="end-screen" class="hidden">...</div>
+
+BASE INIT FAILED:", e); }
+
+
+        // --- DOM Elemente ---
+        var startScreen = document.getElementById('start-    <script>
         console.log("SCRIPT START");
 
         // --- Firebase Konfiguration ---
-        var firebaseConfig = { apiKey: "...", databaseURL: "..." /* Add other keys */ };
+        var firebaseConfig = { apiKeyscreen');
+        var playerNameInput = document.getElementById('player-name');
+        var startGameButton = document.getElementById('start-game-button');
+        // ... (keep all other DOM element vars)
+        var gameArea = document.getElementById: "AIzaSyAJWO7g9Xgy-c2nX8ovNpSlqmuFp('game-area');
+        var hero = document.getElementById('hero');
+        var inventoryDisplay = document.getElementById('inventory');_EZy9Q", /*...*/ databaseURL: "https://blumen-b5bac-default-rtd
+        var quizModal = document.getElementById('quiz-modal');
+        var enemyElement = document.getElementById('b.europe-west1.firebasedatabase.app/" }; // Simplified for brevity
         try {
-            firebase.initializeApp(firebaseConfig);
+            firebaseenemy');
+        var endScreen = document.getElementById('end-screen');
+        // etc.
+        console.log("DOM.initializeApp(firebaseConfig);
             var database = firebase.database();
-            console.log("Firebase Initialized");
+            console.log("Firebase Initialized Elements Referenced");
+
+
+        // --- Audio Context & Sounds ---
+        var audioCtx;
+        var levelUpSound;
+        var levelUpSound");
         } catch (e) { console.error("FIREBASE INIT FAILED:", e); }
 
 
         // --- DOM Elemente ---
         var startScreen = document.getElementById('start-screen');
-        var playerNameInput = document.getElementById('player-name');
+        var playerNameInput = document.getElementById('player-Base64 = 'data:audio/mpeg;base64,SUQzBAAAAAABEVRYWFgAAAAtAAADY29tbWVudABCaWdTb3VuZEJhbmsuY29tIC8gTGliAvUMAAAAEAAAAAAAAAAAAAAAAAAAAAAA//MkxAAAANIAAAAAExBTUUzLjk4LjIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
+        console.log("Audio variables declared");
+
+        // *** SIMPLIFIED initAudio - NO try/catch,name');
         var startGameButton = document.getElementById('start-game-button');
-        // ... (keep all other DOM element vars)
         var gameArea = document.getElementById('game-area');
-        var hero = document.getElementById('hero');
-        var inventoryDisplay = document.getElementById('inventory');
-        var quizModal = document.getElementById('quiz-modal');
-        var enemyElement = document.getElementById('enemy');
-        var endScreen = document.getElementById('end-screen');
-        // etc.
+        // ... (Assume other DOM vars are here) ...
         console.log("DOM Elements Referenced");
 
 
         // --- Audio Context & Sounds ---
-        // *** ADDING BACK VARS AND CORE FUNCTIONS ***
-        var audioCtx;
-        var levelUpSound; // keep declaration even if file isn't used yet
-        var levelUpSoundBase64 = 'data:audio/mpeg;base64,SUQzBAAAAAABEVRYWFgAAAAtAAADY29tbWVudABCaWdTb3VuZEJhbmsuY29tIC8gTGliAvUMAAAAEAAAAAAAAAAAAAAAAAAAAAAA//MkxAAAANIAAAAAExBTUUzLjk4LjIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
-        console.log("Audio variables declared");
+        var audioCtx; // Keep
+        // var levelUpSound; // Comment out object creation reference for now
+        // var levelUpSoundBase64 = '...'; // Comment out base64 data
+        console.log NO context creation ***
+        function initAudio() {
+            if (audioCtx) { console.log("AudioContext already initialized."); return; }
+            console.log("initAudio called, but doing nothing for now.");
+            // We("Audio variables declared (simplified)");
 
         function initAudio() {
-            // Check if context already exists
-            if (audioCtx) {
-                 console.log("AudioContext already initialized.");
-                 return;
-            }
-            // Prevent running if game is over (might be overkill here)
-            // if (gameIsOver) return;
-
+            if (audioCtx) { console.log("AudioContext already initialized."); return; }
             console.log("Attempting to initialize AudioContext...");
             try {
-                // Use the standard construction, should be compatible
+                // Try will attempt context creation later if this version works
+        }
+        console.log("Simplified initAudio function defined");
+
+        // *** playTone with BODY COMMENTED OUT ***
+        function playTone(frequency, duration, type, volume) {
+            // Keep parameter handling
+            var freq = (typeof frequency !== 'undefined') ? frequency : 4 creating the context
                 audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-                // Check if context was successfully created
                 if (audioCtx) {
                     console.log("AudioContext initialized successfully.");
-                    // Try creating the Audio object, but maybe don't load/preload yet
-                    // levelUpSound = new Audio(levelUpSoundBase64);
-                    // levelUpSound.preload = 'auto';
-                    // console.log("Level up sound Audio object created.");
+                    // DO NOT create the new Audio() object here yet
                 } else {
                     console.error("AudioContext creation returned null or undefined.");
                 }
-
-            } catch (e) {
-                // Log the specific error during initialization
+            } catch (e) {40;
+            var dur = (typeof duration !== 'undefined') ? duration : 0.1;
+            var waveType = (typeof type !== 'undefined') ? type : 'sine';
+            var vol = (typeof volume !== 'undefined') ? volume : 0.5;
+            console.log("playTone function CALLED (body commented out)
                 console.error("AudioContext init failed with error:", e);
-                audioCtx = null; // Ensure it's null if failed
+                audioCtx = null;
             }
         }
         console.log("initAudio function defined");
 
-        function playTone(frequency, duration, type, volume) {
-            // Definition kept from previous step (ES5 compatible)
-            var freq = (typeof frequency !== 'undefined') ? frequency : 440;
-            var dur = (typeof duration !== 'undefined') ? duration : 0.1;
-            var waveType = (typeof type !== 'undefined') ? type : 'sine';
-            var vol = (typeof volume !== 'undefined') ? volume : 0.5;
+        // *** COMMENT OUT playTone function definition *** with f=", freq);
+            /* // BODY COMMENTED OUT
             if (!audioCtx) {
                 console.log("playTone called but audioCtx is null.");
                 return;
             }
             console.log("playTone attempting: f=", freq, " d=", dur, " t=", waveType, " v=", vol);
             try {
-                var oscillator = audioCtx.createOscillator();
+
+        /*
+        function playTone(frequency, duration, type, volume) {
+            // ... function body ...
+        }
+        */
+        console.log("playTone function definition COMMENTED OUT");
+
+        // --- Specific play...Sound functions remain commented out ---
+
+
+        // --- Spielzustand (using var) ---
+        var currentPlayerName = "Anonym";
+        var gameIsOver =                var oscillator = audioCtx.createOscillator();
                 var gainNode = audioCtx.createGain();
                 oscillator.type = waveType;
                 oscillator.frequency.setValueAtTime(freq, audioCtx.currentTime);
                 gainNode.gain.setValueAtTime(vol, audioCtx.currentTime);
                 gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + dur);
-                oscillator.connect(gainNode);
+                oscillator.connect false;
+        // ... (keep others needed for basic start)
+        var localHighScores = [];
+        console.log("Basic game state variables declared.");
+
+
+        // --- Konfiguration (using var) ---
+        var FLOWER_GOAL = 20;
+        // ... (keep others)
+        console.log("Config(gainNode);
                 gainNode.connect(audioCtx.destination);
                 oscillator.start(audioCtx.currentTime);
                 oscillator.stop(audioCtx.currentTime + dur + 0.05);
@@ -166,8 +294,24 @@
             } catch (e) {
                 console.error("Error executing playTone sequence:", e);
             }
+            */ // END BODY COMMENTED OUT
         }
-        console.log("playTone function defined");
+        console.log("playTone function variables declared.");
+
+
+        // --- Feind Konfiguration & Zustand (using var) ---
+        var BASE_ENEMY_STEP_SIZE = 10;
+        // ... (keep others)
+        console.log("Enemy config declared.");
+
+
+        // --- Initialisierung ---
+        function initGame() {
+            console.log("initGame called");
+            gameIsOver = false;
+            // Add click listener to trigger audio init
+            if (gameArea) {
+                gameArea.removeEventListener defined (body commented)");
 
         // --- Specific play...Sound functions remain commented out ---
         /*
@@ -180,7 +324,19 @@
         // --- Spielzustand (using var) ---
         var currentPlayerName = "Anonym";
         var gameIsOver = false;
-        var localHighScores = [];
+        var local('click', handleFirstClick); // Clean up previous
+                gameArea.addEventListener('click', handleFirstClick);
+                gameArea.classList.remove('hidden'); // Make clickable
+                console.log("initGame added first click listener & made game area visible");
+            } else {
+                 console.error("initGame: gameArea not found!");
+            }
+            /* Other initGame content remains commented */
+        }
+        console.log("initGame function defined");
+
+
+        // --- Start ScreenHighScores = [];
         console.log("Basic game state variables declared.");
 
 
@@ -188,11 +344,24 @@
         var FLOWER_GOAL = 20;
         var CORRECT_ANSWERS_NEEDED_FOR_FLOWER = 3;
         // ... (keep others)
-        var flowerColors = [ { bg: '#f48fb1', border: '#ad1457' }, { bg: '#90caf9', border: '#1e88e5' }, { bg: '#ffe082', border: '#ffab00' }, { bg: '#a5d6a7', border: '#388e3c' }, { bg: '#b39ddb', border: '#5e35b1' } ];
+        var flowerColors = [ { bg: '#f48fb1', border: '#ad1457' }, { bg: '#90caf9', border: '#1e88e5' }, { Logic ---
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log("DOMContentLoaded event fired");
+            try {
+                var savedName = localStorage.getItem('lastPlayerName');
+                if (savedName && playerNameInput) { playerNameInput.value = savedName; console.log("Player name loaded"); }
+                console.log("High score functions skipped");
+
+                if bg: '#ffe082', border: '#ffab00' }, { bg: '#a5d6a7', border: '#388e3c' }, { bg: '#b39ddb', border: '#5e35b1' } ];
         console.log("Config variables declared.");
 
 
-        // --- Feind Konfiguration & Zustand (using var) ---
+        // --- Fe (startGameButton) {
+                    startGameButton.addEventListener('click', function() {
+                        console.log("Start Game Button Clicked");
+                        var name = ""; if(playerNameInput) { name = playerNameInput.value.trim(); }
+                        if (!name) { console.log("Player name missing"); return; }
+                        currentPlayerName = name; localStorageind Konfiguration & Zustand (using var) ---
         var BASE_ENEMY_STEP_SIZE = 10;
         // ... (keep others)
         var enemyData = { element: enemyElement, position: { x: -100, y: -100 }, active: false, frozen: false, freezeTimeoutId: null, moveIntervalId: null };
@@ -200,22 +369,37 @@
 
 
         // --- Initialisierung ---
-        function initGame() {
+        function initGame().setItem('lastPlayerName', name);
+                        if(startScreen) { startScreen.classList.add('hidden'); }
+                        console.log("Calling initGame from Start Button");
+                        initGame();
+                    });
+                    console.log("Start button listener added");
+                } else { console.error("Start game button not found!"); }
+            } catch(e) { console.error {
             console.log("initGame called (content still mostly commented)");
-            // Make sure gameIsOver is reset if we test interactions
             gameIsOver = false;
-
-            // We need the first click handler active to test initAudio
-            gameArea.removeEventListener('click', handleGameAreaClick); // Ensure no duplicates if run again
+            gameArea.removeEventListener('click', handleGameAreaClick);
             gameArea.removeEventListener('click', handleFirstClick);
             gameArea.addEventListener('click', handleFirstClick);
             console.log("initGame added first click listener");
-
-            // Show the game area so we can click it
             if(gameArea) gameArea.classList.remove('hidden');
-
             /* Other initGame content remains commented */
+        }("Error in DOMContentLoaded:", e); }
+        });
+
+
+        // --- Spezieller Handler für den ersten Klick (Audio) ---
+        function handleFirstClick(event) {
+            console.log("handleFirstClick called");
+            if (gameIsOver) { console.log("handleFirstClick skipped (game over)"); return; }
+            initAudio(); // Try to initialize audio context
+            if (gameArea) {
+                gameArea.removeEventListener('click', handleFirstClick);
+                console.log("handleFirstClick listener removed");
+            }
         }
+        console.log("handleFirstClick
 
 
         // --- Start Screen Logic ---
@@ -227,52 +411,20 @@
                 console.log("High score functions skipped");
 
                 if (startGameButton) {
-                    startGameButton.addEventListener('click', function() {
+                    startGameButton. function defined");
+
+
+        // --- ALL OTHER GAME LOGIC FUNCTIONS MOSTLY COMMENTED OUT ---
+        // ... (keep function stubs or comments) ...
+        function escapeHtml(unsafe) { if (!unsafe) return ""; return unsafe.replace(/&/g,"&").replace(/</g,"<").replace(/>/g,">").replace(/"/g,""").replace(/'/g,"'"); }
+
+        console.log("SCRIPT END");addEventListener('click', function() {
                         console.log("Start Game Button Clicked");
                         var name = ""; if(playerNameInput) { name = playerNameInput.value.trim(); }
                         if (!name) { console.log("Player name missing"); return; }
                         currentPlayerName = name; localStorage.setItem('lastPlayerName', name);
                         if(startScreen) { startScreen.classList.add('hidden'); }
-                        console.log("Calling initGame from Start Button");
-                        initGame(); // Call initGame, which now adds the click listener
-                    });
-                    console.log("Start button listener added");
-                } else { console.error("Start game button not found!"); }
-            } catch(e) { console.error("Error in DOMContentLoaded:", e); }
-        });
-
-
-        // --- Spezieller Handler für den ersten Klick (Audio) ---
-        // *** MODIFY TO ONLY CALL initAudio and remove itself ***
-        function handleFirstClick(event) {
-            console.log("handleFirstClick called");
-            if (gameIsOver) {
-                console.log("handleFirstClick skipped (game over)");
-                return;
-            }
-            // Attempt to initialize audio context
-            initAudio();
-
-            // Remove this specific listener after the first click
-            if (gameArea) {
-                gameArea.removeEventListener('click', handleFirstClick);
-                console.log("handleFirstClick listener removed");
-                // Add the regular game click listener (though its content is commented)
-                // gameArea.addEventListener('click', handleGameAreaClick);
-                // console.log("handleGameAreaClick listener added (but function is empty)");
-            }
-            // handleGameAreaClick(event); // Don't call the main handler yet
-        }
-        console.log("handleFirstClick function defined");
-
-
-        // --- ALL OTHER GAME LOGIC FUNCTIONS MOSTLY COMMENTED OUT ---
-        function setupLevel() { /* ... */ }
-        function handleGameAreaClick(event) { console.log("Game area clicked (post-first click)"); /* ... */ }
-        // ... keep other functions commented ...
-        function escapeHtml(unsafe) { if (!unsafe) return ""; return unsafe.replace(/&/g,"&").replace(/</g,"<").replace(/>/g,">").replace(/"/g,""").replace(/'/g,"'"); }
-
-        console.log("SCRIPT END");
+                        console.log("Calling
     </script>
 </body>
 </html>
