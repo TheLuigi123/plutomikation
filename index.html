@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Koalas Multiplikations-Abenteuer</title>
     <style>
-        /* CSS */
+        /* CSS (Keep all styles) */
         html, body { height: 100%; margin: 0; overflow: hidden; font-family: sans-serif; background-color: #e0f7fa; }
         #start-screen { position: fixed; inset: 0; background-color: #a2d5ab; color: #333; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 110; padding: 20px; text-align: center; overflow-y: auto; }
         /* ... other styles ... */
@@ -20,11 +20,11 @@
 </head>
 <body>
     <!-- HTML Structure -->
-    <div id="start-screen"><h2>Willkommen...</h2><!-- ... --></div>
+    <div id="start-screen"><h2>Willkommen...</h2><label for="player-name">Dein Name:</label><input type="text" id="player-name" placeholder="Gib deinen Namen ein"><button id="start-game-button">Spiel starten</button><div class="highscore-section"><h3>Klasse Top 10</h3><table id="global-highscore-table" class="highscore-table"><thead><tr><th>#</th><th>Name</th><th>Zeit</th><th>Monster getroffen</th></tr></thead><tbody id="global-highscore-body"><tr class="loading-msg"><td colspan="4">Lade Klasse Top 10...</td></tr></tbody></table></div><div class="highscore-section"><h3>Deine Top 10 (Lokal)</h3><table id="local-highscore-table" class="highscore-table"><thead><tr><th>#</th><th>Name</th><th>Zeit</th><th>Monster getroffen</th></tr></thead><tbody id="local-highscore-body"><tr class="loading-msg"><td colspan="4">Keine lokalen Highscores gefunden.</td></tr></tbody></table></div></div>
     <div id="game-area" class="hidden"><div id="hero"></div><div id="enemy" class="hidden"></div></div>
     <div id="inventory" class="hidden">Blumen: 0</div>
-    <div id="quiz-modal" class="hidden"><!-- ... --></div>
-    <div id="end-screen" class="hidden"><!-- ... --></div>
+    <div id="quiz-modal" class="hidden"><h3 id="quiz-title">...</h3><div id="quiz-question">...</div><div id="quiz-input-display" aria-live="polite"></div><div id="numpad-container"><button data-digit="1">1</button> <button data-digit="2">2</button> <button data-digit="3">3</button><button data-digit="4">4</button> <button data-digit="5">5</button> <button data-digit="6">6</button><button data-digit="7">7</button> <button data-digit="8">8</button> <button data-digit="9">9</button><button id="numpad-clear">Löschen</button> <button data-digit="0" id="numpad-zero">0</button> <button id="numpad-submit">OK</button></div><div id="quiz-message"></div></div>
+    <div id="end-screen" class="hidden"><h2>Geschafft!</h2><p id="final-time">...</p><div class="highscore-section"><h3>...</h3><table id="local-end-highscore-table" class="highscore-table"><thead><tr><th>#</th><th>Name</th><th>Zeit</th><th>Monster getroffen</th></tr></thead><tbody id="local-end-highscore-body"><tr class="loading-msg"><td colspan="4">...</td></tr></tbody></table></div><h3>Fehlerhafte Aufgaben:</h3><ul id="wrong-answers-list"><li>...</li></ul><button id="play-again-button">Nochmal spielen?</button></div>
 
     <script>
         console.log("SCRIPT START");
@@ -54,7 +54,7 @@
         var quizInputDisplay = document.getElementById('quiz-input-display');
         var quizMessage = document.getElementById('quiz-message');
         var numpadContainer = document.getElementById('numpad-container');
-        var enemyElement = document.getElementById('enemy');
+        var enemyElement = document.getElementById('enemy'); // Keep this one as it's potentially used below
         var endScreen = document.getElementById('end-screen');
         var finalTimeDisplay = document.getElementById('final-time');
         var localEndHighscoreBody = document.getElementById('local-end-highscore-body');
@@ -65,36 +65,30 @@
         // --- Audio Context & Sounds --- DELETED
         console.log("Audio section deleted.");
 
-
-        // *** Spielzustand Variables - COMMENT REMOVED ***
-        // *** Ensure there are NO hidden characters or weird spaces around here ***
+        // --- Spielzustand (using var) ---
+        // *** Keep commented out ***
+        /*
         var currentPlayerName = "Anonym";
         var currentLevel = 1;
-        var flowersCollected = 0;
-        var flowers = [];
-        var activeItem = null;
-        var activeItemType = null;
-        var currentQuestions = [];
-        var currentQuestionIndex = 0;
-        var correctAnswersForItem = 0;
-        var heroIsMoving = false;
-        var gameIsOver = false;
-        var startTime = 0;
-        var wrongAnswersLog = {};
-        var monsterEncounters = 0;
+        // ... etc ...
         var localHighScores = [];
-        console.log("Game state variables DECLARED."); // Log confirms this block was parsed
-
+        */
+        console.log("Game state variables SKIPPED.");
 
         // --- Konfiguration (using var) ---
+        // *** Keep commented out ***
+        /*
         var FLOWER_GOAL = 20;
         var CORRECT_ANSWERS_NEEDED_FOR_FLOWER = 3;
         var NUM_QUESTIONS_PER_ENEMY = 5;
         var NUM_QUESTIONS_TO_GENERATE = 5;
         var flowerColors = [ { bg: '#f48fb1', border: '#ad1457' }, { bg: '#90caf9', border: '#1e88e5' }, { bg: '#ffe082', border: '#ffab00' }, { bg: '#a5d6a7', border: '#388e3c' }, { bg: '#b39ddb', border: '#5e35b1' } ];
-        console.log("Config variables declared.");
+        */
+        console.log("Config variables SKIPPED.");
 
         // --- Feind Konfiguration & Zustand (using var) ---
+        // *** Keep commented out ***
+        /*
         var BASE_ENEMY_STEP_SIZE = 10;
         var BASE_ENEMY_MOVE_INTERVAL = 200;
         var ENEMY_RANDOM_FACTOR = 4;
@@ -103,7 +97,8 @@
         var currentEnemyStepSize = BASE_ENEMY_STEP_SIZE;
         var currentEnemyMoveInterval = BASE_ENEMY_MOVE_INTERVAL;
         var enemyData = { element: enemyElement, position: { x: -100, y: -100 }, active: false, frozen: false, freezeTimeoutId: null, moveIntervalId: null };
-        console.log("Enemy config declared.");
+        */
+        console.log("Enemy config SKIPPED.");
 
         // --- Initialisierung ---
         function initGame() {
@@ -121,13 +116,14 @@
                 }
                 console.log("High score functions skipped");
                 if (startGameButton) {
+                    // *** Keep inner logic commented out ***
                     startGameButton.addEventListener('click', function() {
                         console.log("Start Game Button Clicked (inner logic commented)");
-                        /* // Inner logic still commented
+                        /*
                         var name = "";
                         if(playerNameInput) { name = playerNameInput.value.trim(); }
                         if (!name) { console.log("Player name missing"); return; }
-                        currentPlayerName = name; // Assign to variable from active state block
+                        window.currentPlayerName = name; // Assign to global scope if state block is commented
                         localStorage.setItem('lastPlayerName', name);
                         if(startScreen) { startScreen.classList.add('hidden'); }
                         console.log("Starting game setup (calling initGame)");
@@ -139,25 +135,23 @@
             } catch(e) { console.error("Error in DOMContentLoaded:", e); }
         });
 
+        // Minimal global declaration
+        var currentPlayerName = "Anonym";
+
 
         // --- ALL GAME LOGIC FUNCTIONS COMMENTED OUT OR EMPTY ---
         // ... function stubs ...
         function handleFirstClick(event) { /* ... */ }
         function setupLevel() { /* ... */ }
         // ... other functions ...
-
-        // *** Keep formatTime function commented out ***
-        /*
-        function formatTime(milliseconds) { // ... }
-        */
-        console.log("formatTime function skipped.");
-
+        function formatTime(milliseconds) { return "00:00.0"; } // Keep stub
         function loadLocalHighScores() { /* ... */ }
         // ... other function stubs ...
         function endGame() { /* ... */ }
 
         // --- Hilfsfunktionen ---
-        // Keep uncommented
+        // *** Keep commented out ***
+        /*
         function getRandomPosition(bounds, margin) {
              var w = bounds.width || window.innerWidth; var h = bounds.height || window.innerHeight;
              var sz = 40; var x = Math.random() * (w - margin * 2 - sz) + margin; var y = Math.random() * (h - margin * 2 - sz) + margin;
@@ -167,7 +161,9 @@
              if (!unsafe) return "";
              return unsafe.replace(/&/g, "&").replace(/</g, "<").replace(/>/g, ">").replace(/"/g, """).replace(/'/g, "'");
         }
-        console.log("Helper functions defined.");
+        */
+        console.log("Helper functions SKIPPED.");
+
 
         console.log("SCRIPT END");
     </script>
