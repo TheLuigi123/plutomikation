@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Koalas Multiplikations-Abenteuer</title> <!-- Level removed from title -->
+    <title>Koalas Multiplikations-Abenteuer</title>
     <style>
         /* CSS (inkl. neuem End Screen Style & Start Screen) */
         html, body {
@@ -279,7 +279,7 @@
                     <tr><th>#</th><th>Name</th><th>Zeit</th><th>Monster getroffen</th></tr>
                 </thead>
                 <tbody id="global-highscore-body">
-                    <tr class="loading-msg"><td colspan="4">Lade globale Highscores...</td></tr>
+                    <tr class="loading-msg"><td colspan="4">Lade Klasse Top 10...</td></tr>
                 </tbody>
             </table>
         </div>
@@ -393,7 +393,6 @@
         const enemyElement = document.getElementById('enemy');
         const endScreen = document.getElementById('end-screen');
         const finalTimeDisplay = document.getElementById('final-time');
-        // const localEndHighscoreList = document.getElementById('local-end-highscore-list'); // No longer a list
         const localEndHighscoreBody = document.getElementById('local-end-highscore-body'); // New table body ID
         const wrongAnswersList = document.getElementById('wrong-answers-list');
         const playAgainButton = document.getElementById('play-again-button');
@@ -448,14 +447,14 @@
 
         // --- Spielzustand ---
         let currentPlayerName = "Anonym";
-        let currentLevel = 1; // Still used for flower colors and potentially enemy scaling later
+        let currentLevel = 1;
         let flowersCollected = 0;
         let flowers = [];
         let activeItem = null;
         let activeItemType = null;
         let currentQuestions = [];
         let currentQuestionIndex = 0;
-        let correctAnswersForItem = 0; // *** NEU: Zähler für aktuelle Interaktion ***
+        let correctAnswersForItem = 0;
         let heroIsMoving = false;
         let gameIsOver = false;
         let startTime = 0;
@@ -464,10 +463,10 @@
         let localHighScores = [];
 
         // --- Konfiguration ---
-        const FLOWER_GOAL = 20; // *** GEÄNDERT: Zurück auf 20 ***
-        const CORRECT_ANSWERS_NEEDED_FOR_FLOWER = 3; // *** NEU ***
-        const NUM_QUESTIONS_PER_ENEMY = 5; // Keep separate for enemy
-        const NUM_QUESTIONS_TO_GENERATE = 5; // Generate enough questions
+        const FLOWER_GOAL = 20;
+        const CORRECT_ANSWERS_NEEDED_FOR_FLOWER = 3;
+        const NUM_QUESTIONS_PER_ENEMY = 5;
+        const NUM_QUESTIONS_TO_GENERATE = 5;
         const flowerColors = [
             { bg: '#f48fb1', border: '#ad1457' }, { bg: '#90caf9', border: '#1e88e5' },
             { bg: '#ffe082', border: '#ffab00' }, { bg: '#a5d6a7', border: '#388e3c' },
@@ -491,12 +490,12 @@
             wrongAnswersLog = {};
             monsterEncounters = 0;
             flowersCollected = 0;
-            currentLevel = 1; // Reset level for colors/scaling
-            currentEnemyStepSize = BASE_ENEMY_STEP_SIZE; // Reset enemy speed
+            currentLevel = 1;
+            currentEnemyStepSize = BASE_ENEMY_STEP_SIZE; // Start with base speed
             currentEnemyMoveInterval = BASE_ENEMY_MOVE_INTERVAL;
 
             updateInventory();
-            updateTitle(); // Title no longer shows level
+            updateTitle();
             setupLevel();
 
             gameArea.removeEventListener('click', handleGameAreaClick);
@@ -521,13 +520,13 @@
                 playerNameInput.value = savedName;
             }
             loadLocalHighScores();
-            displayLocalHighScores(); // Display in start screen table
+            displayLocalHighScores();
             fetchAndDisplayGlobalHighScores();
 
             startGameButton.addEventListener('click', () => {
                 const name = playerNameInput.value.trim();
                 if (!name) {
-                    alert("Bitte gib deinen Namen ein!"); // Keep alert for essential info
+                    alert("Bitte gib deinen Namen ein!");
                     return;
                 }
                 currentPlayerName = name;
@@ -546,37 +545,29 @@
             gameArea.addEventListener('click', handleGameAreaClick);
         }
 
-        // --- Level Management (Simplified - mostly for flower colors/enemy scaling now) ---
+        // --- Level Management (Simplified) ---
         function setupLevel() {
             if(gameIsOver) return;
             clearOldFlowers();
-            createFlowers(); // Create flowers for the current "stage"
-            // Optional: Increase enemy speed based on flowersCollected instead of levels?
-             // Example: currentEnemyStepSize = BASE_ENEMY_STEP_SIZE * (1 + flowersCollected * 0.05);
-             // Make sure enemy is respawned if speed changes significantly
+            createFlowers();
         }
 
-        // Function to start a *new set* of flowers, maybe not strictly a "level" anymore
         function replenishFlowers() {
             if(gameIsOver) return;
-            currentLevel++; // Advance color/difficulty index
-            updateTitle(); // Update title (if it showed level)
-            playLevelUpJingle(); // Sound for progress
-
-            // Potentially increase enemy speed here too
-            currentEnemyStepSize = BASE_ENEMY_STEP_SIZE * (1 + Math.floor(flowersCollected / 5) * 0.2); // Example: speed boost every 5 flowers
+            currentLevel++;
+            updateTitle();
+            playLevelUpJingle();
+            currentEnemyStepSize = BASE_ENEMY_STEP_SIZE * (1 + Math.floor(flowersCollected / 5) * 0.2);
             console.log(`Replenishing flowers. Total collected: ${flowersCollected}. Enemy Speed: ${currentEnemyStepSize.toFixed(2)}`);
 
             setTimeout(() => {
-                 setupLevel(); // Creates new flowers
-                 // Respawn enemy only if speed changed significantly or desired
+                 setupLevel();
                  if (enemyData.active) despawnEnemy();
                  spawnEnemy();
             }, 1500);
         }
 
         function updateTitle() {
-             // Title doesn't show level anymore, could show goal
              document.title = `Koalas Multiplikations-Abenteuer`;
         }
 
@@ -587,12 +578,11 @@
         function createFlowers() {
             const areaRect = gameArea.getBoundingClientRect();
             const colors = flowerColors[(currentLevel - 1) % flowerColors.length];
-            const numToCreate = 5; // How many flowers appear at once
+            const numToCreate = 5;
 
             for (let i = 0; i < numToCreate; i++) {
                 const flowerElement = document.createElement('div');
                 flowerElement.classList.add('flower');
-                // Simple ID based on collection count might be better if levels are gone
                 flowerElement.id = `flower-${flowersCollected + i}`;
                 flowerElement.style.backgroundColor = colors.bg;
                 flowerElement.style.borderColor = colors.border;
@@ -638,7 +628,7 @@
                 const heroRect = hero.getBoundingClientRect(); const enemyRect = enemyData.element.getBoundingClientRect();
                  if (checkRectOverlap(heroRect, enemyRect)) {
                      console.log("KOLLISION mit Feind!"); playEnemyHitSound();
-                     triggerEnemyQuiz(); // Increments encounter count
+                     triggerEnemyQuiz();
                      return;
                  }
             }
@@ -650,7 +640,7 @@
                     if (checkRectOverlap(heroRect, flowerRect)) {
                         console.log("KOLLISION mit Blume!", flower.id); playInteractSound();
                         activeItem = flower; activeItemType = 'flower';
-                        startQuiz(); // Start quiz for the flower
+                        startQuiz();
                         return;
                     }
                 }
@@ -671,40 +661,36 @@
         }
 
         // --- Quiz-Logik ---
-        function startQuiz() { // Called for both flowers and enemies now
+        function startQuiz() {
             if (!activeItem || gameIsOver) return;
-
-            correctAnswersForItem = 0; // *** Reset counter for this new item ***
-            currentQuestionIndex = 0; // Start from the first question
+            correctAnswersForItem = 0;
+            currentQuestionIndex = 0;
             quizMessage.textContent = '';
             quizMessage.className = '';
             quizInputDisplay.textContent = '';
 
             if (activeItemType === 'flower') {
                 quizTitle.textContent = "Blumen-Aufgabe!";
-                currentQuestions = generateQuestions(NUM_QUESTIONS_TO_GENERATE); // Generate questions
+                currentQuestions = generateQuestions(NUM_QUESTIONS_TO_GENERATE);
             } else if (activeItemType === 'enemy') {
                 quizTitle.textContent = "Monster-Aufgabe!";
-                currentQuestions = generateQuestions(NUM_QUESTIONS_PER_ENEMY); // Generate specific number for enemy
+                currentQuestions = generateQuestions(NUM_QUESTIONS_PER_ENEMY);
             }
-
             displayQuestion();
             quizModal.style.display = 'block';
         }
 
-        // triggerEnemyQuiz remains largely the same, just calls startQuiz
         function triggerEnemyQuiz() {
             if (!enemyData.active || enemyData.frozen || gameIsOver) return;
             monsterEncounters++;
             console.log("Starte Feind-Quiz, Begegnung #", monsterEncounters);
             if (enemyData.moveIntervalId) { clearInterval(enemyData.moveIntervalId); enemyData.moveIntervalId = null; }
             activeItem = enemyData; activeItemType = 'enemy';
-            startQuiz(); // Use the unified startQuiz function
+            startQuiz();
         }
 
         function generateQuestions(count) {
             const questions = [];
-            // Ensure we don't generate duplicates within a single quiz set
             const usedPairs = new Set();
             while (questions.length < count) {
                 const num1 = Math.floor(Math.random() * 10) + 1;
@@ -721,17 +707,12 @@
         function displayQuestion() {
             if (currentQuestionIndex < currentQuestions.length) {
                 quizQuestion.textContent = currentQuestions[currentQuestionIndex].text;
-                // Optionally add progress indicator for flowers
                  if(activeItemType === 'flower') {
                     quizMessage.textContent = `(${correctAnswersForItem} / ${CORRECT_ANSWERS_NEEDED_FOR_FLOWER} richtig)`;
-                    quizMessage.className = ''; // Neutral color
+                    quizMessage.className = '';
                  }
             } else {
-                 // This case might happen if enemy needs all 5, but we only generated 5
-                 // Or if something goes wrong with flower logic.
                  console.error("Versucht, Frage außerhalb des Bereichs anzuzeigen oder Quiz logik fehlerhaft.", currentQuestionIndex, currentQuestions.length);
-                 // Maybe close the quiz if this happens unexpectedly
-                 // handleQuizSuccess(); // Or handleQuizFailure?
                  quizModal.style.display = 'none';
                  activeItem = null;
                  activeItemType = null;
@@ -739,78 +720,48 @@
         }
 
         function checkAnswer() {
-            if (gameIsOver || !activeItem) return; // Check activeItem exists
-
+            if (gameIsOver || !activeItem) return;
             const userAnswerText = quizInputDisplay.textContent;
-            if (userAnswerText === '') {
-                 quizMessage.textContent = "Bitte gib eine Antwort ein!";
-                 quizMessage.className = 'incorrect';
-                 return;
-            }
-
+            if (userAnswerText === '') { quizMessage.textContent = "Bitte gib eine Antwort ein!"; quizMessage.className = 'incorrect'; return; }
             const userAnswer = parseInt(userAnswerText, 10);
             const currentQ = currentQuestions[currentQuestionIndex];
             const correctAnswer = currentQ.answer;
 
             if (isNaN(userAnswer)) {
-                quizMessage.textContent = "Ungültige Eingabe.";
-                quizMessage.className = 'incorrect';
-                quizInputDisplay.textContent = '';
-                return;
+                quizMessage.textContent = "Ungültige Eingabe."; quizMessage.className = 'incorrect'; quizInputDisplay.textContent = ''; return;
             }
 
             if (userAnswer === correctAnswer) {
                 playCorrectSound();
-                correctAnswersForItem++; // Increment counter for this item
-
-                // Check success conditions
+                correctAnswersForItem++;
                 let success = false;
                 if (activeItemType === 'flower' && correctAnswersForItem >= CORRECT_ANSWERS_NEEDED_FOR_FLOWER) {
-                    quizMessage.textContent = `Richtig! (${correctAnswersForItem}/${CORRECT_ANSWERS_NEEDED_FOR_FLOWER})`;
-                    quizMessage.className = 'correct';
-                    success = true;
+                    quizMessage.textContent = `Richtig! (${correctAnswersForItem}/${CORRECT_ANSWERS_NEEDED_FOR_FLOWER})`; quizMessage.className = 'correct'; success = true;
                 } else if (activeItemType === 'enemy' && currentQuestionIndex + 1 >= NUM_QUESTIONS_PER_ENEMY) {
-                    // Need to check index + 1 because index is 0-based
-                     quizMessage.textContent = "Richtig!";
-                     quizMessage.className = 'correct';
-                    success = true;
+                     quizMessage.textContent = "Richtig!"; quizMessage.className = 'correct'; success = true;
                 } else {
-                    // Correct, but not enough for success yet
-                     quizMessage.textContent = (activeItemType === 'flower')
-                        ? `Richtig! (${correctAnswersForItem}/${CORRECT_ANSWERS_NEEDED_FOR_FLOWER})`
-                        : "Richtig!";
-                     quizMessage.className = 'correct';
+                     quizMessage.textContent = (activeItemType === 'flower') ? `Richtig! (${correctAnswersForItem}/${CORRECT_ANSWERS_NEEDED_FOR_FLOWER})` : "Richtig!"; quizMessage.className = 'correct';
                 }
 
                 setTimeout(() => {
-                    if (success) {
-                        handleQuizSuccess(); // Handle collection or freeze
-                    } else {
-                        // Move to the next question
-                        currentQuestionIndex++;
-                        quizInputDisplay.textContent = ''; // Clear input for next question
-                        displayQuestion(); // Display next question (will update message)
+                    if (success) { handleQuizSuccess(); }
+                    else {
+                        currentQuestionIndex++; quizInputDisplay.textContent = ''; displayQuestion();
                     }
-                }, 800); // Delay to show message
+                }, 800);
 
             } else {
                 playWrongSound();
                 logWrongAnswer(currentQ.num1, currentQ.num2);
-                // Reset correct answer counter for flowers if wrong? Makes it harder. Let's NOT reset for now.
-                // correctAnswersForItem = (activeItemType === 'flower') ? 0 : correctAnswersForItem;
-                quizMessage.textContent = `Leider falsch. Richtig war ${correctAnswer}. Nochmal!`;
-                quizMessage.className = 'incorrect';
-                quizInputDisplay.textContent = ''; // Clear input for retry
-                // Keep the same question: don't increment currentQuestionIndex
-                // displayQuestion(); // Re-display same question with error message
+                quizMessage.textContent = `Leider falsch. Richtig war ${correctAnswer}. Nochmal!`; quizMessage.className = 'incorrect';
+                quizInputDisplay.textContent = '';
             }
         }
 
-        function handleQuizSuccess() { // Called when enough correct answers (flower) or all questions answered (enemy)
+        function handleQuizSuccess() {
             if (gameIsOver) return;
             quizModal.style.display = 'none';
-            const itemJustProcessed = activeItem;
-            const itemTypeProcessed = activeItemType;
+            const itemJustProcessed = activeItem; const itemTypeProcessed = activeItemType;
             console.log("handleQuizSuccess triggered for:", itemTypeProcessed);
 
             if (itemTypeProcessed === 'flower') {
@@ -822,32 +773,15 @@
                     flowersCollected++;
                     updateInventory();
 
-                    // Check for game end
-                    if (flowersCollected >= FLOWER_GOAL) {
-                        console.log("Blumen-Ziel erreicht!");
-                        endGame();
-                        return; // Stop processing
-                    }
+                    if (flowersCollected >= FLOWER_GOAL) { console.log("Blumen-Ziel erreicht!"); endGame(); return; }
+                    if (flowers.every(f => f.collected)) { console.log(`Alle sichtbaren Blumen gesammelt. Nachschub!`); replenishFlowers(); }
 
-                    // Check if all *currently visible* flowers are collected to replenish
-                    if (flowers.every(f => f.collected)) {
-                         console.log(`Alle sichtbaren Blumen gesammelt. Nachschub!`);
-                         // *** REMOVED Level completion alert ***
-                         // setTimeout(() => {
-                         //      alert(`Super! Level ${currentLevel} geschafft! ${flowersCollected} von ${FLOWER_GOAL} Blumen insgesamt gesammelt.`);
-                         // }, 100); // Short delay after sound
-                         replenishFlowers(); // Get new flowers
-                    }
                 } else { console.warn("Skipping flower processing - item invalid/collected:", itemJustProcessed); }
             } else if (itemTypeProcessed === 'enemy') {
-                console.log("Processing enemy freeze");
-                playFreezeSound();
-                freezeEnemy();
+                console.log("Processing enemy freeze"); playFreezeSound(); freezeEnemy();
             } else { console.warn("handleQuizSuccess called with unknown item type:", itemTypeProcessed); }
 
-            activeItem = null;
-            activeItemType = null;
-            correctAnswersForItem = 0; // Reset counter for next interaction
+            activeItem = null; activeItemType = null; correctAnswersForItem = 0;
         }
 
         // --- Inventar aktualisieren ---
@@ -863,8 +797,7 @@
              switch (edge) { case 0: startX = Math.random() * (areaRect.width - enemySize); startY = -enemySize; break; case 1: startX = areaRect.width; startY = Math.random() * (areaRect.height - enemySize); break; case 2: startX = Math.random() * (areaRect.width - enemySize); startY = areaRect.height; break; case 3: startX = -enemySize; startY = Math.random() * (areaRect.height - enemySize); break; }
              enemyData.position = { x: startX, y: startY }; enemyData.element.style.left = `${startX}px`; enemyData.element.style.top = `${startY}px`; enemyData.element.classList.remove('hidden', 'enemy-frozen'); enemyData.active = true; enemyData.frozen = false;
              if (enemyData.moveIntervalId) clearInterval(enemyData.moveIntervalId);
-             // Use current speed for this enemy instance
-             enemyData.moveIntervalId = setInterval(moveEnemy, currentEnemyMoveInterval); // Interval remains constant, speed changes via step size
+             enemyData.moveIntervalId = setInterval(moveEnemy, currentEnemyMoveInterval);
              console.log(`Feind gespawnt bei (${startX.toFixed(0)}, ${startY.toFixed(0)}) Speed Factor: ${currentEnemyStepSize/BASE_ENEMY_STEP_SIZE}`);
         }
         function despawnEnemy() {
@@ -879,7 +812,6 @@
             const dx = heroCenterX - (enemyX + enemyWidth / 2); const dy = heroCenterY - (enemyY + enemyHeight / 2); const distance = Math.sqrt(dx * dx + dy * dy);
             if (distance < (heroRect.width / 2 + enemyWidth / 2) * 0.8) { checkCollision(); return; }
             const normDx = dx / distance; const normDy = dy / distance;
-            // Use the current step size which might have been increased
             let stepX = normDx * currentEnemyStepSize; let stepY = normDy * currentEnemyStepSize;
             stepX += (Math.random() - 0.5) * 2 * ENEMY_RANDOM_FACTOR; stepY += (Math.random() - 0.5) * 2 * ENEMY_RANDOM_FACTOR;
             let newX = enemyX + stepX; let newY = enemyY + stepY;
@@ -899,16 +831,14 @@
         // --- Zeit- und Speicherfunktionen ---
         function formatTime(milliseconds) { // *** MODIFIED for 1 decimal place ***
              if (typeof milliseconds !== 'number' || isNaN(milliseconds)) return 'Ungültig';
-             const totalSeconds = milliseconds / 1000; // Keep fractional seconds
+             const totalSeconds = milliseconds / 1000;
              const minutes = Math.floor(totalSeconds / 60);
              const seconds = Math.floor(totalSeconds % 60);
-             // Calculate tenths of a second
              const tenths = Math.floor((totalSeconds - Math.floor(totalSeconds)) * 10);
              return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}.${tenths}`;
         }
 
-
-        // --- Lokale Highscore Verwaltung (mit Objekten) ---
+        // --- Lokale Highscore Verwaltung ---
         function loadLocalHighScores() {
             try {
                 const storedScores = localStorage.getItem('koalaMultiplyLocalScores');
@@ -931,25 +861,25 @@
             localHighScores.sort((a, b) => a.time - b.time);
             localHighScores = localHighScores.slice(0, 10);
             saveLocalHighScores();
-             displayLocalHighScores(); // Update start screen table (if visible)
+             displayLocalHighScores(); // Update start screen table
              displayLocalHighScoresEndScreen(); // Update end screen table
         }
 
-        // Function to display scores in a table body (used by both start and end screens)
+        // --- Highscore Table Display Logic (Shared) ---
         function populateScoreTable(tbodyElement, scores) {
-             tbodyElement.innerHTML = ''; // Clear previous entries
+             tbodyElement.innerHTML = '';
              if (!scores || scores.length === 0) {
-                 const message = (tbodyElement.id === "local-end-highscore-body") ? "Keine lokalen Highscores." : "Keine Highscores gefunden.";
+                 const message = (tbodyElement.id === "local-end-highscore-body" || tbodyElement.id === "local-highscore-body")
+                               ? "Keine lokalen Highscores."
+                               : "Keine Klasse Highscores."; // Adjusted message
                  tbodyElement.innerHTML = `<tr class="loading-msg"><td colspan="4">${message}</td></tr>`;
                  return;
              }
              scores.forEach((score, index) => {
                  const row = tbodyElement.insertRow();
-                 // Validate score object before accessing properties
                  const name = score.name ? escapeHtml(score.name) : 'Unbekannt';
                  const time = (score.time && typeof score.time === 'number') ? formatTime(score.time) : 'Ungültig';
                  const encounters = (score.encounters !== undefined && typeof score.encounters === 'number') ? score.encounters : '?';
-
                  row.innerHTML = `
                      <td>${index + 1}</td>
                      <td>${name}</td>
@@ -958,16 +888,12 @@
                  `;
              });
         }
-
-
         function displayLocalHighScores() { // For the Start Screen table
             populateScoreTable(localHighscoreBody, localHighScores);
         }
-
-        function displayLocalHighScoresEndScreen() { // *** MODIFIED for End Screen TABLE ***
+        function displayLocalHighScoresEndScreen() { // For the End Screen TABLE
             populateScoreTable(localEndHighscoreBody, localHighScores);
         }
-
 
         // --- Globale Highscore Verwaltung (Firebase) ---
         function fetchAndDisplayGlobalHighScores() {
@@ -977,13 +903,9 @@
             scoresRef.get().then((snapshot) => {
                 const scores = [];
                 if (snapshot.exists()) {
-                    snapshot.forEach((childSnapshot) => {
-                        scores.push(childSnapshot.val());
-                    });
+                    snapshot.forEach((childSnapshot) => { scores.push(childSnapshot.val()); });
                 }
-                 // Pass the potentially empty scores array to the populate function
-                 populateScoreTable(globalHighscoreBody, scores);
-
+                 populateScoreTable(globalHighscoreBody, scores); // Use shared function
             }).catch((error) => {
                 console.error("Error getting global high scores: ", error);
                 globalHighscoreBody.innerHTML = '<tr class="loading-msg"><td colspan="4">Fehler beim Laden der Highscores.</td></tr>';
@@ -1024,16 +946,24 @@
                 timestamp: firebase.database.ServerValue.TIMESTAMP
             };
 
+            // Score in Firebase speichern
             const scoresRef = database.ref('scores');
             const newScoreRef = scoresRef.push();
+            // *** USING TRADITIONAL FUNCTIONS FOR THEN/CATCH ***
             newScoreRef.set(currentScoreData)
-                .then(() => { console.log("Score erfolgreich in Firebase gespeichert!"); })
-                .catch((error) => { console.error("Fehler beim Speichern des Scores in Firebase: ", error); });
+                .then(function() {
+                    console.log("Score erfolgreich in Firebase gespeichert!");
+                })
+                .catch(function(error) {
+                    console.error("Fehler beim Speichern des Scores in Firebase: ", error);
+                }); // Semicolon added
+            // *** END CHANGE ***
 
-            updateLocalHighScores(currentScoreData);
 
-            finalTimeDisplay.textContent = `Deine Zeit: ${formatTime(elapsedTime)}`;
-            displayLocalHighScoresEndScreen(); // Update end screen table
+            updateLocalHighScores(currentScoreData); // Update local scores (calls display functions)
+
+            finalTimeDisplay.textContent = `Deine Zeit: ${formatTime(elapsedTime)}`; // Use updated format
+            // displayLocalHighScoresEndScreen(); // Already called by updateLocalHighScores
 
             const wrongAnswersFormatted = formatWrongAnswersForDisplay();
             wrongAnswersList.innerHTML = wrongAnswersFormatted.join('');
