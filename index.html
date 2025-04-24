@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Koalas Multiplikations-Abenteuer</title>
     <style>
-        /* CSS (Keep all styles for now, they shouldn't cause JS errors) */
+        /* CSS (Keep all styles) */
         html, body { height: 100%; margin: 0; overflow: hidden; font-family: sans-serif; background-color: #e0f7fa; }
         #start-screen { position: fixed; inset: 0; background-color: #a2d5ab; color: #333; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 110; padding: 20px; text-align: center; overflow-y: auto; }
         #start-screen h2 { color: #2e7d32; margin-bottom: 25px; font-size: clamp(1.5em, 4vw, 2.2em); }
@@ -109,7 +109,7 @@
     <div id="inventory" class="hidden">Blumen: 0</div>
 
     <!-- Pop-up für die Aufgaben -->
-    <div id="quiz-modal" class="hidden"> <!-- Keep hidden initially -->
+    <div id="quiz-modal" class="hidden">
         <h3 id="quiz-title">Multiplikations-Aufgabe!</h3>
         <div id="quiz-question">Frage lädt...</div>
         <div id="quiz-input-display" aria-live="polite"></div>
@@ -145,10 +145,9 @@
     </div>
 
     <script>
-        console.log("SCRIPT START"); // Log script start
+        console.log("SCRIPT START");
 
         // --- Firebase Konfiguration ---
-        // Keep this section active
         var firebaseConfig = {
             apiKey: "AIzaSyAJWO7g9Xgy-c2nX8ovNpSlqmuFp_EZy9Q",
             authDomain: "blumen-b5bac.firebaseapp.com",
@@ -169,7 +168,6 @@
 
 
         // --- DOM Elemente ---
-        // Keep these declarations
         var startScreen = document.getElementById('start-screen');
         var playerNameInput = document.getElementById('player-name');
         var startGameButton = document.getElementById('start-game-button');
@@ -193,70 +191,25 @@
         console.log("DOM Elements Referenced");
 
         // --- Audio Context & Sounds ---
-        // Commented Out
-        /*
-        var audioCtx;
-        var levelUpSound;
-        var levelUpSoundBase64 = 'data:audio/mpeg;base64,SUQzBAAAAAABEVRYWFgAAAAtAAADY29tbWVudABCaWdTb3VuZEJhbmsuY29tIC8gTGliAvUMAAAAEAAAAAAAAAAAAAAAAAAAAAAA//MkxAAAANIAAAAAExBTUUzLjk4LjIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
-
-        function initAudio() {
-            // ... content commented ...
-        }
-        function playTone(frequency, duration, type, volume) {
-            // ... content commented ...
-        }
-        function playClickSound() { /* playTone(880, 0.05, 'triangle', 0.3); * / }
-        function playInteractSound() { /* playTone(660, 0.08, 'sine', 0.4); * / }
-        function playCorrectSound() {
-            // ... content commented ...
-        }
-        function playWrongSound() {
-            // ... content commented ...
-        }
-        function playCollectSound() {
-            // ... content commented ...
-        }
-        function playFreezeSound() { /* playTone(440, 0.3, 'sawtooth', 0.4); * / }
-        function playUnfreezeSound() { /* playTone(587.33, 0.2, 'sine', 0.4); * / }
-        function playEnemySpawnSound() { /* playTone(110, 0.3, 'sawtooth', 0.5); * / }
-        function playEnemyHitSound() { /* playTone(220, 0.2, 'square', 0.6); * / }
-        function playLevelUpJingle() {
-            // ... content commented ...
-        }
-        function playGameOverSound() {
-            // ... content commented ...
-        }
-        */
+        // *** ENTIRE AUDIO SECTION DELETED ***
+        console.log("Audio section deleted.");
 
 
         // --- Spielzustand (using var) ---
-        // Keep declarations, maybe simplify initializations
         var currentPlayerName = "Anonym";
-        var currentLevel = 1;
-        var flowersCollected = 0;
-        var flowers = [];
-        var activeItem = null;
-        var activeItemType = null;
-        var currentQuestions = [];
-        var currentQuestionIndex = 0;
-        var correctAnswersForItem = 0;
-        var heroIsMoving = false;
         var gameIsOver = false;
-        var startTime = 0;
-        var wrongAnswersLog = {};
-        var monsterEncounters = 0;
-        var localHighScores = []; // Keep for structure
+        var localHighScores = []; // Keep for structure if needed later
+        console.log("Basic game state variables declared.");
 
         // --- Konfiguration (using var) ---
-        // Keep
         var FLOWER_GOAL = 20;
         var CORRECT_ANSWERS_NEEDED_FOR_FLOWER = 3;
         var NUM_QUESTIONS_PER_ENEMY = 5;
         var NUM_QUESTIONS_TO_GENERATE = 5;
         var flowerColors = [ { bg: '#f48fb1', border: '#ad1457' }, { bg: '#90caf9', border: '#1e88e5' }, { bg: '#ffe082', border: '#ffab00' }, { bg: '#a5d6a7', border: '#388e3c' }, { bg: '#b39ddb', border: '#5e35b1' } ];
+        console.log("Config variables declared.");
 
         // --- Feind Konfiguration & Zustand (using var) ---
-        // Keep declarations
         var BASE_ENEMY_STEP_SIZE = 10;
         var BASE_ENEMY_MOVE_INTERVAL = 200;
         var ENEMY_RANDOM_FACTOR = 4;
@@ -265,25 +218,16 @@
         var currentEnemyStepSize = BASE_ENEMY_STEP_SIZE;
         var currentEnemyMoveInterval = BASE_ENEMY_MOVE_INTERVAL;
         var enemyData = { element: enemyElement, position: { x: -100, y: -100 }, active: false, frozen: false, freezeTimeoutId: null, moveIntervalId: null };
+        console.log("Enemy config declared.");
 
 
         // --- Initialisierung ---
-        // Comment out content
         function initGame() {
-            console.log("initGame called (but content is commented out)");
-            /*
-            gameIsOver = false; startTime = Date.now(); wrongAnswersLog = {}; monsterEncounters = 0; flowersCollected = 0; currentLevel = 1; currentEnemyStepSize = BASE_ENEMY_STEP_SIZE; currentEnemyMoveInterval = BASE_ENEMY_MOVE_INTERVAL;
-            updateInventory(); updateTitle(); setupLevel();
-            gameArea.removeEventListener('click', handleGameAreaClick); gameArea.removeEventListener('click', handleFirstClick); gameArea.addEventListener('click', handleFirstClick);
-            hero.addEventListener('transitionend', onHeroMovementEnd); numpadContainer.addEventListener('click', handleNumpadClick);
-            playAgainButton.removeEventListener('click', function(){ location.reload(); }); playAgainButton.addEventListener('click', function(){ location.reload(); });
-            startEnemyLogic();
-            gameArea.classList.remove('hidden'); inventory.classList.remove('hidden'); endScreen.classList.add('hidden');
-            */
+            console.log("initGame called (empty)");
+            // Content remains commented out
         }
 
         // --- Start Screen Logic ---
-        // Keep structure, comment out most actions
         document.addEventListener('DOMContentLoaded', function() {
             console.log("DOMContentLoaded event fired");
             try {
@@ -292,12 +236,7 @@
                     playerNameInput.value = savedName;
                     console.log("Player name loaded from localStorage");
                 }
-
-                //loadLocalHighScores(); // Commented out
-                //displayLocalHighScores(); // Commented out
-                //fetchAndDisplayGlobalHighScores(); // Commented out
                 console.log("High score functions skipped");
-
 
                 if (startGameButton) {
                     startGameButton.addEventListener('click', function() {
@@ -307,9 +246,7 @@
                             name = playerNameInput.value.trim();
                         }
                         if (!name) {
-                            // Use console log instead of alert for testing
                             console.log("Player name missing");
-                            // alert("Bitte gib deinen Namen ein!");
                             return;
                         }
                         currentPlayerName = name;
@@ -318,7 +255,7 @@
                             startScreen.classList.add('hidden');
                         }
                         console.log("Starting game setup (calling initGame)");
-                        initGame(); // Call the (empty) initGame
+                        initGame();
                     });
                     console.log("Start button listener added");
                 } else {
@@ -329,132 +266,47 @@
             }
         });
 
-        // --- Spezieller Handler für den ersten Klick (Audio) ---
-        // Comment out content
-        function handleFirstClick(event) {
-            console.log("handleFirstClick called (content commented)");
-            /*
-            if (gameIsOver) return;
-            // initAudio(); // Audio commented out
-            handleGameAreaClick(event);
-            gameArea.removeEventListener('click', handleFirstClick);
-            gameArea.addEventListener('click', handleGameAreaClick);
-            */
-        }
+        // --- ALL GAME LOGIC FUNCTIONS COMMENTED OUT OR EMPTY ---
+        function handleFirstClick(event) { /* Content commented out */ }
+        function setupLevel() { /* Content commented out */ }
+        function replenishFlowers() { /* Content commented out */ }
+        function updateTitle() { /* Content commented out */ }
+        function clearOldFlowers() { /* Content commented out */ }
+        function createFlowers() { /* Content commented out */ }
+        function handleGameAreaClick(event) { /* Content commented out */ }
+        function moveHero(tX, tY) { /* Content commented out */ }
+        function onHeroMovementEnd() { /* Content commented out */ }
+        function checkCollision() { /* Content commented out */ }
+        function checkRectOverlap(r1, r2) { /* Content commented out */ }
+        function handleNumpadClick(event) { /* Content commented out */ }
+        function startQuiz() { /* Content commented out */ }
+        function triggerEnemyQuiz() { /* Content commented out */ }
+        function generateQuestions(count) { return []; }
+        function displayQuestion() { /* Content commented out */ }
+        function checkAnswer() { /* Content commented out */ }
+        function handleQuizSuccess() { /* Content commented out */ }
+        function updateInventory() { /* Content commented out */ }
+        function startEnemyLogic() { /* Content commented out */ }
+        function spawnEnemy() { /* Content commented out */ }
+        function despawnEnemy() { /* Content commented out */ }
+        function moveEnemy() { /* Content commented out */ }
+        function freezeEnemy() { /* Content commented out */ }
+        function unfreezeEnemy() { /* Content commented out */ }
+        function formatTime(milliseconds) { return "00:00.0"; }
+        function loadLocalHighScores() { /* Content commented out */ }
+        function saveLocalHighScores() { /* Content commented out */ }
+        function updateLocalHighScores(newScore) { /* Content commented out */ }
+        function populateScoreTable(tbodyEl, scores) { /* Content commented out */ }
+        function displayLocalHighScores() { /* Content commented out */ }
+        function displayLocalHighScoresEndScreen() { /* Content commented out */ }
+        function fetchAndDisplayGlobalHighScores() { /* Content commented out */ }
+        function logWrongAnswer(num1, num2) { /* Content commented out */ }
+        function formatWrongAnswersForDisplay() { return ["<li>Keine Fehler gemacht!</li>"]; }
+        function endGame() { /* Content commented out */ }
+        function getRandomPosition(bounds, margin) { return { x: 50, y: 50 }; }
+        function escapeHtml(unsafe) { if (!unsafe) return ""; return unsafe.replace(/&/g,"&").replace(/</g,"<").replace(/>/g,">").replace(/"/g,""").replace(/'/g,"'"); }
 
-        // --- Level Management ---
-        // Comment out content
-        function setupLevel() { /* if(gameIsOver) return; clearOldFlowers(); createFlowers(); */ }
-        function replenishFlowers() { /* ... */ }
-        function updateTitle() { /* document.title = 'Koalas Multiplikations-Abenteuer'; */ }
-
-        // --- Blumen Management ---
-        // Comment out content
-        function clearOldFlowers() { /* ... */ }
-        function createFlowers() { /* ... */ }
-
-        // --- Heldenbewegung & Klick-Handling ---
-        // Comment out content
-        function handleGameAreaClick(event) { /* ... */ }
-        function moveHero(tX, tY) { /* ... */ }
-        function onHeroMovementEnd() { /* if (gameIsOver) return; heroIsMoving = false; checkCollision(); */ }
-
-        // --- Kollisionserkennung ---
-        // Comment out content
-        function checkCollision() { /* ... */ }
-        function checkRectOverlap(r1, r2) { /* return !(r1.right < r2.left || r1.left > r2.right || r1.bottom < r2.top || r1.top > r2.bottom); */ }
-
-        // --- NumPad-Logik ---
-        // Comment out content
-        function handleNumpadClick(event) { /* ... */ }
-
-        // --- Quiz-Logik ---
-        // Comment out content
-        function startQuiz() { /* ... */ }
-        function triggerEnemyQuiz() { /* ... */ }
-        function generateQuestions(count) { /* return []; // Return empty array */ }
-        function displayQuestion() { /* ... */ }
-        function checkAnswer() { /* ... */ }
-        function handleQuizSuccess() { /* ... */ }
-
-        // --- Inventar ---
-        // Comment out content
-        function updateInventory() { /* inventoryDisplay.textContent = 'Blumen: ' + flowersCollected + ' / ' + FLOWER_GOAL; */ }
-
-        // --- Feind-Logik ---
-        // Comment out content
-        function startEnemyLogic() { /* if (gameIsOver) return; setTimeout(spawnEnemy, ENEMY_SPAWN_DELAY); */ }
-        function spawnEnemy() { /* ... */ }
-        function despawnEnemy() { /* ... */ }
-        function moveEnemy() { /* ... */ }
-        function freezeEnemy() { /* ... */ }
-        function unfreezeEnemy() { /* ... */ }
-
-        // --- Zeit- und Speicherfunktionen ---
-        // Comment out content
-        function formatTime(milliseconds) { /* ... return "00:00.0"; */ }
-
-        // --- Lokale Highscore Verwaltung ---
-        // Comment out content
-        function loadLocalHighScores() { /* ... */ }
-        function saveLocalHighScores() { /* ... */ }
-        function updateLocalHighScores(newScore) { /* ... */ }
-
-        // --- Highscore Table Display ---
-        // Comment out content
-        function populateScoreTable(tbodyEl, scores) { /* ... */ }
-        function displayLocalHighScores() { /* populateScoreTable(localHighscoreBody, localHighScores); */ }
-        function displayLocalHighScoresEndScreen() { /* populateScoreTable(localEndHighscoreBody, localHighScores); */ }
-
-        // --- Globale Highscore Verwaltung ---
-        // Comment out content
-        function fetchAndDisplayGlobalHighScores() {
-            /*
-            var scoresRef = database.ref('scores').orderByChild('time').limitToFirst(10);
-            globalHighscoreBody.innerHTML = '<tr class="loading-msg"><td colspan="4">Lade Klasse Top 10...</td></tr>';
-            scoresRef.get().then(function(snapshot) {
-                var scores = [];
-                if (snapshot.exists()) { snapshot.forEach(function(childSnapshot) { scores.push(childSnapshot.val()); }); }
-                populateScoreTable(globalHighscoreBody, scores);
-            }).catch(function(error) {
-                console.error("Error getting global high scores: ", error);
-                globalHighscoreBody.innerHTML = '<tr class="loading-msg"><td colspan="4">Fehler beim Laden der Highscores.</td></tr>';
-            });
-            */
-        }
-
-        // --- Fehler Logging ---
-        // Comment out content
-        function logWrongAnswer(num1, num2) { /* ... */ }
-        function formatWrongAnswersForDisplay() { /* return ["<li>Keine Fehler gemacht!</li>"]; */ }
-
-        // --- Spielende ---
-        // Comment out content
-        function endGame() {
-             console.log("endGame called (content commented out)");
-            /*
-            if (gameIsOver) return; gameIsOver = true; console.log("Spiel beendet!"); // playGameOverSound();
-            var elapsedTime = Date.now() - startTime; console.log('Gesamtspielzeit: ' + elapsedTime + ' ms, Monsterbegegnungen: ' + monsterEncounters);
-            despawnEnemy(); gameArea.removeEventListener('click', handleGameAreaClick); gameArea.removeEventListener('click', handleFirstClick); quizModal.style.display = 'none';
-            var currentScoreData = { name: currentPlayerName, time: elapsedTime, encounters: monsterEncounters, timestamp: firebase.database.ServerValue.TIMESTAMP };
-            var scoresRef = database.ref('scores'); var newScoreRef = scoresRef.push();
-            newScoreRef.set(currentScoreData)
-                .then(function() { console.log("Score erfolgreich in Firebase gespeichert!"); })
-                .catch(function(error) { console.error("Fehler beim Speichern des Scores in Firebase: ", error); });
-
-            updateLocalHighScores(currentScoreData);
-            finalTimeDisplay.textContent = 'Deine Zeit: ' + formatTime(elapsedTime);
-            var wrongAnswersFormatted = formatWrongAnswersForDisplay(); wrongAnswersList.innerHTML = wrongAnswersFormatted.join('');
-            gameArea.classList.add('hidden'); inventory.classList.add('hidden'); endScreen.classList.remove('hidden');
-            */
-        }
-
-        // --- Hilfsfunktionen ---
-        // Comment out content
-        function getRandomPosition(bounds, margin) { /* return { x: 50, y: 50 }; */ }
-        function escapeHtml(unsafe) { if (!unsafe) return ""; return unsafe.replace(/&/g,"&").replace(/</g,"<").replace(/>/g,">").replace(/"/g,""").replace(/'/g,"'"); } // Keep escapeHtml
-
-        console.log("SCRIPT END"); // Log script end
+        console.log("SCRIPT END");
     </script>
 </body>
 </html>
