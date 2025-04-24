@@ -67,23 +67,25 @@
 
 </head>
 <body>
-    <!-- HTML Structure Remains the Same -->
-    <div id="start-screen"><h2>Willkommen...</h2><label>...</label><input...><button id="start-game-button">Spiel starten</button>...</div>
+    <!-- HTML Structure remains the same -->
+    <div id="start-screen"><h2>Willkommen...</h2><!-- Rest --></div>
     <div id="game-area" class="hidden"><div id="hero"></div><div id="enemy" class="hidden"></div></div>
     <div id="inventory" class="hidden">Blumen: 0</div>
-    <div id="quiz-modal" class="hidden">...</div>
-    <div id="end-screen" class="hidden">...</div>
+    <div id="quiz-modal" class="hidden"><!-- Rest --></div>
+    <div id="end-screen" class="hidden"><!-- Rest --></div>
 
     <script>
         console.log("SCRIPT START");
 
         // --- Firebase Konfiguration ---
-        var firebaseConfig = { /* ... */ }; // Assume config is correct
+        var firebaseConfig = { /* ... */ }; // Keep config
         try {
             firebase.initializeApp(firebaseConfig);
             var database = firebase.database();
             console.log("Firebase Initialized");
-        } catch (e) { console.error("FIREBASE INIT FAILED:", e); }
+        } catch (e) {
+            console.error("FIREBASE INIT FAILED:", e);
+        }
 
         // --- DOM Elemente ---
         var startScreen = document.getElementById('start-screen');
@@ -108,12 +110,14 @@
         var playAgainButton = document.getElementById('play-again-button');
         console.log("DOM Elements Referenced");
 
-        // --- Audio Section Deleted ---
+        // --- Audio Context & Sounds --- DELETED
         console.log("Audio section deleted.");
 
         // --- Spielzustand (using var) ---
-        // Restore all state variables
         var currentPlayerName = "Anonym";
+        var gameIsOver = false;
+        var localHighScores = [];
+        // Add back more variables as needed later
         var currentLevel = 1;
         var flowersCollected = 0;
         var flowers = [];
@@ -123,12 +127,10 @@
         var currentQuestionIndex = 0;
         var correctAnswersForItem = 0;
         var heroIsMoving = false;
-        var gameIsOver = false;
         var startTime = 0;
         var wrongAnswersLog = {};
         var monsterEncounters = 0;
-        var localHighScores = [];
-        console.log("Full game state variables declared.");
+        console.log("Basic game state variables declared.");
 
         // --- Konfiguration (using var) ---
         var FLOWER_GOAL = 20;
@@ -149,45 +151,26 @@
         var enemyData = { element: enemyElement, position: { x: -100, y: -100 }, active: false, frozen: false, freezeTimeoutId: null, moveIntervalId: null };
         console.log("Enemy config declared.");
 
-
         // --- Initialisierung ---
-        // Function definition uncommented, content remains commented
         function initGame() {
-             console.log("initGame called (empty)");
-            /*
-            gameIsOver = false; startTime = Date.now(); wrongAnswersLog = {}; monsterEncounters = 0; flowersCollected = 0; currentLevel = 1; currentEnemyStepSize = BASE_ENEMY_STEP_SIZE; currentEnemyMoveInterval = BASE_ENEMY_MOVE_INTERVAL;
-            updateInventory(); updateTitle(); setupLevel();
-            gameArea.removeEventListener('click', handleGameAreaClick); gameArea.removeEventListener('click', handleFirstClick); gameArea.addEventListener('click', handleFirstClick);
-            hero.addEventListener('transitionend', onHeroMovementEnd); numpadContainer.addEventListener('click', handleNumpadClick);
-            playAgainButton.removeEventListener('click', function(){ location.reload(); }); playAgainButton.addEventListener('click', function(){ location.reload(); });
-            startEnemyLogic();
-            gameArea.classList.remove('hidden'); inventory.classList.remove('hidden'); endScreen.classList.add('hidden');
-            */
+            console.log("initGame called (empty)");
+            // Content remains commented out
         }
 
         // --- Start Screen Logic ---
-        // Structure remains, actions mostly commented
         document.addEventListener('DOMContentLoaded', function() {
             console.log("DOMContentLoaded event fired");
             try {
                 var savedName = localStorage.getItem('lastPlayerName');
-                if (savedName && playerNameInput) {
-                    playerNameInput.value = savedName;
-                    console.log("Player name loaded from localStorage");
-                }
-                //loadLocalHighScores(); // Still commented
-                //displayLocalHighScores(); // Still commented
-                //fetchAndDisplayGlobalHighScores(); // Still commented
+                if (savedName && playerNameInput) { playerNameInput.value = savedName; console.log("Player name loaded"); }
                 console.log("High score functions skipped");
-
                 if (startGameButton) {
                     startGameButton.addEventListener('click', function() {
                         console.log("Start Game Button Clicked");
                         var name = "";
                         if(playerNameInput) { name = playerNameInput.value.trim(); }
                         if (!name) { console.log("Player name missing"); return; }
-                        currentPlayerName = name;
-                        localStorage.setItem('lastPlayerName', name);
+                        currentPlayerName = name; localStorage.setItem('lastPlayerName', name);
                         if(startScreen) { startScreen.classList.add('hidden'); }
                         console.log("Starting game setup (calling initGame)");
                         initGame();
@@ -197,7 +180,7 @@
             } catch(e) { console.error("Error in DOMContentLoaded:", e); }
         });
 
-        // --- Function Definitions Uncommented (Keep Content Commented) ---
+        // --- ALL GAME LOGIC FUNCTIONS COMMENTED OUT OR EMPTY ---
         function handleFirstClick(event) { /* Content commented out */ }
         function setupLevel() { /* Content commented out */ }
         function replenishFlowers() { /* Content commented out */ }
@@ -212,7 +195,7 @@
         function handleNumpadClick(event) { /* Content commented out */ }
         function startQuiz() { /* Content commented out */ }
         function triggerEnemyQuiz() { /* Content commented out */ }
-        function generateQuestions(count) { /* return []; */ }
+        function generateQuestions(count) { return []; }
         function displayQuestion() { /* Content commented out */ }
         function checkAnswer() { /* Content commented out */ }
         function handleQuizSuccess() { /* Content commented out */ }
@@ -223,7 +206,7 @@
         function moveEnemy() { /* Content commented out */ }
         function freezeEnemy() { /* Content commented out */ }
         function unfreezeEnemy() { /* Content commented out */ }
-        function formatTime(milliseconds) { /* return "00:00.0"; */ }
+        function formatTime(milliseconds) { return "00:00.0"; }
         function loadLocalHighScores() { /* Content commented out */ }
         function saveLocalHighScores() { /* Content commented out */ }
         function updateLocalHighScores(newScore) { /* Content commented out */ }
@@ -232,286 +215,29 @@
         function displayLocalHighScoresEndScreen() { /* Content commented out */ }
         function fetchAndDisplayGlobalHighScores() { /* Content commented out */ }
         function logWrongAnswer(num1, num2) { /* Content commented out */ }
-        function formatWrongAnswersForDisplay() { /* return ["<li>Keine Fehler gemacht!</li>"]; */ }
+        function formatWrongAnswersForDisplay() { return ["<li>Keine Fehler gemacht!</li>"]; }
         function endGame() { /* Content commented out */ }
 
-        // --- Helper Functions (Content Uncommented) ---
+        // --- Hilfsfunktionen ---
+        // *** UNCOMMENTED ***
         function getRandomPosition(bounds, margin) {
              var w = bounds.width || window.innerWidth;
              var h = bounds.height || window.innerHeight;
-             var sz = 40;
+             var sz = 40; // Approx size of flower/item
              var x = Math.random() * (w - margin * 2 - sz) + margin;
              var y = Math.random() * (h - margin * 2 - sz) + margin;
              return { x: x, y: y };
         }
         function escapeHtml(unsafe) {
-            if (!unsafe) return "";
-            return unsafe.replace(/&/g,"&")
-                         .replace(/</g,"<")
-                         .replace(/>/g,">")
-                         .replace(/"/g,""")
-                         .replace(/'/g,"'");
+             if (!unsafe) return "";
+             return unsafe.replace(/&/g, "&")
+                          .replace(/</g, "<")
+                          .replace(/>/g, ">")
+                          .replace(/"/g, """)
+                          .replace(/'/g, "'");
         }
         console.log("Helper functions defined.");
 
-        console.log("SCRIPT END");
-    </script>
-</body>
-</html><!DOCTYPE html>
-<html lang="de">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Koalas Multiplikations-Abenteuer</title>
-    <style>
-        /* CSS (Keep all styles) */
-        html, body { height: 100%; margin: 0; overflow: hidden; font-family: sans-serif; background-color: #e0f7fa; }
-        #start-screen { position: fixed; inset: 0; background-color: #a2d5ab; color: #333; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 110; padding: 20px; text-align: center; overflow-y: auto; }
-        #start-screen h2 { color: #2e7d32; margin-bottom: 25px; font-size: clamp(1.5em, 4vw, 2.2em); }
-        #start-screen label { display: block; margin-bottom: 8px; font-weight: bold; font-size: clamp(1em, 2.5vw, 1.3em); }
-        #start-screen input[type="text"] { padding: 10px 12px; margin-bottom: 20px; width: clamp(200px, 60vw, 300px); border: 2px solid #ccc; border-radius: 5px; font-size: clamp(1em, 2.5vw, 1.2em); text-align: center; }
-        #start-game-button { padding: 12px 30px; font-size: clamp(1.1em, 3vw, 1.4em); background-color: #4CAF50; color: white; border: none; border-radius: 8px; cursor: pointer; transition: background-color 0.3s; margin-bottom: 30px; }
-        #start-game-button:hover { background-color: #45a049; }
-        #start-screen .highscore-section { margin-top: 20px; width: 100%; max-width: 600px; }
-        #start-screen h3 { color: #388e3c; margin-bottom: 10px; font-size: clamp(1.2em, 3vw, 1.6em); }
-        .highscore-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; background-color: rgba(255, 255, 255, 0.7); border-radius: 5px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); font-size: clamp(0.8em, 2vw, 1em); }
-        .highscore-table th, .highscore-table td { border: 1px solid #ccc; padding: 6px 8px; text-align: left; }
-        .highscore-table th { background-color: #c8e6c9; color: #333; }
-        .highscore-table td:nth-child(1), .highscore-table td:nth-child(3), .highscore-table td:nth-child(4), .highscore-table th:nth-child(1), .highscore-table th:nth-child(3), .highscore-table th:nth-child(4) { text-align: center; }
-        #start-screen .loading-msg, #end-screen .loading-msg { font-style: italic; color: #555; }
-        #start-screen .loading-msg td { text-align: center !important; }
-        #end-screen .loading-msg td { text-align: center !important; color: #ddd; }
-        #game-area { position: relative; width: 100vw; height: 100vh; background-color: #c8e6c9; cursor: pointer; overflow: hidden; }
-        #hero { position: absolute; width: 50px; height: 50px; background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj4KICA8ZyBmaWxsPSIjODg4Ij4KICAgIDwhLS0gQm9keSAtLT4KICAgIDxlbGxpcHNlIGN4PSI1MCIgY3k9IjcwIiByeD0iMzAiIHJ5PSIyNSIgZmlsbD0iI2NjY2NjIi8+CiAgICA8Y2lyY2xlIGN4PSI1MCIgY3k9IjUwIiByPSIyNSIgZmlsbD0iI2NjY2NjIi8+CiAgICA8IS0tIEVhcnMgLS0+CiAgICA8ZWxsaXBzZSBjeD0iMzAiIGN5PSIzMCIgcng9IjE1IiByeT0iMjAiIGZpbGw9IiNjY2NjY2MiLz4KICAgIDxlbGxpcHNlIGN4PSI3MCIgY3k9IjMwIiByeD0iMTUiIHJ5PSIyMCIgZmlsbD0iI2NjY2NjIi8+CiAgICA8ZWxsaXBzZSBjeD0iMzAiIGN5PSIzMCIgcng9IjEwIiByeT0iMTUiIGZpbGw9IiNmZmZmZmYiLz4KICAgIDxlbGxpc2UgY3g9IjcwIiBjeT0iMzAiIHJ4PSIxMCIgc3k9IjE1IiBmaWxsPSIjZmZmZmZmIi8+CiAgICA8IS0tIEZlYXR1cmVzIC0tPgogICAgPGNpcmNsZSBjeD0iNDMiIGN5PSI1MCIgcj0iMyIgZmlsbD0iIzAwMDAwMCIvPgogICAgPGNpcmNsZSBjeD0iNTciIGN5PSI1MCIgcj0iMyIgZmlsbD0iIzAwMDAwMCIvPgogICAgPGVsbGlwc2UgY3g9IjUwIiBjeT0iNjAiIHJ4PSI2IiByeT0iNCIgZmlsbD0iIzAwMDAwMCIvPgogIDwvZz4KPC9zdmc+'); background-size: contain; background-repeat: no-repeat; background-position: center; top: 50px; left: 50px; transition: top 0.5s ease-in-out, left 0.5s ease-in-out; z-index: 10; }
-        .flower { position: absolute; width: 40px; height: 40px; border-radius: 50% 50% 0 0 / 60% 60% 0 0; transform: rotate(45deg); cursor: default; z-index: 5; transition: background-color 0.3s, border-color 0.3s; }
-        .flower::before { content: ''; position: absolute; width: 5px; height: 20px; background-color: #388e3c; bottom: -18px; left: 50%; transform: translateX(-50%) rotate(-45deg); z-index: -1; }
-        #enemy { position: absolute; width: 40px; height: 40px; background-color: #f44336; border: 2px solid #c62828; border-radius: 50%; box-shadow: 0 0 5px rgba(0,0,0,0.5); z-index: 7; transition: background-color 0.3s ease; }
-        #enemy.enemy-frozen { background-color: #42a5f5; border-color: #1e88e5; }
-        #inventory { position: fixed; top: 10px; right: 10px; padding: 10px 15px; background-color: rgba(255, 255, 255, 0.8); border: 1px solid #ccc; border-radius: 5px; font-size: clamp(1em, 2.5vw, 1.5em); z-index: 20; }
-        #quiz-modal { display: none; position: fixed; left: 50%; top: 50%; transform: translate(-50%, -50%); width: clamp(280px, 80vw, 400px); padding: 20px; background-color: white; border: 2px solid #4CAF50; border-radius: 10px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); z-index: 30; text-align: center; }
-        #quiz-modal h3 { margin-top: 0; margin-bottom: 15px; color: #4CAF50; font-size: clamp(1.1em, 3vw, 1.6em); }
-        #quiz-question { font-size: clamp(1.3em, 4vw, 1.8em); margin-bottom: 15px; color: #333; min-height: 1.5em; }
-        #quiz-input-display { width: 80%; margin: 0 auto 15px auto; padding: 10px; font-size: clamp(1.2em, 3.5vw, 1.7em); border: 1px solid #ccc; border-radius: 4px; min-height: 1.5em; background-color: #f8f8f8; color: #333; text-align: center; letter-spacing: 2px; }
-        #numpad-container { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 15px; }
-        #numpad-container button { padding: 12px 0; font-size: clamp(1.1em, 3.5vw, 1.6em); background-color: #e0e0e0; border: 1px solid #bdbdbd; border-radius: 5px; cursor: pointer; transition: background-color 0.2s; -webkit-tap-highlight-color: transparent; }
-        #numpad-container button:hover:not(:active) { background-color: #d5d5d5; }
-        #numpad-container button:active { background-color: #cccccc; }
-        #numpad-clear { background-color: #ffcdd2; border-color: #ef9a9a; }
-        #numpad-clear:hover:not(:active) { background-color: #ef9a9a; }
-        #numpad-clear:active { background-color: #e57373; }
-        #numpad-zero { }
-        #numpad-submit { background-color: #a5d6a7; border-color: #81c784; }
-        #numpad-submit:hover:not(:active) { background-color: #81c784; }
-        #numpad-submit:active { background-color: #66bb6a; }
-        #quiz-message { margin-top: 15px; font-weight: bold; min-height: 1.2em; font-size: clamp(0.9em, 2.5vw, 1.2em); }
-        .correct { color: green; } .incorrect { color: red; } .hidden { display: none !important; }
-        #end-screen { position: fixed; inset: 0; background-color: rgba(0, 80, 0, 0.85); color: white; display: flex; justify-content: center; align-items: center; z-index: 100; text-align: center; padding: 20px; font-size: clamp(1em, 3vw, 1.4em); flex-direction: column; overflow-y: auto; }
-        #end-screen h2 { color: #ffd700; margin-bottom: 20px; }
-        #end-screen p { margin: 8px 0; }
-        #end-screen h3 { margin-top: 25px; margin-bottom: 10px; color: #ffcc80; }
-        #end-screen .highscore-section { margin-top: 20px; width: 100%; max-width: 600px; }
-        #end-screen .highscore-table { background-color: rgba(255, 255, 255, 0.1); color: #eee; }
-        #end-screen .highscore-table th { background-color: rgba(0, 0, 0, 0.3); color: #ffcc80; }
-        #end-screen .highscore-table td { border-color: rgba(255, 255, 255, 0.2); }
-        #end-screen #wrong-answers-list { list-style: none; padding: 0; margin: 10px 0 20px 0; max-width: 400px; text-align: left; }
-        #end-screen #wrong-answers-list li { background-color: rgba(255, 100, 100, 0.15); padding: 5px 10px; margin-bottom: 5px; border-radius: 4px; font-family: sans-serif; }
-        #play-again-button { margin-top: 30px; padding: 12px 25px; font-size: 1.1em; background-color: #4CAF50; color: white; border: none; border-radius: 5px; cursor: pointer; transition: background-color 0.3s; }
-        #play-again-button:hover { background-color: #45a049; }
-        @media (min-width: 600px) { #numpad-container button { padding: 15px 0; } }
-    </style>
-
-    <!-- Firebase SDKs -->
-    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
-
-</head>
-<body>
-    <!-- HTML Structure Remains the Same -->
-    <div id="start-screen"><h2>Willkommen...</h2><label>...</label><input...><button id="start-game-button">Spiel starten</button>...</div>
-    <div id="game-area" class="hidden"><div id="hero"></div><div id="enemy" class="hidden"></div></div>
-    <div id="inventory" class="hidden">Blumen: 0</div>
-    <div id="quiz-modal" class="hidden">...</div>
-    <div id="end-screen" class="hidden">...</div>
-
-    <script>
-        console.log("SCRIPT START");
-
-        // --- Firebase Konfiguration ---
-        var firebaseConfig = { /* ... */ }; // Assume config is correct
-        try {
-            firebase.initializeApp(firebaseConfig);
-            var database = firebase.database();
-            console.log("Firebase Initialized");
-        } catch (e) { console.error("FIREBASE INIT FAILED:", e); }
-
-        // --- DOM Elemente ---
-        var startScreen = document.getElementById('start-screen');
-        var playerNameInput = document.getElementById('player-name');
-        var startGameButton = document.getElementById('start-game-button');
-        var globalHighscoreBody = document.getElementById('global-highscore-body');
-        var localHighscoreBody = document.getElementById('local-highscore-body');
-        var gameArea = document.getElementById('game-area');
-        var hero = document.getElementById('hero');
-        var inventoryDisplay = document.getElementById('inventory');
-        var quizModal = document.getElementById('quiz-modal');
-        var quizTitle = document.getElementById('quiz-title');
-        var quizQuestion = document.getElementById('quiz-question');
-        var quizInputDisplay = document.getElementById('quiz-input-display');
-        var quizMessage = document.getElementById('quiz-message');
-        var numpadContainer = document.getElementById('numpad-container');
-        var enemyElement = document.getElementById('enemy');
-        var endScreen = document.getElementById('end-screen');
-        var finalTimeDisplay = document.getElementById('final-time');
-        var localEndHighscoreBody = document.getElementById('local-end-highscore-body');
-        var wrongAnswersList = document.getElementById('wrong-answers-list');
-        var playAgainButton = document.getElementById('play-again-button');
-        console.log("DOM Elements Referenced");
-
-        // --- Audio Section Deleted ---
-        console.log("Audio section deleted.");
-
-        // --- Spielzustand (using var) ---
-        // Restore all state variables
-        var currentPlayerName = "Anonym";
-        var currentLevel = 1;
-        var flowersCollected = 0;
-        var flowers = [];
-        var activeItem = null;
-        var activeItemType = null;
-        var currentQuestions = [];
-        var currentQuestionIndex = 0;
-        var correctAnswersForItem = 0;
-        var heroIsMoving = false;
-        var gameIsOver = false;
-        var startTime = 0;
-        var wrongAnswersLog = {};
-        var monsterEncounters = 0;
-        var localHighScores = [];
-        console.log("Full game state variables declared.");
-
-        // --- Konfiguration (using var) ---
-        var FLOWER_GOAL = 20;
-        var CORRECT_ANSWERS_NEEDED_FOR_FLOWER = 3;
-        var NUM_QUESTIONS_PER_ENEMY = 5;
-        var NUM_QUESTIONS_TO_GENERATE = 5;
-        var flowerColors = [ { bg: '#f48fb1', border: '#ad1457' }, { bg: '#90caf9', border: '#1e88e5' }, { bg: '#ffe082', border: '#ffab00' }, { bg: '#a5d6a7', border: '#388e3c' }, { bg: '#b39ddb', border: '#5e35b1' } ];
-        console.log("Config variables declared.");
-
-        // --- Feind Konfiguration & Zustand (using var) ---
-        var BASE_ENEMY_STEP_SIZE = 10;
-        var BASE_ENEMY_MOVE_INTERVAL = 200;
-        var ENEMY_RANDOM_FACTOR = 4;
-        var ENEMY_FREEZE_DURATION = 10000;
-        var ENEMY_SPAWN_DELAY = 5000;
-        var currentEnemyStepSize = BASE_ENEMY_STEP_SIZE;
-        var currentEnemyMoveInterval = BASE_ENEMY_MOVE_INTERVAL;
-        var enemyData = { element: enemyElement, position: { x: -100, y: -100 }, active: false, frozen: false, freezeTimeoutId: null, moveIntervalId: null };
-        console.log("Enemy config declared.");
-
-
-        // --- Initialisierung ---
-        // Function definition uncommented, content remains commented
-        function initGame() {
-             console.log("initGame called (empty)");
-            /*
-            gameIsOver = false; startTime = Date.now(); wrongAnswersLog = {}; monsterEncounters = 0; flowersCollected = 0; currentLevel = 1; currentEnemyStepSize = BASE_ENEMY_STEP_SIZE; currentEnemyMoveInterval = BASE_ENEMY_MOVE_INTERVAL;
-            updateInventory(); updateTitle(); setupLevel();
-            gameArea.removeEventListener('click', handleGameAreaClick); gameArea.removeEventListener('click', handleFirstClick); gameArea.addEventListener('click', handleFirstClick);
-            hero.addEventListener('transitionend', onHeroMovementEnd); numpadContainer.addEventListener('click', handleNumpadClick);
-            playAgainButton.removeEventListener('click', function(){ location.reload(); }); playAgainButton.addEventListener('click', function(){ location.reload(); });
-            startEnemyLogic();
-            gameArea.classList.remove('hidden'); inventory.classList.remove('hidden'); endScreen.classList.add('hidden');
-            */
-        }
-
-        // --- Start Screen Logic ---
-        // Structure remains, actions mostly commented
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log("DOMContentLoaded event fired");
-            try {
-                var savedName = localStorage.getItem('lastPlayerName');
-                if (savedName && playerNameInput) {
-                    playerNameInput.value = savedName;
-                    console.log("Player name loaded from localStorage");
-                }
-                //loadLocalHighScores(); // Still commented
-                //displayLocalHighScores(); // Still commented
-                //fetchAndDisplayGlobalHighScores(); // Still commented
-                console.log("High score functions skipped");
-
-                if (startGameButton) {
-                    startGameButton.addEventListener('click', function() {
-                        console.log("Start Game Button Clicked");
-                        var name = "";
-                        if(playerNameInput) { name = playerNameInput.value.trim(); }
-                        if (!name) { console.log("Player name missing"); return; }
-                        currentPlayerName = name;
-                        localStorage.setItem('lastPlayerName', name);
-                        if(startScreen) { startScreen.classList.add('hidden'); }
-                        console.log("Starting game setup (calling initGame)");
-                        initGame();
-                    });
-                    console.log("Start button listener added");
-                } else { console.error("Start game button not found!"); }
-            } catch(e) { console.error("Error in DOMContentLoaded:", e); }
-        });
-
-        // --- Function Definitions Uncommented (Keep Content Commented) ---
-        function handleFirstClick(event) { /* Content commented out */ }
-        function setupLevel() { /* Content commented out */ }
-        function replenishFlowers() { /* Content commented out */ }
-        function updateTitle() { /* Content commented out */ }
-        function clearOldFlowers() { /* Content commented out */ }
-        function createFlowers() { /* Content commented out */ }
-        function handleGameAreaClick(event) { /* Content commented out */ }
-        function moveHero(tX, tY) { /* Content commented out */ }
-        function onHeroMovementEnd() { /* Content commented out */ }
-        function checkCollision() { /* Content commented out */ }
-        function checkRectOverlap(r1, r2) { /* Content commented out */ }
-        function handleNumpadClick(event) { /* Content commented out */ }
-        function startQuiz() { /* Content commented out */ }
-        function triggerEnemyQuiz() { /* Content commented out */ }
-        function generateQuestions(count) { /* return []; */ }
-        function displayQuestion() { /* Content commented out */ }
-        function checkAnswer() { /* Content commented out */ }
-        function handleQuizSuccess() { /* Content commented out */ }
-        function updateInventory() { /* Content commented out */ }
-        function startEnemyLogic() { /* Content commented out */ }
-        function spawnEnemy() { /* Content commented out */ }
-        function despawnEnemy() { /* Content commented out */ }
-        function moveEnemy() { /* Content commented out */ }
-        function freezeEnemy() { /* Content commented out */ }
-        function unfreezeEnemy() { /* Content commented out */ }
-        function formatTime(milliseconds) { /* return "00:00.0"; */ }
-        function loadLocalHighScores() { /* Content commented out */ }
-        function saveLocalHighScores() { /* Content commented out */ }
-        function updateLocalHighScores(newScore) { /* Content commented out */ }
-        function populateScoreTable(tbodyEl, scores) { /* Content commented out */ }
-        function displayLocalHighScores() { /* Content commented out */ }
-        function displayLocalHighScoresEndScreen() { /* Content commented out */ }
-        function fetchAndDisplayGlobalHighScores() { /* Content commented out */ }
-        function logWrongAnswer(num1, num2) { /* Content commented out */ }
-        function formatWrongAnswersForDisplay() { /* return ["<li>Keine Fehler gemacht!</li>"]; */ }
-        function endGame() { /* Content commented out */ }
-
-        // --- Helper Functions (Content Uncommented) ---
-        function getRandomPosition(bounds, margin) {
-             var w = bounds.width || window.innerWidth;
-             var h = bounds.height || window.innerHeight;
-             var sz = 40;
-             var x = Math.random() * (w - margin * 2 - sz) + margin;
-             var y = Math.random() * (h - margin * 2 - sz) + margin;
-             return { x: x, y: y };
-        }
-        function escapeHtml(unsafe) {
-            if (!unsafe) return "";
-            return unsafe.replace(/&/g,"&")
-                         .replace(/</g,"<")
-                         .replace(/>/g,">")
-                         .replace(/"/g,""")
-                         .replace(/'/g,"'");
-        }
-        console.log("Helper functions defined.");
 
         console.log("SCRIPT END");
     </script>
