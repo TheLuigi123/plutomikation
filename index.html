@@ -396,15 +396,15 @@
         function playTone(f=440,d=0.1,t='sine',v=0.5) { if (!audioCtx) return; try { const o=audioCtx.createOscillator(), g=audioCtx.createGain(); o.type=t; o.frequency.setValueAtTime(f, audioCtx.currentTime); g.gain.setValueAtTime(v, audioCtx.currentTime); g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + d); o.connect(g); g.connect(audioCtx.destination); o.start(audioCtx.currentTime); o.stop(audioCtx.currentTime + d + 0.05); } catch (e) { console.error("Error playing tone:", e); } }
         function playClickSound() { playTone(880, 0.05, 'triangle', 0.3); }
         function playInteractSound() { playTone(660, 0.08, 'sine', 0.4); }
-        function playCorrectSound() { playTone(523.25, 0.1, 'sine', 0.5); setTimeout(() => playTone(659.25, 0.15, 'sine', 0.5), 100); }
-        function playWrongSound() { playTone(349.23, 0.15, 'square', 0.4); setTimeout(() => playTone(261.63, 0.2, 'square', 0.4), 150); }
-        function playCollectSound() { playTone(783.99, 0.08, 'triangle', 0.6); setTimeout(() => playTone(1046.50, 0.08, 'triangle', 0.6), 80); setTimeout(() => playTone(1318.51, 0.1, 'triangle', 0.6), 160); }
+        function playCorrectSound() { playTone(523.25, 0.1, 'sine', 0.5); setTimeout(function(){ playTone(659.25, 0.15, 'sine', 0.5); }, 100); } // Use function
+        function playWrongSound() { playTone(349.23, 0.15, 'square', 0.4); setTimeout(function(){ playTone(261.63, 0.2, 'square', 0.4); }, 150); } // Use function
+        function playCollectSound() { playTone(783.99, 0.08, 'triangle', 0.6); setTimeout(function(){ playTone(1046.50, 0.08, 'triangle', 0.6); }, 80); setTimeout(function(){ playTone(1318.51, 0.1, 'triangle', 0.6); }, 160); } // Use function
         function playFreezeSound() { playTone(440, 0.3, 'sawtooth', 0.4); }
         function playUnfreezeSound() { playTone(587.33, 0.2, 'sine', 0.4); }
         function playEnemySpawnSound() { playTone(110, 0.3, 'sawtooth', 0.5); }
         function playEnemyHitSound() { playTone(220, 0.2, 'square', 0.6); }
-        function playLevelUpJingle() { if (levelUpSound && audioCtx) { levelUpSound.play().catch(e => console.error("Error playing level up sound:", e)); } else { playTone(523, 0.1); setTimeout(() => playTone(783, 0.1), 100); setTimeout(() => playTone(1046, 0.2), 200); } }
-        function playGameOverSound() { playTone(1046, 0.2); setTimeout(() => playTone(783, 0.2), 200); setTimeout(() => playTone(523, 0.3), 400); }
+        function playLevelUpJingle() { if (levelUpSound && audioCtx) { levelUpSound.play().catch(function(e){ console.error("Error playing level up sound:", e); }); } else { playTone(523, 0.1); setTimeout(function(){ playTone(783, 0.1); }, 100); setTimeout(function(){ playTone(1046, 0.2); }, 200); } } // Use function
+        function playGameOverSound() { playTone(1046, 0.2); setTimeout(function(){ playTone(783, 0.2); }, 200); setTimeout(function(){ playTone(523, 0.3); }, 400); } // Use function
 
         // --- Spielzustand ---
         let currentPlayerName = "Anonym"; let currentLevel = 1; let flowersCollected = 0; let flowers = []; let activeItem = null; let activeItemType = null; let currentQuestions = []; let currentQuestionIndex = 0; let correctAnswersForItem = 0; let heroIsMoving = false; let gameIsOver = false; let startTime = 0; let wrongAnswersLog = {}; let monsterEncounters = 0; let localHighScores = [];
@@ -424,16 +424,22 @@
             updateInventory(); updateTitle(); setupLevel();
             gameArea.removeEventListener('click', handleGameAreaClick); gameArea.removeEventListener('click', handleFirstClick); gameArea.addEventListener('click', handleFirstClick);
             hero.addEventListener('transitionend', onHeroMovementEnd); numpadContainer.addEventListener('click', handleNumpadClick);
-            playAgainButton.removeEventListener('click', () => location.reload()); playAgainButton.addEventListener('click', () => location.reload());
+            // Use function for event listener callbacks too for max compatibility
+            playAgainButton.removeEventListener('click', function(){ location.reload(); });
+            playAgainButton.addEventListener('click', function(){ location.reload(); });
             startEnemyLogic();
             gameArea.classList.remove('hidden'); inventory.classList.remove('hidden'); endScreen.classList.add('hidden');
         }
 
         // --- Start Screen Logic ---
-        document.addEventListener('DOMContentLoaded', () => {
+        document.addEventListener('DOMContentLoaded', function() { // Use function
             const savedName = localStorage.getItem('lastPlayerName'); if (savedName) { playerNameInput.value = savedName; }
             loadLocalHighScores(); displayLocalHighScores(); fetchAndDisplayGlobalHighScores();
-            startGameButton.addEventListener('click', () => { const name = playerNameInput.value.trim(); if (!name) { alert("Bitte gib deinen Namen ein!"); return; } currentPlayerName = name; localStorage.setItem('lastPlayerName', name); startScreen.classList.add('hidden'); initGame(); });
+            startGameButton.addEventListener('click', function() { // Use function
+                const name = playerNameInput.value.trim(); if (!name) { alert("Bitte gib deinen Namen ein!"); return; }
+                currentPlayerName = name; localStorage.setItem('lastPlayerName', name);
+                startScreen.classList.add('hidden'); initGame();
+            });
         });
 
         // --- Spezieller Handler für den ersten Klick (Audio) ---
@@ -441,25 +447,32 @@
 
         // --- Level Management (Simplified) ---
         function setupLevel() { if(gameIsOver) return; clearOldFlowers(); createFlowers(); }
-        function replenishFlowers() { if(gameIsOver) return; currentLevel++; updateTitle(); playLevelUpJingle(); currentEnemyStepSize = BASE_ENEMY_STEP_SIZE * (1 + Math.floor(flowersCollected / 5) * 0.2); console.log(`Replenishing flowers. Total collected: ${flowersCollected}. Enemy Speed: ${currentEnemyStepSize.toFixed(2)}`); setTimeout(() => { setupLevel(); if (enemyData.active) despawnEnemy(); spawnEnemy(); }, 1500); }
-        function updateTitle() { document.title = `Koalas Multiplikations-Abenteuer`; }
+        function replenishFlowers() { if(gameIsOver) return; currentLevel++; updateTitle(); playLevelUpJingle(); currentEnemyStepSize = BASE_ENEMY_STEP_SIZE * (1 + Math.floor(flowersCollected / 5) * 0.2); console.log('Replenishing flowers. Total collected: ' + flowersCollected + '. Enemy Speed: ' + currentEnemyStepSize.toFixed(2)); setTimeout(function() { setupLevel(); if (enemyData.active) despawnEnemy(); spawnEnemy(); }, 1500); } // Use function
+        function updateTitle() { document.title = 'Koalas Multiplikations-Abenteuer'; }
 
         // --- Blumen Management ---
-        function clearOldFlowers() { flowers.forEach(flower => { if (flower.element && flower.element.parentNode === gameArea) { gameArea.removeChild(flower.element); } }); flowers = []; }
+        function clearOldFlowers() { flowers.forEach(function(flower){ if (flower.element && flower.element.parentNode === gameArea) { gameArea.removeChild(flower.element); } }); flowers = []; } // Use function
         function createFlowers() {
             const areaRect = gameArea.getBoundingClientRect(); const colors = flowerColors[(currentLevel - 1) % flowerColors.length]; const numToCreate = 5;
             for (let i = 0; i < numToCreate; i++) {
-                const fEl = document.createElement('div'); fEl.classList.add('flower'); fEl.id = `flower-${flowersCollected + i}`; fEl.style.backgroundColor = colors.bg; fEl.style.borderColor = colors.border;
+                const fEl = document.createElement('div'); fEl.classList.add('flower'); fEl.id = 'flower-' + (flowersCollected + i); fEl.style.backgroundColor = colors.bg; fEl.style.borderColor = colors.border;
                 let pos, tooClose, attempts = 0;
-                do { tooClose = false; pos = getRandomPosition(areaRect, 60); for (const flw of flowers) { if (Math.sqrt(Math.pow(pos.x - flw.position.x, 2) + Math.pow(pos.y - flw.position.y, 2)) < 50) { tooClose = true; break; } } attempts++; } while (tooClose && attempts < 100);
-                if (attempts >= 100) console.warn(`Keine Position für Blume ${i}.`);
-                fEl.style.left = `${pos.x}px`; fEl.style.top = `${pos.y}px`; gameArea.appendChild(fEl); flowers.push({ id: fEl.id, element: fEl, collected: false, position: pos });
+                do { tooClose = false; pos = getRandomPosition(areaRect, 60);
+                     // Use a standard for loop for maximum compatibility inside the loop
+                     for (let j = 0; j < flowers.length; j++) {
+                         const flw = flowers[j];
+                         if (Math.sqrt(Math.pow(pos.x - flw.position.x, 2) + Math.pow(pos.y - flw.position.y, 2)) < 50) { tooClose = true; break; }
+                     }
+                     attempts++;
+                 } while (tooClose && attempts < 100);
+                if (attempts >= 100) console.warn('Keine Position für Blume ' + i + '.');
+                fEl.style.left = pos.x + 'px'; fEl.style.top = pos.y + 'px'; gameArea.appendChild(fEl); flowers.push({ id: fEl.id, element: fEl, collected: false, position: pos });
             }
         }
 
         // --- Heldenbewegung & Klick-Handling ---
         function handleGameAreaClick(event) { if (gameIsOver || heroIsMoving || quizModal.style.display === 'block') return; playClickSound(); const r = gameArea.getBoundingClientRect(); moveHero(event.clientX - r.left, event.clientY - r.top); }
-        function moveHero(tX, tY) { heroIsMoving = true; const hW = hero.offsetWidth || 50; const hH = hero.offsetHeight || 50; let fX = tX - hW / 2; let fY = tY - hH / 2; const aR = gameArea.getBoundingClientRect(); fX = Math.max(0, Math.min(fX, aR.width - hW)); fY = Math.max(0, Math.min(fY, aR.height - hH)); hero.style.left = `${fX}px`; hero.style.top = `${fY}px`; }
+        function moveHero(tX, tY) { heroIsMoving = true; const hW = hero.offsetWidth || 50; const hH = hero.offsetHeight || 50; let fX = tX - hW / 2; let fY = tY - hH / 2; const aR = gameArea.getBoundingClientRect(); fX = Math.max(0, Math.min(fX, aR.width - hW)); fY = Math.max(0, Math.min(fY, aR.height - hH)); hero.style.left = fX + 'px'; hero.style.top = fY + 'px'; }
         function onHeroMovementEnd() { if (gameIsOver) return; heroIsMoving = false; checkCollision(); }
 
         // --- Kollisionserkennung ---
@@ -468,7 +481,11 @@
             if (enemyData.active && !enemyData.frozen && quizModal.style.display !== 'block') { const hR = hero.getBoundingClientRect(); const eR = enemyData.element.getBoundingClientRect(); if (checkRectOverlap(hR, eR)) { console.log("KOLLISION mit Feind!"); playEnemyHitSound(); triggerEnemyQuiz(); return; } }
             if (heroIsMoving || quizModal.style.display === 'block') return;
             const heroRect = hero.getBoundingClientRect();
-            for (let flower of flowers) { if (!flower.collected) { const fR = flower.element.getBoundingClientRect(); if (checkRectOverlap(heroRect, fR)) { console.log("KOLLISION mit Blume!", flower.id); playInteractSound(); activeItem = flower; activeItemType = 'flower'; startQuiz(); return; } } }
+            // Use standard for loop here too
+            for (let i = 0; i < flowers.length; i++) {
+                 let flower = flowers[i];
+                 if (!flower.collected) { const fR = flower.element.getBoundingClientRect(); if (checkRectOverlap(heroRect, fR)) { console.log("KOLLISION mit Blume!", flower.id); playInteractSound(); activeItem = flower; activeItemType = 'flower'; startQuiz(); return; } }
+            }
         }
         function checkRectOverlap(r1, r2) { return !(r1.right < r2.left || r1.left > r2.right || r1.bottom < r2.top || r1.top > r2.bottom); }
 
@@ -478,37 +495,52 @@
         // --- Quiz-Logik ---
         function startQuiz() { if (!activeItem || gameIsOver) return; correctAnswersForItem = 0; currentQuestionIndex = 0; quizMessage.textContent = ''; quizMessage.className = ''; quizInputDisplay.textContent = ''; if (activeItemType === 'flower') { quizTitle.textContent = "Blumen-Aufgabe!"; currentQuestions = generateQuestions(NUM_QUESTIONS_TO_GENERATE); } else if (activeItemType === 'enemy') { quizTitle.textContent = "Monster-Aufgabe!"; currentQuestions = generateQuestions(NUM_QUESTIONS_PER_ENEMY); } displayQuestion(); quizModal.style.display = 'block'; }
         function triggerEnemyQuiz() { if (!enemyData.active || enemyData.frozen || gameIsOver) return; monsterEncounters++; console.log("Starte Feind-Quiz, Begegnung #", monsterEncounters); if (enemyData.moveIntervalId) { clearInterval(enemyData.moveIntervalId); enemyData.moveIntervalId = null; } activeItem = enemyData; activeItemType = 'enemy'; startQuiz(); }
-        function generateQuestions(count) { const qs = []; const used = new Set(); while (qs.length < count) { const n1 = Math.floor(Math.random() * 10) + 1; const n2 = Math.floor(Math.random() * 10) + 1; const key = `${Math.min(n1,n2)}x${Math.max(n1,n2)}`; if (!used.has(key)) { qs.push({ text: `${n1} x ${n2} = ?`, answer: n1 * n2, num1: n1, num2: n2 }); used.add(key); } } return qs; }
-        function displayQuestion() { if (currentQuestionIndex < currentQuestions.length) { quizQuestion.textContent = currentQuestions[currentQuestionIndex].text; if(activeItemType === 'flower') { quizMessage.textContent = `(${correctAnswersForItem} / ${CORRECT_ANSWERS_NEEDED_FOR_FLOWER} richtig)`; quizMessage.className = ''; } } else { console.error("Versucht, Frage außerhalb des Bereichs anzuzeigen.", currentQuestionIndex, currentQuestions.length); quizModal.style.display = 'none'; activeItem = null; activeItemType = null; } }
+        function generateQuestions(count) { const qs = []; const used = new Set(); while (qs.length < count) { const n1 = Math.floor(Math.random() * 10) + 1; const n2 = Math.floor(Math.random() * 10) + 1; const key = Math.min(n1,n2) + 'x' + Math.max(n1,n2); if (!used.has(key)) { qs.push({ text: n1 + ' x ' + n2 + ' = ?', answer: n1 * n2, num1: n1, num2: n2 }); used.add(key); } } return qs; } // Use concat for question text
+        function displayQuestion() { if (currentQuestionIndex < currentQuestions.length) { quizQuestion.textContent = currentQuestions[currentQuestionIndex].text; if(activeItemType === 'flower') { quizMessage.textContent = '(' + correctAnswersForItem + ' / ' + CORRECT_ANSWERS_NEEDED_FOR_FLOWER + ' richtig)'; quizMessage.className = ''; } } else { console.error("Versucht, Frage außerhalb des Bereichs anzuzeigen.", currentQuestionIndex, currentQuestions.length); quizModal.style.display = 'none'; activeItem = null; activeItemType = null; } }
         function checkAnswer() {
             if (gameIsOver || !activeItem) return; const uAnsTxt = quizInputDisplay.textContent; if (uAnsTxt === '') { quizMessage.textContent = "Bitte gib eine Antwort ein!"; quizMessage.className = 'incorrect'; return; }
             const uAns = parseInt(uAnsTxt, 10); const currQ = currentQuestions[currentQuestionIndex]; const corrAns = currQ.answer;
             if (isNaN(uAns)) { quizMessage.textContent = "Ungültige Eingabe."; quizMessage.className = 'incorrect'; quizInputDisplay.textContent = ''; return; }
+
             if (uAns === corrAns) {
                 playCorrectSound(); correctAnswersForItem++; let success = false;
-                if (activeItemType === 'flower' && correctAnswersForItem >= CORRECT_ANSWERS_NEEDED_FOR_FLOWER) { quizMessage.textContent = `Richtig! (${correctAnswersForItem}/${CORRECT_ANSWERS_NEEDED_FOR_FLOWER})`; quizMessage.className = 'correct'; success = true; }
-                else if (activeItemType === 'enemy' && currentQuestionIndex + 1 >= NUM_QUESTIONS_PER_ENEMY) { quizMessage.textContent = "Richtig!"; quizMessage.className = 'correct'; success = true; }
-                else { quizMessage.textContent = (activeItemType === 'flower') ? `Richtig! (${correctAnswersForItem}/${CORRECT_ANSWERS_NEEDED_FOR_FLOWER})` : "Richtig!"; quizMessage.className = 'correct'; }
-                setTimeout(() => { if (success) { handleQuizSuccess(); } else { currentQuestionIndex++; quizInputDisplay.textContent = ''; displayQuestion(); } }, 800);
-            } else { playWrongSound(); logWrongAnswer(currQ.num1, currQ.num2); quizMessage.textContent = `Leider falsch. Richtig war ${corrAns}. Nochmal!`; quizMessage.className = 'incorrect'; quizInputDisplay.textContent = ''; }
+                // *** USING CONCATENATION ***
+                if (activeItemType === 'flower' && correctAnswersForItem >= CORRECT_ANSWERS_NEEDED_FOR_FLOWER) {
+                    quizMessage.textContent = 'Richtig! (' + correctAnswersForItem + '/' + CORRECT_ANSWERS_NEEDED_FOR_FLOWER + ')'; quizMessage.className = 'correct'; success = true;
+                } else if (activeItemType === 'enemy' && currentQuestionIndex + 1 >= NUM_QUESTIONS_PER_ENEMY) {
+                    quizMessage.textContent = "Richtig!"; quizMessage.className = 'correct'; success = true;
+                } else {
+                    quizMessage.textContent = (activeItemType === 'flower') ? 'Richtig! (' + correctAnswersForItem + '/' + CORRECT_ANSWERS_NEEDED_FOR_FLOWER + ')' : "Richtig!"; quizMessage.className = 'correct';
+                }
+                // *** USING TRADITIONAL FUNCTION ***
+                setTimeout(function() {
+                    if (success) { handleQuizSuccess(); }
+                    else { currentQuestionIndex++; quizInputDisplay.textContent = ''; displayQuestion(); }
+                }, 800);
+            } else {
+                playWrongSound(); logWrongAnswer(currQ.num1, currQ.num2);
+                // *** USING CONCATENATION ***
+                quizMessage.textContent = 'Leider falsch. Richtig war ' + corrAns + '. Nochmal!'; quizMessage.className = 'incorrect';
+                quizInputDisplay.textContent = '';
+            }
         }
         function handleQuizSuccess() {
             if (gameIsOver) return; quizModal.style.display = 'none'; const itemProc = activeItem; const typeProc = activeItemType; console.log("handleQuizSuccess triggered for:", typeProc);
-            if (typeProc === 'flower') { if (itemProc && itemProc.element && !itemProc.collected) { console.log("Processing valid flower:", itemProc.id); playCollectSound(); itemProc.element.classList.add('hidden'); itemProc.collected = true; flowersCollected++; updateInventory(); if (flowersCollected >= FLOWER_GOAL) { console.log("Blumen-Ziel erreicht!"); endGame(); return; } if (flowers.every(f => f.collected)) { console.log(`Alle sichtbaren Blumen gesammelt. Nachschub!`); replenishFlowers(); } } else { console.warn("Skipping flower processing - item invalid/collected:", itemProc); } }
+            if (typeProc === 'flower') { if (itemProc && itemProc.element && !itemProc.collected) { console.log("Processing valid flower:", itemProc.id); playCollectSound(); itemProc.element.classList.add('hidden'); itemProc.collected = true; flowersCollected++; updateInventory(); if (flowersCollected >= FLOWER_GOAL) { console.log("Blumen-Ziel erreicht!"); endGame(); return; } if (flowers.every(function(f){ return f.collected; })) { console.log('Alle sichtbaren Blumen gesammelt. Nachschub!'); replenishFlowers(); } } else { console.warn("Skipping flower processing - item invalid/collected:", itemProc); } } // Use function for every
             else if (typeProc === 'enemy') { console.log("Processing enemy freeze"); playFreezeSound(); freezeEnemy(); } else { console.warn("handleQuizSuccess called with unknown item type:", typeProc); }
             activeItem = null; activeItemType = null; correctAnswersForItem = 0;
         }
 
         // --- Inventar aktualisieren ---
-        function updateInventory() { inventoryDisplay.textContent = `Blumen: ${flowersCollected} / ${FLOWER_GOAL}`; }
+        function updateInventory() { inventoryDisplay.textContent = 'Blumen: ' + flowersCollected + ' / ' + FLOWER_GOAL; } // Use concat
 
         // --- Feind-Logik ---
         function startEnemyLogic() { if (gameIsOver) return; setTimeout(spawnEnemy, ENEMY_SPAWN_DELAY); }
         function spawnEnemy() {
              if (gameIsOver || enemyData.active) return; playEnemySpawnSound(); const r=gameArea.getBoundingClientRect(); const edge=Math.floor(Math.random()*4); const sz=enemyElement.offsetWidth||40; let sX, sY;
              switch(edge){ case 0:sX=Math.random()*(r.width-sz);sY=-sz;break; case 1:sX=r.width;sY=Math.random()*(r.height-sz);break; case 2:sX=Math.random()*(r.width-sz);sY=r.height;break; case 3:sX=-sz;sY=Math.random()*(r.height-sz);break; }
-             enemyData.position={x:sX,y:sY}; enemyData.element.style.left=`${sX}px`; enemyData.element.style.top=`${sY}px`; enemyData.element.classList.remove('hidden','enemy-frozen'); enemyData.active=true; enemyData.frozen=false;
-             if(enemyData.moveIntervalId)clearInterval(enemyData.moveIntervalId); enemyData.moveIntervalId=setInterval(moveEnemy, currentEnemyMoveInterval); console.log(`Feind gespawnt bei (${sX.toFixed(0)}, ${sY.toFixed(0)}) Speed Factor: ${currentEnemyStepSize/BASE_ENEMY_STEP_SIZE}`);
+             enemyData.position={x:sX,y:sY}; enemyData.element.style.left= sX + 'px'; enemyData.element.style.top= sY + 'px'; enemyData.element.classList.remove('hidden','enemy-frozen'); enemyData.active=true; enemyData.frozen=false;
+             if(enemyData.moveIntervalId)clearInterval(enemyData.moveIntervalId); enemyData.moveIntervalId=setInterval(moveEnemy, currentEnemyMoveInterval); console.log('Feind gespawnt bei (' + sX.toFixed(0) + ', ' + sY.toFixed(0) + ') Speed Factor: ' + (currentEnemyStepSize/BASE_ENEMY_STEP_SIZE)); // Use concat
         }
         function despawnEnemy() { if (!enemyData.active) return; console.log("Feind despawned"); if (enemyData.moveIntervalId) clearInterval(enemyData.moveIntervalId); if (enemyData.freezeTimeoutId) clearTimeout(enemyData.freezeTimeoutId); enemyData.element.classList.add('hidden'); enemyData.active=false; enemyData.frozen=false; enemyData.moveIntervalId=null; enemyData.freezeTimeoutId=null; enemyData.position={x:-100,y:-100}; }
         function moveEnemy() {
@@ -518,39 +550,35 @@
             if (dist < (hR.width/2 + eW/2) * 0.8) { checkCollision(); return; }
             const nDx=dx/dist; const nDy=dy/dist; let sX=nDx*currentEnemyStepSize; let sY=nDy*currentEnemyStepSize; sX+=(Math.random()-0.5)*2*ENEMY_RANDOM_FACTOR; sY+=(Math.random()-0.5)*2*ENEMY_RANDOM_FACTOR;
             let nX=eX+sX; let nY=eY+sY; nX=Math.max(0, Math.min(nX, aR.width - eW)); nY=Math.max(0, Math.min(nY, aR.height - eH));
-            enemyData.position={x:nX, y:nY}; enemyData.element.style.left=`${nX}px`; enemyData.element.style.top=`${nY}px`; checkCollision();
+            enemyData.position={x:nX, y:nY}; enemyData.element.style.left= nX + 'px'; enemyData.element.style.top= nY + 'px'; checkCollision();
         }
         function freezeEnemy() { if (gameIsOver || !enemyData.active) return; console.log("Feind wird eingefroren!"); if (enemyData.moveIntervalId) { clearInterval(enemyData.moveIntervalId); enemyData.moveIntervalId = null; } if (enemyData.freezeTimeoutId) clearTimeout(enemyData.freezeTimeoutId); enemyData.frozen=true; enemyData.element.classList.add('enemy-frozen'); enemyData.freezeTimeoutId = setTimeout(unfreezeEnemy, ENEMY_FREEZE_DURATION); }
         function unfreezeEnemy() { if (gameIsOver || !enemyData.active || !enemyData.frozen) return; console.log("Feind taut auf!"); playUnfreezeSound(); enemyData.frozen=false; enemyData.element.classList.remove('enemy-frozen'); enemyData.freezeTimeoutId = null; if (quizModal.style.display !== 'block') { if (enemyData.moveIntervalId) clearInterval(enemyData.moveIntervalId); enemyData.moveIntervalId = setInterval(moveEnemy, currentEnemyMoveInterval); } else { console.log("Feind bleibt pausiert, da Quiz aktiv."); } }
 
         // --- Zeit- und Speicherfunktionen ---
-        // *** NEW VERSION (ES5 compatible) ***
         function formatTime(milliseconds) {
             if (typeof milliseconds !== 'number' || isNaN(milliseconds)) return 'Ungültig';
-            const totalSeconds = milliseconds / 1000;
-            let minutes = Math.floor(totalSeconds / 60);
-            let seconds = Math.floor(totalSeconds % 60);
-            const tenths = Math.floor((totalSeconds - Math.floor(totalSeconds)) * 10);
-
-            // Manual padding
-            const minutesStr = minutes < 10 ? '0' + minutes : String(minutes);
-            const secondsStr = seconds < 10 ? '0' + seconds : String(seconds);
-
-            // String concatenation
+            const totalSeconds = milliseconds / 1000; let minutes = Math.floor(totalSeconds / 60); let seconds = Math.floor(totalSeconds % 60); const tenths = Math.floor((totalSeconds - Math.floor(totalSeconds)) * 10);
+            const minutesStr = minutes < 10 ? '0' + minutes : String(minutes); const secondsStr = seconds < 10 ? '0' + seconds : String(seconds);
             return minutesStr + ':' + secondsStr + '.' + tenths;
         }
-        // *** END NEW VERSION ***
 
         // --- Lokale Highscore Verwaltung ---
-        function loadLocalHighScores() { try { const sS = localStorage.getItem('koalaMultiplyLocalScores'); if (sS) { localHighScores = JSON.parse(sS); if (!Array.isArray(localHighScores)) localHighScores = []; localHighScores = localHighScores.filter(s => typeof s==='object'&&s!==null&&typeof s.name==='string'&&typeof s.time==='number'&&!isNaN(s.time)&&s.time>0&&typeof s.encounters==='number'&&!isNaN(s.encounters)); } else { localHighScores = []; } } catch (e) { console.error("Konnte lokale Highscores nicht laden:", e); localHighScores = []; } localHighScores.sort((a, b) => a.time - b.time); localHighScores = localHighScores.slice(0, 10); }
+        function loadLocalHighScores() { try { const sS = localStorage.getItem('koalaMultiplyLocalScores'); if (sS) { localHighScores = JSON.parse(sS); if (!Array.isArray(localHighScores)) localHighScores = []; localHighScores = localHighScores.filter(function(s){ return typeof s==='object'&&s!==null&&typeof s.name==='string'&&typeof s.time==='number'&&!isNaN(s.time)&&s.time>0&&typeof s.encounters==='number'&&!isNaN(s.encounters); }); } else { localHighScores = []; } } catch (e) { console.error("Konnte lokale Highscores nicht laden:", e); localHighScores = []; } localHighScores.sort(function(a, b){ return a.time - b.time; }); localHighScores = localHighScores.slice(0, 10); } // Use function
         function saveLocalHighScores() { try { localStorage.setItem('koalaMultiplyLocalScores', JSON.stringify(localHighScores)); } catch (e) { console.error("Konnte lokale Highscores nicht speichern:", e); } }
-        function updateLocalHighScores(newScore) { if (!newScore || typeof newScore.time !== 'number' || isNaN(newScore.time) || newScore.time <= 0) return; localHighScores.push(newScore); localHighScores.sort((a, b) => a.time - b.time); localHighScores = localHighScores.slice(0, 10); saveLocalHighScores(); displayLocalHighScores(); displayLocalHighScoresEndScreen(); }
+        function updateLocalHighScores(newScore) { if (!newScore || typeof newScore.time !== 'number' || isNaN(newScore.time) || newScore.time <= 0) return; localHighScores.push(newScore); localHighScores.sort(function(a, b){ return a.time - b.time; }); localHighScores = localHighScores.slice(0, 10); saveLocalHighScores(); displayLocalHighScores(); displayLocalHighScoresEndScreen(); } // Use function
 
         // --- Highscore Table Display Logic (Shared) ---
         function populateScoreTable(tbodyEl, scores) {
              tbodyEl.innerHTML = '';
-             if (!scores || scores.length === 0) { const msg = (tbodyEl.id === "local-end-highscore-body" || tbodyEl.id === "local-highscore-body") ? "Keine lokalen Highscores." : "Keine Klasse Highscores."; tbodyEl.innerHTML = `<tr class="loading-msg"><td colspan="4">${msg}</td></tr>`; return; }
-             scores.forEach((score, index) => { const row = tbodyEl.insertRow(); const name = score.name ? escapeHtml(score.name) : 'Unbekannt'; const time = (score.time && typeof score.time === 'number') ? formatTime(score.time) : 'Ungültig'; const enc = (score.encounters !== undefined && typeof score.encounters === 'number') ? score.encounters : '?'; row.innerHTML = `<td>${index + 1}</td><td>${name}</td><td>${time}</td><td>${enc}</td>`; });
+             if (!scores || scores.length === 0) { const msg = (tbodyEl.id === "local-end-highscore-body" || tbodyEl.id === "local-highscore-body") ? "Keine lokalen Highscores." : "Keine Klasse Highscores."; tbodyEl.innerHTML = '<tr class="loading-msg"><td colspan="4">' + msg + '</td></tr>'; return; } // Use concat
+             // Use standard for loop
+             for (let index = 0; index < scores.length; index++) {
+                 const score = scores[index];
+                 const row = tbodyEl.insertRow(); const name = score.name ? escapeHtml(score.name) : 'Unbekannt'; const time = (score.time && typeof score.time === 'number') ? formatTime(score.time) : 'Ungültig'; const enc = (score.encounters !== undefined && typeof score.encounters === 'number') ? score.encounters : '?';
+                 // Use concat for row HTML
+                 row.innerHTML = '<td>' + (index + 1) + '</td><td>' + name + '</td><td>' + time + '</td><td>' + enc + '</td>';
+            }
         }
         function displayLocalHighScores() { populateScoreTable(localHighscoreBody, localHighScores); }
         function displayLocalHighScoresEndScreen() { populateScoreTable(localEndHighscoreBody, localHighScores); }
@@ -559,17 +587,28 @@
         function fetchAndDisplayGlobalHighScores() {
             const scoresRef = database.ref('scores').orderByChild('time').limitToFirst(10);
             globalHighscoreBody.innerHTML = '<tr class="loading-msg"><td colspan="4">Lade Klasse Top 10...</td></tr>';
-            scoresRef.get().then((snapshot) => { const scores = []; if (snapshot.exists()) { snapshot.forEach((childSnapshot) => { scores.push(childSnapshot.val()); }); } populateScoreTable(globalHighscoreBody, scores); }).catch((error) => { console.error("Error getting global high scores: ", error); globalHighscoreBody.innerHTML = '<tr class="loading-msg"><td colspan="4">Fehler beim Laden der Highscores.</td></tr>'; });
+            // Use functions for then/catch
+            scoresRef.get().then(function(snapshot) {
+                const scores = [];
+                if (snapshot.exists()) {
+                     // Use function for forEach
+                     snapshot.forEach(function(childSnapshot) { scores.push(childSnapshot.val()); });
+                }
+                populateScoreTable(globalHighscoreBody, scores);
+            }).catch(function(error) {
+                console.error("Error getting global high scores: ", error);
+                globalHighscoreBody.innerHTML = '<tr class="loading-msg"><td colspan="4">Fehler beim Laden der Highscores.</td></tr>';
+            });
         }
 
         // --- Fehler Logging ---
-        function logWrongAnswer(num1, num2) { const key = `${Math.min(num1, num2)}x${Math.max(num1, num2)}`; wrongAnswersLog[key] = (wrongAnswersLog[key] || 0) + 1; }
-        function formatWrongAnswersForDisplay() { const fmt = []; const keys = Object.keys(wrongAnswersLog); if (keys.length === 0) return ["<li>Keine Fehler gemacht!</li>"]; keys.sort(); keys.forEach(key => fmt.push(`<li>${wrongAnswersLog[key]}x falsch: ${key.replace('x', ' x ')}</li>`)); return fmt; }
+        function logWrongAnswer(num1, num2) { const key = Math.min(num1, num2) + 'x' + Math.max(num1, num2); wrongAnswersLog[key] = (wrongAnswersLog[key] || 0) + 1; } // Use concat
+        function formatWrongAnswersForDisplay() { const fmt = []; const keys = Object.keys(wrongAnswersLog); if (keys.length === 0) return ["<li>Keine Fehler gemacht!</li>"]; keys.sort(); keys.forEach(function(key){ fmt.push('<li>' + wrongAnswersLog[key] + 'x falsch: ' + key.replace('x', ' x ') + '</li>'); }); return fmt; } // Use concat & function
 
         // --- Spielende Funktion (mit Firebase Upload) ---
         function endGame() {
             if (gameIsOver) return; gameIsOver = true; console.log("Spiel beendet!"); playGameOverSound();
-            const elapsedTime = Date.now() - startTime; console.log(`Gesamtspielzeit: ${elapsedTime} ms, Monsterbegegnungen: ${monsterEncounters}`);
+            const elapsedTime = Date.now() - startTime; console.log('Gesamtspielzeit: ' + elapsedTime + ' ms, Monsterbegegnungen: ' + monsterEncounters); // Use concat
             despawnEnemy(); gameArea.removeEventListener('click', handleGameAreaClick); gameArea.removeEventListener('click', handleFirstClick); quizModal.style.display = 'none';
             const currentScoreData = { name: currentPlayerName, time: elapsedTime, encounters: monsterEncounters, timestamp: firebase.database.ServerValue.TIMESTAMP };
             const scoresRef = database.ref('scores'); const newScoreRef = scoresRef.push();
@@ -578,14 +617,13 @@
                 .catch(function(error) { console.error("Fehler beim Speichern des Scores in Firebase: ", error); });
 
             updateLocalHighScores(currentScoreData);
-            // *** USE SIMPLE CONCATENATION FOR MAX COMPATIBILITY ***
-            finalTimeDisplay.textContent = 'Deine Zeit: ' + formatTime(elapsedTime);
+            finalTimeDisplay.textContent = 'Deine Zeit: ' + formatTime(elapsedTime); // Use concat
             const wrongAnswersFormatted = formatWrongAnswersForDisplay(); wrongAnswersList.innerHTML = wrongAnswersFormatted.join('');
             gameArea.classList.add('hidden'); inventory.classList.add('hidden'); endScreen.classList.remove('hidden');
         }
 
         // --- Hilfsfunktionen ---
-        function getRandomPosition(bounds, margin) { const w = bounds.width || window.innerWidth; const h = bounds.height || window.innerHeight; const sz = 40; const x = Math.random() * (w - margin * 2 - sz) + margin; const y = Math.random() * (h - margin * 2 - sz) + margin; return { x, y }; }
+        function getRandomPosition(bounds, margin) { const w = bounds.width || window.innerWidth; const h = bounds.height || window.innerHeight; const sz = 40; const x = Math.random() * (w - margin * 2 - sz) + margin; const y = Math.random() * (h - margin * 2 - sz) + margin; return { x: x, y: y }; }
         function escapeHtml(unsafe) { if (!unsafe) return ""; return unsafe.replace(/&/g,"&").replace(/</g,"<").replace(/>/g,">").replace(/"/g,""").replace(/'/g,"'"); }
 
     </script>
