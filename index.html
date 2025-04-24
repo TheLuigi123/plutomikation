@@ -146,7 +146,6 @@
 
     <script>
         // --- Firebase Konfiguration ---
-        // Using var instead of const for max compatibility (though unlikely needed for this)
         var firebaseConfig = {
             apiKey: "AIzaSyAJWO7g9Xgy-c2nX8ovNpSlqmuFp_EZy9Q",
             authDomain: "blumen-b5bac.firebaseapp.com",
@@ -158,9 +157,9 @@
             databaseURL: "https://blumen-b5bac-default-rtdb.europe-west1.firebasedatabase.app/"
         };
         firebase.initializeApp(firebaseConfig);
-        var database = firebase.database(); // Use var
+        var database = firebase.database();
 
-        // --- DOM Elemente (using const should be fine, but var for consistency) ---
+        // --- DOM Elemente ---
         var startScreen = document.getElementById('start-screen');
         var playerNameInput = document.getElementById('player-name');
         var startGameButton = document.getElementById('start-game-button');
@@ -183,23 +182,84 @@
         var playAgainButton = document.getElementById('play-again-button');
 
         // --- Audio Context & Sounds ---
-        var audioCtx; // Use var
-        var levelUpSound; // Use var
-        var levelUpSoundBase64 = 'data:audio/mpeg;base64,SUQzBAAAAAABEVRYWFgAAAAtAAADY29tbWVudABCaWdTb3VuZEJhbmsuY29tIC8gTGliAvUMAAAAEAAAAAAAAAAAAAAAAAAAAAAA//MkxAAAANIAAAAAExBTUUzLjk4LjIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'; // var
+        var audioCtx;
+        var levelUpSound;
+        var levelUpSoundBase64 = 'data:audio/mpeg;base64,SUQzBAAAAAABEVRYWFgAAAAtAAADY29tbWVudABCaWdTb3VuZEJhbmsuY29tIC8gTGliAvUMAAAAEAAAAAAAAAAAAAAAAAAAAAAA//MkxAAAANIAAAAAExBTUUzLjk4LjIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
 
-        function initAudio() { if (!audioCtx) { try { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); levelUpSound = new Audio(levelUpSoundBase64); levelUpSound.preload = 'auto'; console.log("AudioContext initialized."); } catch (e) { console.error("AudioContext init failed.", e); } } }
-        function playTone(f,d,t,v) { f=f||440; d=d||0.1; t=t||'sine'; v=v||0.5; if (!audioCtx) return; try { var o=audioCtx.createOscillator(), g=audioCtx.createGain(); o.type=t; o.frequency.setValueAtTime(f, audioCtx.currentTime); g.gain.setValueAtTime(v, audioCtx.currentTime); g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + d); o.connect(g); g.connect(audioCtx.destination); o.start(audioCtx.currentTime); o.stop(audioCtx.currentTime + d + 0.05); } catch (e) { console.error("Error playing tone:", e); } } // Default params replaced with ||, var used inside
-        function playClickSound() { playTone(880, 0.05, 'triangle', 0.3); }
-        function playInteractSound() { playTone(660, 0.08, 'sine', 0.4); }
-        function playCorrectSound() { playTone(523.25, 0.1, 'sine', 0.5); setTimeout(function(){ playTone(659.25, 0.15, 'sine', 0.5); }, 100); }
-        function playWrongSound() { playTone(349.23, 0.15, 'square', 0.4); setTimeout(function(){ playTone(261.63, 0.2, 'square', 0.4); }, 150); }
-        function playCollectSound() { playTone(783.99, 0.08, 'triangle', 0.6); setTimeout(function(){ playTone(1046.50, 0.08, 'triangle', 0.6); }, 80); setTimeout(function(){ playTone(1318.51, 0.1, 'triangle', 0.6); }, 160); }
-        function playFreezeSound() { playTone(440, 0.3, 'sawtooth', 0.4); }
-        function playUnfreezeSound() { playTone(587.33, 0.2, 'sine', 0.4); }
-        function playEnemySpawnSound() { playTone(110, 0.3, 'sawtooth', 0.5); }
-        function playEnemyHitSound() { playTone(220, 0.2, 'square', 0.6); }
-        function playLevelUpJingle() { if (levelUpSound && audioCtx) { levelUpSound.play().catch(function(e){ console.error("Error playing level up sound:", e); }); } else { playTone(523, 0.1); setTimeout(function(){ playTone(783, 0.1); }, 100); setTimeout(function(){ playTone(1046, 0.2); }, 200); } }
-        function playGameOverSound() { playTone(1046, 0.2); setTimeout(function(){ playTone(783, 0.2); }, 200); setTimeout(function(){ playTone(523, 0.3); }, 400); }
+        function initAudio() {
+            if (!audioCtx) {
+                try {
+                    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                    levelUpSound = new Audio(levelUpSoundBase64);
+                    levelUpSound.preload = 'auto';
+                    console.log("AudioContext initialized.");
+                } catch (e) {
+                    console.error("AudioContext init failed.", e);
+                }
+            }
+        }
+
+        // *** Modified playTone with explicit semicolons and ES5 param handling ***
+        function playTone(frequency, duration, type, volume) {
+            var freq = (typeof frequency !== 'undefined') ? frequency : 440;
+            var dur = (typeof duration !== 'undefined') ? duration : 0.1;
+            var waveType = (typeof type !== 'undefined') ? type : 'sine';
+            var vol = (typeof volume !== 'undefined') ? volume : 0.5;
+
+            if (!audioCtx) {
+                return; // Semicolon added
+            }
+            try {
+                var oscillator = audioCtx.createOscillator(); // Semicolon added
+                var gainNode = audioCtx.createGain(); // Semicolon added
+                oscillator.type = waveType; // Semicolon added
+                oscillator.frequency.setValueAtTime(freq, audioCtx.currentTime); // Semicolon added
+                gainNode.gain.setValueAtTime(vol, audioCtx.currentTime); // Semicolon added
+                gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + dur); // Semicolon added
+                oscillator.connect(gainNode); // Semicolon added
+                gainNode.connect(audioCtx.destination); // Semicolon added
+                oscillator.start(audioCtx.currentTime); // Semicolon added
+                oscillator.stop(audioCtx.currentTime + dur + 0.05); // Semicolon added
+            } catch (e) {
+                console.error("Error playing tone:", e); // Semicolon added
+            }
+        } // Semicolon (optional)
+
+        // *** Sound functions with explicit semicolons ***
+        function playClickSound() { playTone(880, 0.05, 'triangle', 0.3); } // Semicolon (optional)
+        function playInteractSound() { playTone(660, 0.08, 'sine', 0.4); } // Semicolon (optional)
+        function playCorrectSound() {
+            playTone(523.25, 0.1, 'sine', 0.5); // Semicolon added
+            setTimeout(function(){ playTone(659.25, 0.15, 'sine', 0.5); }, 100); // Semicolon added
+        } // Semicolon (optional)
+        function playWrongSound() {
+            playTone(349.23, 0.15, 'square', 0.4); // Semicolon added
+            setTimeout(function(){ playTone(261.63, 0.2, 'square', 0.4); }, 150); // Semicolon added
+        } // Semicolon (optional)
+        function playCollectSound() {
+            playTone(783.99, 0.08, 'triangle', 0.6); // Semicolon added
+            setTimeout(function(){ playTone(1046.50, 0.08, 'triangle', 0.6); }, 80); // Semicolon added
+            setTimeout(function(){ playTone(1318.51, 0.1, 'triangle', 0.6); }, 160); // Semicolon added
+        } // Semicolon (optional)
+        function playFreezeSound() { playTone(440, 0.3, 'sawtooth', 0.4); } // Semicolon (optional)
+        function playUnfreezeSound() { playTone(587.33, 0.2, 'sine', 0.4); } // Semicolon (optional)
+        function playEnemySpawnSound() { playTone(110, 0.3, 'sawtooth', 0.5); } // Semicolon (optional)
+        function playEnemyHitSound() { playTone(220, 0.2, 'square', 0.6); } // Semicolon (optional)
+        function playLevelUpJingle() {
+            if (levelUpSound && audioCtx) {
+                levelUpSound.play().catch(function(e){ console.error("Error playing level up sound:", e); }); // Semicolon added
+            } else {
+                playTone(523, 0.1); // Semicolon added
+                setTimeout(function(){ playTone(783, 0.1); }, 100); // Semicolon added
+                setTimeout(function(){ playTone(1046, 0.2); }, 200); // Semicolon added
+            }
+        } // Semicolon (optional)
+        function playGameOverSound() {
+            playTone(1046, 0.2); // Semicolon added
+            setTimeout(function(){ playTone(783, 0.2); }, 200); // Semicolon added
+            setTimeout(function(){ playTone(523, 0.3); }, 400); // Semicolon added
+        } // Semicolon (optional)
+
 
         // --- Spielzustand (using var) ---
         var currentPlayerName = "Anonym"; var currentLevel = 1; var flowersCollected = 0; var flowers = []; var activeItem = null; var activeItemType = null; var currentQuestions = []; var currentQuestionIndex = 0; var correctAnswersForItem = 0; var heroIsMoving = false; var gameIsOver = false; var startTime = 0; var wrongAnswersLog = {}; var monsterEncounters = 0; var localHighScores = [];
@@ -226,10 +286,10 @@
 
         // --- Start Screen Logic ---
         document.addEventListener('DOMContentLoaded', function() {
-            var savedName = localStorage.getItem('lastPlayerName'); if (savedName) { playerNameInput.value = savedName; } // Use var
+            var savedName = localStorage.getItem('lastPlayerName'); if (savedName) { playerNameInput.value = savedName; }
             loadLocalHighScores(); displayLocalHighScores(); fetchAndDisplayGlobalHighScores();
             startGameButton.addEventListener('click', function() {
-                var name = playerNameInput.value.trim(); if (!name) { alert("Bitte gib deinen Namen ein!"); return; } // Use var
+                var name = playerNameInput.value.trim(); if (!name) { alert("Bitte gib deinen Namen ein!"); return; }
                 currentPlayerName = name; localStorage.setItem('lastPlayerName', name);
                 startScreen.classList.add('hidden'); initGame();
             });
@@ -238,7 +298,7 @@
         // --- Spezieller Handler für den ersten Klick (Audio) ---
         function handleFirstClick(event) { if (gameIsOver) return; initAudio(); handleGameAreaClick(event); gameArea.removeEventListener('click', handleFirstClick); gameArea.addEventListener('click', handleGameAreaClick); }
 
-        // --- Level Management (Simplified) ---
+        // --- Level Management ---
         function setupLevel() { if(gameIsOver) return; clearOldFlowers(); createFlowers(); }
         function replenishFlowers() { if(gameIsOver) return; currentLevel++; updateTitle(); playLevelUpJingle(); currentEnemyStepSize = BASE_ENEMY_STEP_SIZE * (1 + Math.floor(flowersCollected / 5) * 0.2); console.log('Replenishing flowers. Total collected: ' + flowersCollected + '. Enemy Speed: ' + currentEnemyStepSize.toFixed(2)); setTimeout(function() { setupLevel(); if (enemyData.active) despawnEnemy(); spawnEnemy(); }, 1500); }
         function updateTitle() { document.title = 'Koalas Multiplikations-Abenteuer'; }
@@ -246,13 +306,13 @@
         // --- Blumen Management ---
         function clearOldFlowers() { flowers.forEach(function(flower){ if (flower.element && flower.element.parentNode === gameArea) { gameArea.removeChild(flower.element); } }); flowers = []; }
         function createFlowers() {
-            var areaRect = gameArea.getBoundingClientRect(); var colors = flowerColors[(currentLevel - 1) % flowerColors.length]; var numToCreate = 5; // Use var
-            for (var i = 0; i < numToCreate; i++) { // Use var
-                var fEl = document.createElement('div'); fEl.classList.add('flower'); fEl.id = 'flower-' + (flowersCollected + i); fEl.style.backgroundColor = colors.bg; fEl.style.borderColor = colors.border; // Use var
-                var pos, tooClose, attempts = 0; // Use var
+            var areaRect = gameArea.getBoundingClientRect(); var colors = flowerColors[(currentLevel - 1) % flowerColors.length]; var numToCreate = 5;
+            for (var i = 0; i < numToCreate; i++) {
+                var fEl = document.createElement('div'); fEl.classList.add('flower'); fEl.id = 'flower-' + (flowersCollected + i); fEl.style.backgroundColor = colors.bg; fEl.style.borderColor = colors.border;
+                var pos, tooClose, attempts = 0;
                 do { tooClose = false; pos = getRandomPosition(areaRect, 60);
-                     for (var j = 0; j < flowers.length; j++) { // Use var
-                         var flw = flowers[j]; // Use var
+                     for (var j = 0; j < flowers.length; j++) {
+                         var flw = flowers[j];
                          if (Math.sqrt(Math.pow(pos.x - flw.position.x, 2) + Math.pow(pos.y - flw.position.y, 2)) < 50) { tooClose = true; break; }
                      }
                      attempts++;
@@ -263,37 +323,37 @@
         }
 
         // --- Heldenbewegung & Klick-Handling ---
-        function handleGameAreaClick(event) { if (gameIsOver || heroIsMoving || quizModal.style.display === 'block') return; playClickSound(); var r = gameArea.getBoundingClientRect(); moveHero(event.clientX - r.left, event.clientY - r.top); } // Use var
-        function moveHero(tX, tY) { heroIsMoving = true; var hW = hero.offsetWidth || 50; var hH = hero.offsetHeight || 50; var fX = tX - hW / 2; var fY = tY - hH / 2; var aR = gameArea.getBoundingClientRect(); fX = Math.max(0, Math.min(fX, aR.width - hW)); fY = Math.max(0, Math.min(fY, aR.height - hH)); hero.style.left = fX + 'px'; hero.style.top = fY + 'px'; } // Use var
+        function handleGameAreaClick(event) { if (gameIsOver || heroIsMoving || quizModal.style.display === 'block') return; playClickSound(); var r = gameArea.getBoundingClientRect(); moveHero(event.clientX - r.left, event.clientY - r.top); }
+        function moveHero(tX, tY) { heroIsMoving = true; var hW = hero.offsetWidth || 50; var hH = hero.offsetHeight || 50; var fX = tX - hW / 2; var fY = tY - hH / 2; var aR = gameArea.getBoundingClientRect(); fX = Math.max(0, Math.min(fX, aR.width - hW)); fY = Math.max(0, Math.min(fY, aR.height - hH)); hero.style.left = fX + 'px'; hero.style.top = fY + 'px'; }
         function onHeroMovementEnd() { if (gameIsOver) return; heroIsMoving = false; checkCollision(); }
 
         // --- Kollisionserkennung ---
         function checkCollision() {
             if (gameIsOver) return;
-            if (enemyData.active && !enemyData.frozen && quizModal.style.display !== 'block') { var hR = hero.getBoundingClientRect(); var eR = enemyData.element.getBoundingClientRect(); if (checkRectOverlap(hR, eR)) { console.log("KOLLISION mit Feind!"); playEnemyHitSound(); triggerEnemyQuiz(); return; } } // Use var
+            if (enemyData.active && !enemyData.frozen && quizModal.style.display !== 'block') { var hR = hero.getBoundingClientRect(); var eR = enemyData.element.getBoundingClientRect(); if (checkRectOverlap(hR, eR)) { console.log("KOLLISION mit Feind!"); playEnemyHitSound(); triggerEnemyQuiz(); return; } }
             if (heroIsMoving || quizModal.style.display === 'block') return;
-            var heroRect = hero.getBoundingClientRect(); // Use var
-            for (var i = 0; i < flowers.length; i++) { // Use var
-                 var flower = flowers[i]; // Use var
-                 if (!flower.collected) { var fR = flower.element.getBoundingClientRect(); if (checkRectOverlap(heroRect, fR)) { console.log("KOLLISION mit Blume!", flower.id); playInteractSound(); activeItem = flower; activeItemType = 'flower'; startQuiz(); return; } } // Use var
+            var heroRect = hero.getBoundingClientRect();
+            for (var i = 0; i < flowers.length; i++) {
+                 var flower = flowers[i];
+                 if (!flower.collected) { var fR = flower.element.getBoundingClientRect(); if (checkRectOverlap(heroRect, fR)) { console.log("KOLLISION mit Blume!", flower.id); playInteractSound(); activeItem = flower; activeItemType = 'flower'; startQuiz(); return; } }
             }
         }
         function checkRectOverlap(r1, r2) { return !(r1.right < r2.left || r1.left > r2.right || r1.bottom < r2.top || r1.top > r2.bottom); }
 
         // --- NumPad-Logik ---
-        function handleNumpadClick(event) { if (gameIsOver) return; var t = event.target; if (t.tagName !== 'BUTTON') return; playClickSound(); if (t.hasAttribute('data-digit')) { if (quizInputDisplay.textContent.length < 4) quizInputDisplay.textContent += t.getAttribute('data-digit'); } else if (t.id === 'numpad-clear') { quizInputDisplay.textContent = ''; } else if (t.id === 'numpad-submit') { checkAnswer(); } } // Use var
+        function handleNumpadClick(event) { if (gameIsOver) return; var t = event.target; if (t.tagName !== 'BUTTON') return; playClickSound(); if (t.hasAttribute('data-digit')) { if (quizInputDisplay.textContent.length < 4) quizInputDisplay.textContent += t.getAttribute('data-digit'); } else if (t.id === 'numpad-clear') { quizInputDisplay.textContent = ''; } else if (t.id === 'numpad-submit') { checkAnswer(); } }
 
         // --- Quiz-Logik ---
         function startQuiz() { if (!activeItem || gameIsOver) return; correctAnswersForItem = 0; currentQuestionIndex = 0; quizMessage.textContent = ''; quizMessage.className = ''; quizInputDisplay.textContent = ''; if (activeItemType === 'flower') { quizTitle.textContent = "Blumen-Aufgabe!"; currentQuestions = generateQuestions(NUM_QUESTIONS_TO_GENERATE); } else if (activeItemType === 'enemy') { quizTitle.textContent = "Monster-Aufgabe!"; currentQuestions = generateQuestions(NUM_QUESTIONS_PER_ENEMY); } displayQuestion(); quizModal.style.display = 'block'; }
         function triggerEnemyQuiz() { if (!enemyData.active || enemyData.frozen || gameIsOver) return; monsterEncounters++; console.log("Starte Feind-Quiz, Begegnung #", monsterEncounters); if (enemyData.moveIntervalId) { clearInterval(enemyData.moveIntervalId); enemyData.moveIntervalId = null; } activeItem = enemyData; activeItemType = 'enemy'; startQuiz(); }
-        function generateQuestions(count) { var qs = []; var used = new Set(); while (qs.length < count) { var n1 = Math.floor(Math.random() * 10) + 1; var n2 = Math.floor(Math.random() * 10) + 1; var key = Math.min(n1,n2) + 'x' + Math.max(n1,n2); if (!used.has(key)) { qs.push({ text: n1 + ' x ' + n2 + ' = ?', answer: n1 * n2, num1: n1, num2: n2 }); used.add(key); } } return qs; } // Use var
+        function generateQuestions(count) { var qs = []; var used = new Set(); while (qs.length < count) { var n1 = Math.floor(Math.random() * 10) + 1; var n2 = Math.floor(Math.random() * 10) + 1; var key = Math.min(n1,n2) + 'x' + Math.max(n1,n2); if (!used.has(key)) { qs.push({ text: n1 + ' x ' + n2 + ' = ?', answer: n1 * n2, num1: n1, num2: n2 }); used.add(key); } } return qs; }
         function displayQuestion() { if (currentQuestionIndex < currentQuestions.length) { quizQuestion.textContent = currentQuestions[currentQuestionIndex].text; if(activeItemType === 'flower') { quizMessage.textContent = '(' + correctAnswersForItem + ' / ' + CORRECT_ANSWERS_NEEDED_FOR_FLOWER + ' richtig)'; quizMessage.className = ''; } } else { console.error("Versucht, Frage außerhalb des Bereichs anzuzeigen.", currentQuestionIndex, currentQuestions.length); quizModal.style.display = 'none'; activeItem = null; activeItemType = null; } }
         function checkAnswer() {
-            if (gameIsOver || !activeItem) return; var uAnsTxt = quizInputDisplay.textContent; if (uAnsTxt === '') { quizMessage.textContent = "Bitte gib eine Antwort ein!"; quizMessage.className = 'incorrect'; return; } // Use var
-            var uAns = parseInt(uAnsTxt, 10); var currQ = currentQuestions[currentQuestionIndex]; var corrAns = currQ.answer; // Use var
+            if (gameIsOver || !activeItem) return; var uAnsTxt = quizInputDisplay.textContent; if (uAnsTxt === '') { quizMessage.textContent = "Bitte gib eine Antwort ein!"; quizMessage.className = 'incorrect'; return; }
+            var uAns = parseInt(uAnsTxt, 10); var currQ = currentQuestions[currentQuestionIndex]; var corrAns = currQ.answer;
             if (isNaN(uAns)) { quizMessage.textContent = "Ungültige Eingabe."; quizMessage.className = 'incorrect'; quizInputDisplay.textContent = ''; return; }
             if (uAns === corrAns) {
-                playCorrectSound(); correctAnswersForItem++; var success = false; // Use var
+                playCorrectSound(); correctAnswersForItem++; var success = false;
                 if (activeItemType === 'flower' && correctAnswersForItem >= CORRECT_ANSWERS_NEEDED_FOR_FLOWER) { quizMessage.textContent = 'Richtig! (' + correctAnswersForItem + '/' + CORRECT_ANSWERS_NEEDED_FOR_FLOWER + ')'; quizMessage.className = 'correct'; success = true; }
                 else if (activeItemType === 'enemy' && currentQuestionIndex + 1 >= NUM_QUESTIONS_PER_ENEMY) { quizMessage.textContent = "Richtig!"; quizMessage.className = 'correct'; success = true; }
                 else { quizMessage.textContent = (activeItemType === 'flower') ? 'Richtig! (' + correctAnswersForItem + '/' + CORRECT_ANSWERS_NEEDED_FOR_FLOWER + ')' : "Richtig!"; quizMessage.className = 'correct'; }
@@ -301,24 +361,14 @@
             } else { playWrongSound(); logWrongAnswer(currQ.num1, currQ.num2); quizMessage.textContent = 'Leider falsch. Richtig war ' + corrAns + '. Nochmal!'; quizMessage.className = 'incorrect'; quizInputDisplay.textContent = ''; }
         }
         function handleQuizSuccess() {
-            if (gameIsOver) return; quizModal.style.display = 'none'; var itemProc = activeItem; var typeProc = activeItemType; console.log("handleQuizSuccess triggered for:", typeProc); // Use var
+            if (gameIsOver) return; quizModal.style.display = 'none'; var itemProc = activeItem; var typeProc = activeItemType; console.log("handleQuizSuccess triggered for:", typeProc);
             if (typeProc === 'flower') {
                 if (itemProc && itemProc.element && !itemProc.collected) {
                     console.log("Processing valid flower:", itemProc.id); playCollectSound(); itemProc.element.classList.add('hidden'); itemProc.collected = true; flowersCollected++; updateInventory();
                     if (flowersCollected >= FLOWER_GOAL) { console.log("Blumen-Ziel erreicht!"); endGame(); return; }
-                    // *** Use standard loop instead of .every() ***
-                    var allFlowersCollected = true; // Use var
-                    for (var i = 0; i < flowers.length; i++) { // Use var
-                        if (!flowers[i].collected) {
-                            allFlowersCollected = false;
-                            break;
-                        }
-                    }
-                    if (allFlowersCollected) {
-                         console.log('Alle sichtbaren Blumen gesammelt. Nachschub!');
-                         replenishFlowers();
-                    }
-                    // *** End replacement ***
+                    var allFlowersCollected = true;
+                    for (var i = 0; i < flowers.length; i++) { if (!flowers[i].collected) { allFlowersCollected = false; break; } }
+                    if (allFlowersCollected) { console.log('Alle sichtbaren Blumen gesammelt. Nachschub!'); replenishFlowers(); }
                 } else { console.warn("Skipping flower processing - item invalid/collected:", itemProc); }
             }
             else if (typeProc === 'enemy') { console.log("Processing enemy freeze"); playFreezeSound(); freezeEnemy(); }
@@ -326,13 +376,13 @@
             activeItem = null; activeItemType = null; correctAnswersForItem = 0;
         }
 
-        // --- Inventar aktualisieren ---
+        // --- Inventar ---
         function updateInventory() { inventoryDisplay.textContent = 'Blumen: ' + flowersCollected + ' / ' + FLOWER_GOAL; }
 
         // --- Feind-Logik ---
         function startEnemyLogic() { if (gameIsOver) return; setTimeout(spawnEnemy, ENEMY_SPAWN_DELAY); }
         function spawnEnemy() {
-             if (gameIsOver || enemyData.active) return; playEnemySpawnSound(); var r=gameArea.getBoundingClientRect(); var edge=Math.floor(Math.random()*4); var sz=enemyElement.offsetWidth||40; var sX, sY; // Use var
+             if (gameIsOver || enemyData.active) return; playEnemySpawnSound(); var r=gameArea.getBoundingClientRect(); var edge=Math.floor(Math.random()*4); var sz=enemyElement.offsetWidth||40; var sX, sY;
              switch(edge){ case 0:sX=Math.random()*(r.width-sz);sY=-sz;break; case 1:sX=r.width;sY=Math.random()*(r.height-sz);break; case 2:sX=Math.random()*(r.width-sz);sY=r.height;break; case 3:sX=-sz;sY=Math.random()*(r.height-sz);break; }
              enemyData.position={x:sX,y:sY}; enemyData.element.style.left= sX + 'px'; enemyData.element.style.top= sY + 'px'; enemyData.element.classList.remove('hidden','enemy-frozen'); enemyData.active=true; enemyData.frozen=false;
              if(enemyData.moveIntervalId)clearInterval(enemyData.moveIntervalId); enemyData.moveIntervalId=setInterval(moveEnemy, currentEnemyMoveInterval); console.log('Feind gespawnt bei (' + sX.toFixed(0) + ', ' + sY.toFixed(0) + ') Speed Factor: ' + (currentEnemyStepSize/BASE_ENEMY_STEP_SIZE));
@@ -340,11 +390,11 @@
         function despawnEnemy() { if (!enemyData.active) return; console.log("Feind despawned"); if (enemyData.moveIntervalId) clearInterval(enemyData.moveIntervalId); if (enemyData.freezeTimeoutId) clearTimeout(enemyData.freezeTimeoutId); enemyData.element.classList.add('hidden'); enemyData.active=false; enemyData.frozen=false; enemyData.moveIntervalId=null; enemyData.freezeTimeoutId=null; enemyData.position={x:-100,y:-100}; }
         function moveEnemy() {
             if (gameIsOver || quizModal.style.display === 'block' || !enemyData.active || enemyData.frozen) return;
-            var eX=enemyData.position.x; var eY=enemyData.position.y; var hR=hero.getBoundingClientRect(); var aR=gameArea.getBoundingClientRect(); var hCX=(hR.left-aR.left)+hR.width/2; var hCY=(hR.top-aR.top)+hR.height/2; // Use var
-            var eW=enemyData.element.offsetWidth||40; var eH=enemyData.element.offsetHeight||40; var dx=hCX-(eX+eW/2); var dy=hCY-(eY+eH/2); var dist=Math.sqrt(dx*dx+dy*dy); // Use var
+            var eX=enemyData.position.x; var eY=enemyData.position.y; var hR=hero.getBoundingClientRect(); var aR=gameArea.getBoundingClientRect(); var hCX=(hR.left-aR.left)+hR.width/2; var hCY=(hR.top-aR.top)+hR.height/2;
+            var eW=enemyData.element.offsetWidth||40; var eH=enemyData.element.offsetHeight||40; var dx=hCX-(eX+eW/2); var dy=hCY-(eY+eH/2); var dist=Math.sqrt(dx*dx+dy*dy);
             if (dist < (hR.width/2 + eW/2) * 0.8) { checkCollision(); return; }
-            var nDx=dx/dist; var nDy=dy/dist; var sX=nDx*currentEnemyStepSize; var sY=nDy*currentEnemyStepSize; sX+=(Math.random()-0.5)*2*ENEMY_RANDOM_FACTOR; sY+=(Math.random()-0.5)*2*ENEMY_RANDOM_FACTOR; // Use var
-            var nX=eX+sX; var nY=eY+sY; nX=Math.max(0, Math.min(nX, aR.width - eW)); nY=Math.max(0, Math.min(nY, aR.height - eH)); // Use var
+            var nDx=dx/dist; var nDy=dy/dist; var sX=nDx*currentEnemyStepSize; var sY=nDy*currentEnemyStepSize; sX+=(Math.random()-0.5)*2*ENEMY_RANDOM_FACTOR; sY+=(Math.random()-0.5)*2*ENEMY_RANDOM_FACTOR;
+            var nX=eX+sX; var nY=eY+sY; nX=Math.max(0, Math.min(nX, aR.width - eW)); nY=Math.max(0, Math.min(nY, aR.height - eH));
             enemyData.position={x:nX, y:nY}; enemyData.element.style.left= nX + 'px'; enemyData.element.style.top= nY + 'px'; checkCollision();
         }
         function freezeEnemy() { if (gameIsOver || !enemyData.active) return; console.log("Feind wird eingefroren!"); if (enemyData.moveIntervalId) { clearInterval(enemyData.moveIntervalId); enemyData.moveIntervalId = null; } if (enemyData.freezeTimeoutId) clearTimeout(enemyData.freezeTimeoutId); enemyData.frozen=true; enemyData.element.classList.add('enemy-frozen'); enemyData.freezeTimeoutId = setTimeout(unfreezeEnemy, ENEMY_FREEZE_DURATION); }
@@ -353,8 +403,8 @@
         // --- Zeit- und Speicherfunktionen ---
         function formatTime(milliseconds) {
             if (typeof milliseconds !== 'number' || isNaN(milliseconds)) return 'Ungültig';
-            var totalSeconds = milliseconds / 1000; var minutes = Math.floor(totalSeconds / 60); var seconds = Math.floor(totalSeconds % 60); var tenths = Math.floor((totalSeconds - Math.floor(totalSeconds)) * 10); // Use var
-            var minutesStr = minutes < 10 ? '0' + minutes : String(minutes); var secondsStr = seconds < 10 ? '0' + seconds : String(seconds); // Use var
+            var totalSeconds = milliseconds / 1000; var minutes = Math.floor(totalSeconds / 60); var seconds = Math.floor(totalSeconds % 60); var tenths = Math.floor((totalSeconds - Math.floor(totalSeconds)) * 10);
+            var minutesStr = minutes < 10 ? '0' + minutes : String(minutes); var secondsStr = seconds < 10 ? '0' + seconds : String(seconds);
             return minutesStr + ':' + secondsStr + '.' + tenths;
         }
 
@@ -363,58 +413,56 @@
         function saveLocalHighScores() { try { localStorage.setItem('koalaMultiplyLocalScores', JSON.stringify(localHighScores)); } catch (e) { console.error("Konnte lokale Highscores nicht speichern:", e); } }
         function updateLocalHighScores(newScore) { if (!newScore || typeof newScore.time !== 'number' || isNaN(newScore.time) || newScore.time <= 0) return; localHighScores.push(newScore); localHighScores.sort(function(a, b){ return a.time - b.time; }); localHighScores = localHighScores.slice(0, 10); saveLocalHighScores(); displayLocalHighScores(); displayLocalHighScoresEndScreen(); }
 
-        // --- Highscore Table Display Logic (Shared) ---
+        // --- Highscore Table Display ---
         function populateScoreTable(tbodyEl, scores) {
              tbodyEl.innerHTML = '';
-             if (!scores || scores.length === 0) { var msg = (tbodyEl.id === "local-end-highscore-body" || tbodyEl.id === "local-highscore-body") ? "Keine lokalen Highscores." : "Keine Klasse Highscores."; tbodyEl.innerHTML = '<tr class="loading-msg"><td colspan="4">' + msg + '</td></tr>'; return; } // Use var
-             for (var index = 0; index < scores.length; index++) { // Use var
-                 var score = scores[index]; // Use var
-                 var row = tbodyEl.insertRow(); var name = score.name ? escapeHtml(score.name) : 'Unbekannt'; var time = (score.time && typeof score.time === 'number') ? formatTime(score.time) : 'Ungültig'; var enc = (score.encounters !== undefined && typeof score.encounters === 'number') ? score.encounters : '?'; // Use var
+             if (!scores || scores.length === 0) { var msg = (tbodyEl.id === "local-end-highscore-body" || tbodyEl.id === "local-highscore-body") ? "Keine lokalen Highscores." : "Keine Klasse Highscores."; tbodyEl.innerHTML = '<tr class="loading-msg"><td colspan="4">' + msg + '</td></tr>'; return; }
+             for (var index = 0; index < scores.length; index++) {
+                 var score = scores[index];
+                 var row = tbodyEl.insertRow(); var name = score.name ? escapeHtml(score.name) : 'Unbekannt'; var time = (score.time && typeof score.time === 'number') ? formatTime(score.time) : 'Ungültig'; var enc = (score.encounters !== undefined && typeof score.encounters === 'number') ? score.encounters : '?';
                  row.innerHTML = '<td>' + (index + 1) + '</td><td>' + name + '</td><td>' + time + '</td><td>' + enc + '</td>';
             }
         }
         function displayLocalHighScores() { populateScoreTable(localHighscoreBody, localHighScores); }
         function displayLocalHighScoresEndScreen() { populateScoreTable(localEndHighscoreBody, localHighScores); }
 
-        // --- Globale Highscore Verwaltung (Firebase) ---
+        // --- Globale Highscore Verwaltung ---
         function fetchAndDisplayGlobalHighScores() {
-            var scoresRef = database.ref('scores').orderByChild('time').limitToFirst(10); // Use var
+            var scoresRef = database.ref('scores').orderByChild('time').limitToFirst(10);
             globalHighscoreBody.innerHTML = '<tr class="loading-msg"><td colspan="4">Lade Klasse Top 10...</td></tr>';
-            scoresRef.get().then(function(snapshot) { // Use function
-                var scores = []; // Use var
-                if (snapshot.exists()) {
-                     snapshot.forEach(function(childSnapshot) { scores.push(childSnapshot.val()); }); // Use function
-                }
+            scoresRef.get().then(function(snapshot) {
+                var scores = [];
+                if (snapshot.exists()) { snapshot.forEach(function(childSnapshot) { scores.push(childSnapshot.val()); }); }
                 populateScoreTable(globalHighscoreBody, scores);
-            }).catch(function(error) { // Use function
+            }).catch(function(error) {
                 console.error("Error getting global high scores: ", error);
                 globalHighscoreBody.innerHTML = '<tr class="loading-msg"><td colspan="4">Fehler beim Laden der Highscores.</td></tr>';
             });
         }
 
         // --- Fehler Logging ---
-        function logWrongAnswer(num1, num2) { var key = Math.min(num1, num2) + 'x' + Math.max(num1, num2); wrongAnswersLog[key] = (wrongAnswersLog[key] || 0) + 1; } // Use var
-        function formatWrongAnswersForDisplay() { var fmt = []; var keys = Object.keys(wrongAnswersLog); if (keys.length === 0) return ["<li>Keine Fehler gemacht!</li>"]; keys.sort(); keys.forEach(function(key){ fmt.push('<li>' + wrongAnswersLog[key] + 'x falsch: ' + key.replace('x', ' x ') + '</li>'); }); return fmt; } // Use var
+        function logWrongAnswer(num1, num2) { var key = Math.min(num1, num2) + 'x' + Math.max(num1, num2); wrongAnswersLog[key] = (wrongAnswersLog[key] || 0) + 1; }
+        function formatWrongAnswersForDisplay() { var fmt = []; var keys = Object.keys(wrongAnswersLog); if (keys.length === 0) return ["<li>Keine Fehler gemacht!</li>"]; keys.sort(); keys.forEach(function(key){ fmt.push('<li>' + wrongAnswersLog[key] + 'x falsch: ' + key.replace('x', ' x ') + '</li>'); }); return fmt; }
 
-        // --- Spielende Funktion (mit Firebase Upload) ---
+        // --- Spielende ---
         function endGame() {
             if (gameIsOver) return; gameIsOver = true; console.log("Spiel beendet!"); playGameOverSound();
-            var elapsedTime = Date.now() - startTime; console.log('Gesamtspielzeit: ' + elapsedTime + ' ms, Monsterbegegnungen: ' + monsterEncounters); // Use var
+            var elapsedTime = Date.now() - startTime; console.log('Gesamtspielzeit: ' + elapsedTime + ' ms, Monsterbegegnungen: ' + monsterEncounters);
             despawnEnemy(); gameArea.removeEventListener('click', handleGameAreaClick); gameArea.removeEventListener('click', handleFirstClick); quizModal.style.display = 'none';
-            var currentScoreData = { name: currentPlayerName, time: elapsedTime, encounters: monsterEncounters, timestamp: firebase.database.ServerValue.TIMESTAMP }; // Use var
-            var scoresRef = database.ref('scores'); var newScoreRef = scoresRef.push(); // Use var
+            var currentScoreData = { name: currentPlayerName, time: elapsedTime, encounters: monsterEncounters, timestamp: firebase.database.ServerValue.TIMESTAMP };
+            var scoresRef = database.ref('scores'); var newScoreRef = scoresRef.push();
             newScoreRef.set(currentScoreData)
                 .then(function() { console.log("Score erfolgreich in Firebase gespeichert!"); })
                 .catch(function(error) { console.error("Fehler beim Speichern des Scores in Firebase: ", error); });
 
             updateLocalHighScores(currentScoreData);
             finalTimeDisplay.textContent = 'Deine Zeit: ' + formatTime(elapsedTime);
-            var wrongAnswersFormatted = formatWrongAnswersForDisplay(); wrongAnswersList.innerHTML = wrongAnswersFormatted.join(''); // Use var
+            var wrongAnswersFormatted = formatWrongAnswersForDisplay(); wrongAnswersList.innerHTML = wrongAnswersFormatted.join('');
             gameArea.classList.add('hidden'); inventory.classList.add('hidden'); endScreen.classList.remove('hidden');
         }
 
         // --- Hilfsfunktionen ---
-        function getRandomPosition(bounds, margin) { var w = bounds.width || window.innerWidth; var h = bounds.height || window.innerHeight; var sz = 40; var x = Math.random() * (w - margin * 2 - sz) + margin; var y = Math.random() * (h - margin * 2 - sz) + margin; return { x: x, y: y }; } // Use var
+        function getRandomPosition(bounds, margin) { var w = bounds.width || window.innerWidth; var h = bounds.height || window.innerHeight; var sz = 40; var x = Math.random() * (w - margin * 2 - sz) + margin; var y = Math.random() * (h - margin * 2 - sz) + margin; return { x: x, y: y }; }
         function escapeHtml(unsafe) { if (!unsafe) return ""; return unsafe.replace(/&/g,"&").replace(/</g,"<").replace(/>/g,">").replace(/"/g,""").replace(/'/g,"'"); }
 
     </script>
