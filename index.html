@@ -182,19 +182,20 @@
         }
         console.log("getRandomPosition defined.");
 
-        // *** COMMENT OUT escapeHtml AGAIN ***
-        /*
+        // *** UNCOMMENT escapeHtml AGAIN - RETYPE MANUALLY ***
+        // Use simple chained version
         function escapeHtml(unsafe) {
-             if (!unsafe) { return ""; } // Added explicit check
-             var safe = unsafe.replace(/&/g, "&");
-             safe = safe.replace(/</g, "<");
-             safe = safe.replace(/>/g, ">");
-             safe = safe.replace(/"/g, """);
-             safe = safe.replace(/'/g, "'");
-             return safe;
+            if (!unsafe) {
+                return "";
+            }
+            // Make sure NO weird characters are in these strings/regex
+            return unsafe.replace(/&/g, "&")
+                         .replace(/</g, "<")
+                         .replace(/>/g, ">")
+                         .replace(/"/g, """)
+                         .replace(/'/g, "'");
         }
-        */
-        console.log("escapeHtml function SKIPPED.");
+        console.log("escapeHtml function DEFINED (chained).");
 
 
         console.log("SCRIPT END");
