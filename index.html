@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multiplikations-Abenteuer</title>
+    <style>
+        /* CSS für das Aussehen */
+        body {
+            font-family: sans-serif;
+            margin: 0;
+            overflow: hidden; /* Verhindert Scrollbalken */
+            background-color: #e0f7fa; /* Heller Himmelblau-Hintergrund */
+        }
+
+        #game-area {
+            position: relative;
+            width: 100vw; /* Volle Breite des Ansichtsfensters */
+            height: 100vh; /* Volle Höhe des Ansichtsfensters */
+            background-color: #c8e6c9; /* Hellgrüner Spielbereich */
+            cursor: pointer;
+            overflow: hidden; /* Stellt sicher, dass Elemente nicht außerhalb landen */
+        }
+
+        #hero {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            background-color: #ffeb3b; /* Gelb */
+            border: 2px solid #fbc02d; /* Dunkleres Gelb */
+            border-radius: 50%; /* Kreis */
+            top: 50px;
+            left: 50px;
+            transition: top 0.5s ease-in-out, left 0.5s ease-in-out; /* Sanfte Bewegung */
+            z-index: 10; /* Über den Blumen */
+            display: flex; /* Für Zentrierung des Inhalts, falls gewünscht */
+            justify-content: center;
+            align-items: center;
+            font-size: 16px; /* Falls Text im Helden sein soll */
+        }
+
+        .flower {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            background-color: #f48fb1; /* Rosa */
+            border: 2px solid #ad1457; /* Dunkles Pink */
+            border-radius: 50% 50% 0 0 / 60% 60% 0 0; /* Einfache Blütenform oben */
+            transform: rotate(45deg); /* Drehen für interessantere Form */
+            cursor: default;
+            z-index: 5;
+        }
+        /* Stiel für die Blume (optional, macht es hübscher) */
+        .flower::before {
+            content: '';
+            position: absolute;
+            width: 5px;
+            height: 20px;
+            background-color: #388e3c; /* Grün */
+            bottom: -18px; /* Unterhalb der Blüte */
+            left: 50%;
+            transform: translateX(-50%) rotate(-45deg); /* Zurückdrehen und zentrieren */
+            z-index: -1;
+        }
+
+
+        #inventory {
+            position: fixed; /* Bleibt beim Scrollen sichtbar (obwohl Scrollen deaktiviert ist) */
+            top: 10px;
+            right: 10px;
+            padding: 10px 15px;
+            background-color: rgba(255, 255, 255, 0.8); /* Halbtransparent weiß */
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 1.2em;
+            z-index: 20; /* Über allem */
+        }
+
+        /* Pop-up für Aufgaben */
+        #quiz-modal {
+            display: none; /* Standardmäßig versteckt */
+            position: fixed;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            width: 300px;
+            padding: 25px;
+            background-color: white;
+            border: 2px solid #4CAF50; /* Grün */
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            z-index: 30; /* Über allem */
+            text-align: center;
+        }
+
+        #quiz-modal h3 {
+            margin-top: 0;
+            color: #4CAF50;
+        }
+
+        #quiz-question {
+            font-size: 1.5em;
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        #quiz-input {
+            width: 80px;
+            padding: 8px;
+            margin-bottom: 15px;
+            text-align: center;
+            font-size: 1.2em;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        #quiz-submit {
+            padding: 10px 20px;
+            font-size: 1em;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        #quiz-submit:hover {
+            background-color: #45a049;
+        }
+
+        #quiz-message {
+            margin-top: 15px;
+            font-weight: bold;
+        }
+        .correct {
+            color: green;
+        }
+        .incorrect {
+            color: red;
+        }
+
+        /* Klasse zum Verstecken von Elementen */
+        .hidden {
+            display: none !important; /* Wichtig, um andere Display-Regeln zu überschreiben */
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Spielbereich -->
+    <div id="game-area">
+        <!-- Held -->
+        <div id="hero"></div>
+        <!-- Blumen werden hier durch JavaScript hinzugefügt -->
+    </div>
+
+    <!-- Inventar-Anzeige -->
+    <div id="inventory">Blumen: 0</div>
+
+    <!-- Pop-up für die Aufgaben -->
+    <div id="quiz-modal">
+        <h3>Multiplikations-Aufgabe!</h3>
+        <div id="quiz-question">Frage lädt...</div>
+        <input type="number" id="quiz-input" placeholder="Antwort">
+        <button id="quiz-submit">Prüfen</button>
+        <div id="quiz-message"></div>
+    </div>
+
+    <script>
+        // JavaScript für die Spiellogik
+        const gameArea = document.getElementById('game-area');
+        const hero = document.getElementById('hero');
+        const inventoryDisplay = document.getElementById('inventory');
+        const quizModal = document.getElementById('quiz-modal');
+        const quizQuestion = document.getElementById('quiz-question');
+        const quizInput = document.getElementById('quiz-input');
+        const quizSubmit = document.getElementById('quiz-submit');
+        const quizMessage = document.getElementById('quiz-message');
+
+        let flowersCollected = 0;
+        let flowers = []; // Array für Blumen-Daten
+        let activeFlower = null; // Die Blume, mit der interagiert wird
+        let currentQuestions = [];
+        let currentQuestionIndex = 0;
+        let heroIsMoving = false; // Verhindert Interaktion während der Bewegung
+
+        const NUM_FLOWERS = 5; // Anzahl der Blumen im Spiel
+        const NUM_QUESTIONS_PER_FLOWER = 5; // Anzahl der Fragen pro Blume
+
+        // --- Initialisierung ---
+        function initGame() {
+            createFlowers();
+            updateInventory();
+            // Event Listener für Heldenbewegung
+            gameArea.addEventListener('click', moveHero);
+            // Event Listener für Quiz-Antwort
+            quizSubmit.addEventListener('click', checkAnswer);
+            // Event Listener für das Ende der Heldenbewegung (Transition)
+            hero.addEventListener('transitionend', onHeroMovementEnd);
+            // Erlaube Eingabe im Quiz mit Enter-Taste
+             quizInput.addEventListener('keyup', function(event) {
+                if (event.key === 'Enter') {
+                    event.preventDefault(); // Verhindert Standardverhalten (z.B. Formularabsendung)
+                    quizSubmit.click(); // Simuliert Klick auf den Prüfen-Button
+                }
+            });
+        }
+
+        // --- Blumen erstellen ---
+        function createFlowers() {
+            const areaRect = gameArea.getBoundingClientRect();
+            for (let i = 0; i < NUM_FLOWERS; i++) {
+                const flowerElement = document.createElement('div');
+                flowerElement.classList.add('flower');
+                flowerElement.id = `flower-${i}`;
+
+                // Zufällige Position, aber nicht zu nah am Rand oder anderen Blumen
+                let pos = getRandomPosition(areaRect, 50); // 50px Mindestabstand zum Rand
+                // TODO: Hier könnte man noch prüfen, ob die Position zu nah an anderen Blumen ist
+                flowerElement.style.left = `${pos.x}px`;
+                flowerElement.style.top = `${pos.y}px`;
+
+                gameArea.appendChild(flowerElement);
+                flowers.push({
+                    id: flowerElement.id,
+                    element: flowerElement,
+                    collected: false,
+                    position: pos
+                });
+            }
+        }
+
+        // Hilfsfunktion für zufällige Position
+        function getRandomPosition(bounds, margin) {
+            const x = Math.random() * (bounds.width - margin * 2) + margin;
+            const y = Math.random() * (bounds.height - margin * 2) + margin;
+            return { x, y };
+        }
+
+        // --- Heldenbewegung ---
+        function moveHero(event) {
+            if (heroIsMoving || quizModal.style.display === 'block') {
+                 // Bewege den Helden nicht, wenn er schon unterwegs ist oder ein Quiz aktiv ist
+                return;
+            }
+
+            heroIsMoving = true; // Bewegung beginnt
+
+            // Klickposition relativ zum gameArea bekommen
+            const areaRect = gameArea.getBoundingClientRect();
+            const targetX = event.clientX - areaRect.left;
+            const targetY = event.clientY - areaRect.top;
+
+            // Zielposition für die obere linke Ecke des Helden setzen
+            // (damit der Mittelpunkt des Helden das Ziel erreicht)
+            const heroRect = hero.getBoundingClientRect();
+            hero.style.left = `${targetX - heroRect.width / 2}px`;
+            hero.style.top = `${targetY - heroRect.height / 2}px`;
+
+            // Normalerweise würde die Kollisionsprüfung im 'transitionend' Event stattfinden
+            // Aber für ein einfacheres Spiel prüfen wir nach kurzer Verzögerung
+            // setTimeout(checkCollision, 500); // Warte auf das Ende der Transition (ca.)
+            // Besser: Event Listener 'transitionend' verwenden (siehe initGame und onHeroMovementEnd)
+        }
+
+        function onHeroMovementEnd() {
+            heroIsMoving = false; // Bewegung beendet
+            checkCollision();
+        }
+
+        // --- Kollisionserkennung ---
+        function checkCollision() {
+            if (heroIsMoving) return; // Nicht prüfen während der Bewegung
+
+            const heroRect = hero.getBoundingClientRect();
+
+            for (let flower of flowers) {
+                if (!flower.collected) {
+                    const flowerElement = flower.element;
+                    const flowerRect = flowerElement.getBoundingClientRect();
+
+                    // Einfache Rechteck-Kollisionsprüfung
+                    const collision = !(
+                        heroRect.right < flowerRect.left ||
+                        heroRect.left > flowerRect.right ||
+                        heroRect.bottom < flowerRect.top ||
+                        heroRect.top > flowerRect.bottom
+                    );
+
+                    if (collision) {
+                        // Kollision gefunden! Starte das Quiz für diese Blume
+                        activeFlower = flower;
+                        startQuiz();
+                        break; // Nur eine Kollision auf einmal behandeln
+                    }
+                }
+            }
+        }
+
+        // --- Quiz-Logik ---
+        function startQuiz() {
+            currentQuestions = generateQuestions(NUM_QUESTIONS_PER_FLOWER);
+            currentQuestionIndex = 0;
+            quizMessage.textContent = ''; // Nachrichten zurücksetzen
+            quizMessage.className = ''; // Klassen zurücksetzen
+            displayQuestion();
+            quizModal.style.display = 'block'; // Modal anzeigen
+            quizInput.focus(); // Fokus auf das Eingabefeld
+        }
+
+        function generateQuestions(count) {
+            const questions = [];
+            for (let i = 0; i < count; i++) {
+                const num1 = Math.floor(Math.random() * 10) + 1; // Zahlen von 1 bis 10
+                const num2 = Math.floor(Math.random() * 10) + 1;
+                questions.push({
+                    text: `${num1} x ${num2} = ?`,
+                    answer: num1 * num2
+                });
+            }
+            return questions;
+        }
+
+        function displayQuestion() {
+            if (currentQuestionIndex < currentQuestions.length) {
+                quizQuestion.textContent = currentQuestions[currentQuestionIndex].text;
+                quizInput.value = ''; // Eingabefeld leeren
+            } else {
+                // Sollte nicht passieren, wenn checkAnswer korrekt funktioniert
+                console.error("Versucht, Frage außerhalb des Bereichs anzuzeigen.");
+            }
+        }
+
+        function checkAnswer() {
+            const userAnswer = parseInt(quizInput.value, 10);
+            const correctAnswer = currentQuestions[currentQuestionIndex].answer;
+
+            if (isNaN(userAnswer)) {
+                quizMessage.textContent = "Bitte gib eine Zahl ein!";
+                quizMessage.className = 'incorrect';
+                return;
+            }
+
+            if (userAnswer === correctAnswer) {
+                quizMessage.textContent = "Richtig!";
+                quizMessage.className = 'correct';
+                currentQuestionIndex++;
+
+                if (currentQuestionIndex >= currentQuestions.length) {
+                    // Alle Fragen richtig beantwortet!
+                    setTimeout(handleQuizSuccess, 500); // Kurze Verzögerung, um "Richtig!" zu sehen
+                } else {
+                    // Nächste Frage nach kurzer Verzögerung anzeigen
+                     setTimeout(() => {
+                        quizMessage.textContent = ''; // Nachricht löschen
+                        quizMessage.className = '';
+                        displayQuestion();
+                        quizInput.focus();
+                    }, 500); // 0.5 Sekunden warten
+                }
+            } else {
+                quizMessage.textContent = `Leider falsch. Die richtige Antwort ist ${correctAnswer}. Versuche es nochmal!`;
+                quizMessage.className = 'incorrect';
+                // Frage bleibt gleich, Spieler muss es erneut versuchen
+                quizInput.value = '';
+                quizInput.focus();
+            }
+        }
+
+        function handleQuizSuccess() {
+            quizModal.style.display = 'none'; // Modal schließen
+            activeFlower.element.classList.add('hidden'); // Blume verstecken
+            activeFlower.collected = true;
+            flowersCollected++;
+            updateInventory();
+
+            // Prüfen, ob alle Blumen gesammelt wurden
+             if (flowersCollected === NUM_FLOWERS) {
+                alert("Herzlichen Glückwunsch! Du hast alle Blumen gesammelt und die Multiplikationen gemeistert!");
+                // Optional: Spiel neu starten oder eine andere Aktion
+            }
+
+            activeFlower = null; // Keine aktive Blume mehr
+        }
+
+
+        // --- Inventar aktualisieren ---
+        function updateInventory() {
+            inventoryDisplay.textContent = `Blumen: ${flowersCollected}`;
+        }
+
+        // --- Spielstart ---
+        // Warte bis das DOM vollständig geladen ist
+        document.addEventListener('DOMContentLoaded', initGame);
+
+    </script>
+
+</body>
+</html>
