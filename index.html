@@ -171,7 +171,7 @@
         function endGame() { /* ... */ }
 
         // --- Hilfsfunktionen ---
-        // *** UNCOMMENTED - Retype manually ***
+        // *** Keep getRandomPosition uncommented ***
         function getRandomPosition(bounds, margin) {
              var w = bounds.width || window.innerWidth;
              var h = bounds.height || window.innerHeight;
@@ -180,9 +180,12 @@
              var y = Math.random() * (h - margin * 2 - sz) + margin;
              return { x: x, y: y };
         }
+        console.log("getRandomPosition defined.");
+
+        // *** COMMENT OUT escapeHtml AGAIN ***
+        /*
         function escapeHtml(unsafe) {
              if (!unsafe) { return ""; } // Added explicit check
-             // Use individual replace calls for max compatibility potentially
              var safe = unsafe.replace(/&/g, "&");
              safe = safe.replace(/</g, "<");
              safe = safe.replace(/>/g, ">");
@@ -190,7 +193,8 @@
              safe = safe.replace(/'/g, "'");
              return safe;
         }
-        console.log("Helper functions DEFINED."); // Check log
+        */
+        console.log("escapeHtml function SKIPPED.");
 
 
         console.log("SCRIPT END");
