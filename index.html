@@ -54,7 +54,7 @@
         var quizInputDisplay = document.getElementById('quiz-input-display');
         var quizMessage = document.getElementById('quiz-message');
         var numpadContainer = document.getElementById('numpad-container');
-        var enemyElement = document.getElementById('enemy'); // Keep this one as it's potentially used below
+        var enemyElement = document.getElementById('enemy'); // Keep this one
         var endScreen = document.getElementById('end-screen');
         var finalTimeDisplay = document.getElementById('final-time');
         var localEndHighscoreBody = document.getElementById('local-end-highscore-body');
@@ -65,24 +65,34 @@
         // --- Audio Context & Sounds --- DELETED
         console.log("Audio section deleted.");
 
+
         // --- Spielzustand (using var) ---
-        // *** Keep commented out ***
-        /*
+        // *** UNCOMMENTED - Remember to retype the first few lines manually ***
         var currentPlayerName = "Anonym";
         var currentLevel = 1;
-        // ... etc ...
+        var flowersCollected = 0;
+        var flowers = [];
+        var activeItem = null;
+        var activeItemType = null;
+        var currentQuestions = [];
+        var currentQuestionIndex = 0;
+        var correctAnswersForItem = 0;
+        var heroIsMoving = false;
+        var gameIsOver = false;
+        var startTime = 0;
+        var wrongAnswersLog = {};
+        var monsterEncounters = 0;
         var localHighScores = [];
-        */
-        console.log("Game state variables SKIPPED.");
+        console.log("Game state variables DECLARED."); // Check if this log appears without error
+
 
         // --- Konfiguration (using var) ---
         // *** Keep commented out ***
         /*
         var FLOWER_GOAL = 20;
         var CORRECT_ANSWERS_NEEDED_FOR_FLOWER = 3;
-        var NUM_QUESTIONS_PER_ENEMY = 5;
-        var NUM_QUESTIONS_TO_GENERATE = 5;
-        var flowerColors = [ { bg: '#f48fb1', border: '#ad1457' }, { bg: '#90caf9', border: '#1e88e5' }, { bg: '#ffe082', border: '#ffab00' }, { bg: '#a5d6a7', border: '#388e3c' }, { bg: '#b39ddb', border: '#5e35b1' } ];
+        // ... etc ...
+        var flowerColors = [ ... ];
         */
         console.log("Config variables SKIPPED.");
 
@@ -90,13 +100,8 @@
         // *** Keep commented out ***
         /*
         var BASE_ENEMY_STEP_SIZE = 10;
-        var BASE_ENEMY_MOVE_INTERVAL = 200;
-        var ENEMY_RANDOM_FACTOR = 4;
-        var ENEMY_FREEZE_DURATION = 10000;
-        var ENEMY_SPAWN_DELAY = 5000;
-        var currentEnemyStepSize = BASE_ENEMY_STEP_SIZE;
-        var currentEnemyMoveInterval = BASE_ENEMY_MOVE_INTERVAL;
-        var enemyData = { element: enemyElement, position: { x: -100, y: -100 }, active: false, frozen: false, freezeTimeoutId: null, moveIntervalId: null };
+        // ... etc ...
+        var enemyData = { element: enemyElement, ... };
         */
         console.log("Enemy config SKIPPED.");
 
@@ -123,7 +128,7 @@
                         var name = "";
                         if(playerNameInput) { name = playerNameInput.value.trim(); }
                         if (!name) { console.log("Player name missing"); return; }
-                        window.currentPlayerName = name; // Assign to global scope if state block is commented
+                        currentPlayerName = name; // Now assigns to the active state variable
                         localStorage.setItem('lastPlayerName', name);
                         if(startScreen) { startScreen.classList.add('hidden'); }
                         console.log("Starting game setup (calling initGame)");
@@ -135,8 +140,8 @@
             } catch(e) { console.error("Error in DOMContentLoaded:", e); }
         });
 
-        // Minimal global declaration
-        var currentPlayerName = "Anonym";
+        // Minimal global declaration (now redundant as state block is active)
+        // var currentPlayerName = "Anonym";
 
 
         // --- ALL GAME LOGIC FUNCTIONS COMMENTED OUT OR EMPTY ---
@@ -152,15 +157,8 @@
         // --- Hilfsfunktionen ---
         // *** Keep commented out ***
         /*
-        function getRandomPosition(bounds, margin) {
-             var w = bounds.width || window.innerWidth; var h = bounds.height || window.innerHeight;
-             var sz = 40; var x = Math.random() * (w - margin * 2 - sz) + margin; var y = Math.random() * (h - margin * 2 - sz) + margin;
-             return { x: x, y: y };
-        }
-        function escapeHtml(unsafe) {
-             if (!unsafe) return "";
-             return unsafe.replace(/&/g, "&").replace(/</g, "<").replace(/>/g, ">").replace(/"/g, """).replace(/'/g, "'");
-        }
+        function getRandomPosition(bounds, margin) { // ... }
+        function escapeHtml(unsafe) { // ... }
         */
         console.log("Helper functions SKIPPED.");
 
