@@ -106,9 +106,7 @@
         var ENEMY_SPAWN_DELAY = 5000;
         var currentEnemyStepSize = BASE_ENEMY_STEP_SIZE;
         var currentEnemyMoveInterval = BASE_ENEMY_MOVE_INTERVAL;
-
-        // *** REBUILD enemyData OBJECT CAREFULLY ***
-        // Retype this section manually in your editor
+        // Keep rebuilt enemyData object
         var enemyData = {
             element: enemyElement,
             position: { x: -100, y: -100 },
@@ -116,8 +114,8 @@
             frozen: false,
             freezeTimeoutId: null,
             moveIntervalId: null
-        }; // Ensure closing brace and semicolon are clean
-        console.log("Enemy config DECLARED (enemyData rebuilt)."); // Check log
+        };
+        console.log("Enemy config DECLARED (enemyData rebuilt).");
 
 
         // --- Initialisierung ---
@@ -173,12 +171,26 @@
         function endGame() { /* ... */ }
 
         // --- Hilfsfunktionen ---
-        // *** Keep commented out ***
-        /*
-        function getRandomPosition(bounds, margin) { // ... }
-        function escapeHtml(unsafe) { // ... }
-        */
-        console.log("Helper functions SKIPPED.");
+        // *** UNCOMMENTED - Retype manually ***
+        function getRandomPosition(bounds, margin) {
+             var w = bounds.width || window.innerWidth;
+             var h = bounds.height || window.innerHeight;
+             var sz = 40; // Approx size of flower/item
+             var x = Math.random() * (w - margin * 2 - sz) + margin;
+             var y = Math.random() * (h - margin * 2 - sz) + margin;
+             return { x: x, y: y };
+        }
+        function escapeHtml(unsafe) {
+             if (!unsafe) { return ""; } // Added explicit check
+             // Use individual replace calls for max compatibility potentially
+             var safe = unsafe.replace(/&/g, "&");
+             safe = safe.replace(/</g, "<");
+             safe = safe.replace(/>/g, ">");
+             safe = safe.replace(/"/g, """);
+             safe = safe.replace(/'/g, "'");
+             return safe;
+        }
+        console.log("Helper functions DEFINED."); // Check log
 
 
         console.log("SCRIPT END");
