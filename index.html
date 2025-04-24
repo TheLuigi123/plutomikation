@@ -5,9 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Koalas Multiplikations-Abenteuer</title>
     <style>
-        /* CSS (Keep all styles) */
+        /* CSS (Keep all styles - but be aware of potential error on line 34) */
         html, body { height: 100%; margin: 0; overflow: hidden; font-family: sans-serif; background-color: #e0f7fa; }
         #start-screen { position: fixed; inset: 0; background-color: #a2d5ab; color: #333; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 110; padding: 20px; text-align: center; overflow-y: auto; }
+        /* ... other styles ... */
+        #hero { /* Potential Error in background-image URL below */ position: absolute; width: 50px; height: 50px; background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj4KICA8ZyBmaWxsPSIjODg4Ij4KICAgIDwhLS0gQm9keSAtLT4KICAgIDxlbGxpcHNlIGN4PSI1MCIgY3k9IjcwIiByeD0iMzAiIHJ5PSIyNSIgZmlsbD0iI2NjY2NjIi8+CiAgICA8Y2lyY2xlIGN4PSI1MCIgY3k9IjUwIiByPSIyNSIgZmlsbD0iI2NjY2NjIi8+CiAgICA8IS0tIEVhcnMgLS0+CiAgICA8ZWxsaXBzZSBjeD0iMzAiIGN5PSIzMCIgcng9IjE1IiByeT0iMjAiIGZpbGw9IiNjY2NjY2MiLz4KICAgIDxlbGxpcHNlIGN4PSI3MCIgY3k9IjMwIiByeD0iMTUiIHJ5PSIyMCIgZmlsbD0iI2NjY2NjIi8+CiAgICA8ZWxsaXBzZSBjeD0iMzAiIGN5PSIzMCIgcng9IjEwIiByeT0iMTUiIGZpbGw9IiNmZmZmZmYiLz4KICAgIDxlbGxpc2UgY3g9IjcwIiBjeT0iMzAiIHJ4PSIxMCIgc3k9IjE1IiBmaWxsPSIjZmZmZmZmIi8+CiAgICA8IS0tIEZlYXR1cmVzIC0tPgogICAgPGNpcmNsZSBjeD0iNDMiIGN5PSI1MCIgcj0iMyIgZmlsbD0iIzAwMDAwMCIvPgogICAgPGNpcmNsZSBjeD0iNTciIGN5PSI1MCIgcj0iMyIgZmlsbD0iIzAwMDAwMCIvPgogICAgPGVsbGlwc2UgY3g9IjUwIiBjeT0iNjAiIHJ4PSI2IiByeT0iNCIgZmlsbD0iIzAwMDAwMCIvPgogIDwvZz4KPC9zdmc+'); background-size: contain; background-repeat: no-repeat; background-position: center; top: 50px; left: 50px; transition: top 0.5s ease-in-out, left 0.5s ease-in-out; z-index: 10; }
         /* ... other styles ... */
         #play-again-button:hover { background-color: #45a049; }
         @media (min-width: 600px) { #numpad-container button { padding: 15px 0; } }
@@ -24,38 +26,20 @@
     <div id="game-area" class="hidden"><div id="hero"></div><div id="enemy" class="hidden"></div></div>
     <div id="inventory" class="hidden">Blumen: 0</div>
     <div id="quiz-modal" class="hidden"><h3 id="quiz-title">...</h3><div id="quiz-question">...</div><div id="quiz-input-display" aria-live="polite"></div><div id="numpad-container"><button data-digit="1">1</button> <button data-digit="2">2</button> <button data-digit="3">3</button><button data-digit="4">4</button> <button data-digit="5">5</button> <button data-digit="6">6</button><button data-digit="7">7</button> <button data-digit="8">8</button> <button data-digit="9">9</button><button id="numpad-clear">Löschen</button> <button data-digit="0" id="numpad-zero">0</button> <button id="numpad-submit">OK</button></div><div id="quiz-message"></div></div>
-    <div id="end-screen" class="hidden"><h2>Geschafft!</h2><p id="final-time">...</p><div class="highscore-section"><h3>...</h3><table id="local-end-highscore-table" class="highscore-table"><thead><tr><th>#</th><th>Name</th><th>Zeit</th><th>Monster getroffen</th></tr></thead><tbody id="local-end-highscore-body"><tr class="loading-msg"><td colspan="4">...</td></tr></tbody></table></div><h3>Fehlerhafte Aufgaben:</h3><ul id="wrong-answers-list">Excellent<li>...</li></ul><button id="play-again-button">Nochmal spielen?</button></div>
+    <div id="end-screen" class="hidden"><h2>Geschafft!</h2><p id="final-time">...</p><div class="highscore-section"><h3>...</h3><table id="local-end-highscore-table" class="highscore-table"><thead><tr><th>#</th><th>Name</th><th>Zeit</th><th>Monster getroffen</th></tr></thead><tbody id="local-end-highscore-body"><tr class="loading-msg"><td colspan="4">...</td></tr></tbody></table></div><h3>Fehlerhafte Aufgaben:</h3><ul id="wrong-answers-list"><li>...</li></ul><button id="play-again-button">Nochmal spielen?</button></div>
 
     <script>
         console.log("SCRIPT START");
 
         // --- Firebase Konfiguration ---
         var firebaseConfig = { /* ... verified config ... */
-             apiKey: "AIzaSyAJWO7g9Xgy-c2nX8ovNpSlqmuFp_EZy9Q", authDomain: "blumen-b5bac.firebaseapp.com", projectId: "blumen-b5bac", storageBucket: "blumen-b5bac.firebasestorage.app", messagingSenderId: "69941054! Progress is steady.
-
-**Iteration 9: Reintroduce Feind Konfiguration & Zustand**
-
-Let's uncomment the enemy configuration variables (`BASE_ENEMY_STEP_SIZE`, etc.) and the `enemyData` object initialization. Again, retyping the first couple of lines (`var BASE_ENEMY_STEP_SIZE = 10;`, `var BASE6284", appId: "1:699410546284:web:5be1a7fd826d324f95a249", measurementId: "G-1LPR6QT9GR", databaseURL: "https://blumen-b5bac-default-_ENEMY_MOVE_INTERVAL = 200;`) manually when uncommenting is the safest way to avoid invisible characters.
-
-**`index.html` - Iteration 9:**
-
-```html
-<!DOCTYPE html>
-<html lang="de">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Koalas Multiplikations-Abenteuer</rtdb.europe-west1.firebasedatabase.app/"
+             apiKey: "AIzaSyAJWO7g9Xgy-c2nX8ovNpSlqmuFp_EZy9Q", authDomain: "blumen-b5bac.firebaseapp.com", projectId: "blumen-b5bac", storageBucket: "blumen-b5bac.firebasestorage.app", messagingSenderId: "699410546284", appId: "1:699410546284:web:5be1a7fd826d324f95a249", measurementId: "G-1LPR6QT9GR", databaseURL: "https://blumen-b5bac-default-rtdb.europe-west1.firebasedatabase.app/"
          };
         try {
             firebase.initializeApp(firebaseConfig);
             var database = firebase.database();
             console.log("Firebase Initialized");
-        } catch (e) { console.error("FIREBASE INIT FAILED:", e); }title>
-    <style>
-        /* CSS (Keep all styles) */
-        html, body { height: 100%; margin: 0; overflow: hidden; font-family: sans-serif; background-color: #e0f7fa; }
-        #start-screen { position: fixed; inset: 0; background-color: #a2d5ab; color: #333; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 110; padding: 20px; text-align: center; overflow-y: auto; }
+        } catch (e) { console.error("FIREBASE INIT FAILED:", e); }
 
         // --- DOM Elemente ---
         var startScreen = document.getElementById('start-screen');
@@ -69,20 +53,7 @@ Let's uncomment the enemy configuration variables (`BASE_ENEMY_STEP_SIZE`, etc.)
         var quizModal = document.getElementById('quiz-modal');
         var quizTitle = document.getElementById('quiz-title');
         var quizQuestion = document.getElementById('quiz-question');
-        
-        /* ... other styles ... */
-        #play-again-button:hover { background-color: #45a049; }
-        @media (min-width: 600px) { #numpad-container button { padding: 15px 0; } }
-    </style>
-
-    <!-- Firebase SDKs -->
-    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
-
-</head>
-<body>
-    <!-- HTML Structure -->
-    <div id="start-screenvar quizInputDisplay = document.getElementById('quiz-input-display');
+        var quizInputDisplay = document.getElementById('quiz-input-display');
         var quizMessage = document.getElementById('quiz-message');
         var numpadContainer = document.getElementById('numpad-container');
         var enemyElement = document.getElementById('enemy'); // Keep this one
@@ -120,17 +91,14 @@ Let's uncomment the enemy configuration variables (`BASE_ENEMY_STEP_SIZE`, etc.)
         // Keep uncommented
         var FLOWER_GOAL = 20;
         var CORRECT_ANSWERS_NEEDED_FOR_FLOWER = 3;
-"><h2>Willkommen...</h2><label for="player-name">Dein Name:</label><input type="text" id="player-name" placeholder="Gib deinen Namen ein"><button id="start-game-button">Spiel starten</button><div class="highscore-section"><h3>Klasse Top 10</h3><table id="global-highscore-table" class="highscore-table"><thead><tr><th>#</th><th>Name</th><th>Zeit</th><th>Monster getroffen</th></tr></thead><tbody id="global-highscore-body"><tr class="loading-msg"><td colspan="4">Lade Klasse Top 10...</td></tr></tbody></table></div><div class="highscore-section"><h3>Deine Top 10 (Lokal)</h3><table id="local-highscore-table" class="highscore-table"><thead><tr><th>#</th><th>Name</th><th>Zeit</th><th>Monster getroffen</th></tr></thead><tbody id="local-highscore-body"><tr class="loading-msg"><td colspan="4">Keine lokalen Highscores gefunden.</td></tr></tbody></table></div></div>
-    <div id="game-area" class="hidden"><div id="hero"></div><div id="enemy" class="hidden"></div></div>
-    <div id="inventory" class="hidden">Blumen: 0</div>
-    <div id="quiz-modal" class="hidden"><h3 id="quiz-title">...</h3><div id="quiz-question">...</div><div id="quiz-input-display" aria-live="polite"></div><div id="numpad-container"><button data-digit="1">        var NUM_QUESTIONS_PER_ENEMY = 5;
+        var NUM_QUESTIONS_PER_ENEMY = 5;
         var NUM_QUESTIONS_TO_GENERATE = 5;
         var flowerColors = [ { bg: '#f48fb1', border: '#ad1457' }, { bg: '#90caf9', border: '#1e88e5' }, { bg: '#ffe082', border: '#ffab00' }, { bg: '#a5d6a7', border: '#388e3c' }, { bg: '#b39ddb', border: '#5e35b1' } ];
         console.log("Config variables DECLARED.");
 
 
         // --- Feind Konfiguration & Zustand (using var) ---
-        // *** UNCOMMENTED - Retype first line if possible ***
+        // Keep uncommented
         var BASE_ENEMY_STEP_SIZE = 10;
         var BASE_ENEMY_MOVE_INTERVAL = 200;
         var ENEMY_RANDOM_FACTOR = 4;
@@ -138,17 +106,11 @@ Let's uncomment the enemy configuration variables (`BASE_ENEMY_STEP_SIZE`, etc.)
         var ENEMY_SPAWN_DELAY = 5000;
         var currentEnemyStepSize = BASE_ENEMY_STEP_SIZE;
         var currentEnemyMoveInterval = BASE_ENEMY_MOVE_INTERVAL;
-        // Ensure enemyElement is defined before this line (it is, in DOM elements)
-        var1</button> <button data-digit="2">2</button> <button data-digit="3">3</button><button data-digit="4">4</button> <button data-digit="5">5</button> <button data-digit="6">6</button><button data-digit="7">7</button> <button data-digit="8">8</button> <button data-digit="9">9</button><button id="numpad-clear">Löschen</button> <button data-digit="0" id="numpad-zero">0</button> <button id="numpad-submit">OK</button></div><div id="quiz-message"></div></div>
-    <div id="end-screen" class="hidden"><h2>Geschafft!</h2><p id="final-time">...</p><div class="highscore-section"><h3>...</h3><table id="local-end-highscore-table" class="highscore-table"><thead><tr><th>#</th><th>Name</th><th>Zeit</th><th>Monster getroffen</th></tr></thead><tbody id="local-end-highscore-body"><tr class="loading-msg"><td colspan="4">...</td></tr></tbody></table></div><h3>Fehlerhafte Aufgaben:</h3><ul id="wrong-answers-list"><li>...</li></ul><button id="play-again-button">Nochmal spielen?</button></div>
-
-    <script>
-        console.log("SCRIPT START");
-
-        // --- Firebase Konfiguration ---
-        var firebaseConfig = { /* ... verified config ... */
-             apiKey: "AIzaSyAJWO7g9Xgy-c2nX8ovNpSlqmuFp_EZy9Q", authDomain: "blumen-b5bac.firebaseapp.com", projectId: "blumen-b5bac", storageBucket: "blumen-b5bac.firebasestorage.app", messaging enemyData = { element: enemyElement, position: { x: -100, y: -100 }, active: false, frozen: false, freezeTimeoutId: null, moveIntervalId: null };
-        console.log("Enemy config DECLARED."); // Check log
+        // *** SIMPLIFY enemyData DECLARATION ***
+        var enemyData = {}; // Assign empty object only
+        // Original line commented out:
+        // var enemyData = { element: enemyElement, position: { x: -100, y: -100 }, active: false, frozen: false, freezeTimeoutId: null, moveIntervalId: null };
+        console.log("Enemy config DECLARED (enemyData simplified)."); // Check log
 
 
         // --- Initialisierung ---
@@ -182,30 +144,7 @@ Let's uncomment the enemy configuration variables (`BASE_ENEMY_STEP_SIZE`, etc.)
                         */
                     });
                     console.log("Start button listener added");
-                } else { console.error("Start gameSenderId: "699410546284", appId: "1:699410546284:web:5be1a7fd826d324f95a249", measurementId: "G-1LPR6QT9GR", databaseURL: "https://blumen-b5bac-default-rtdb.europe-west1.firebasedatabase.app/"
-         };
-        try {
-            firebase.initializeApp(firebaseConfig);
-            var database = firebase.database();
-            console.log("Firebase Initialized");
-        } catch (e) { console.error("FIREBASE INIT FAILED:", e); }
-
-        // --- DOM Elemente ---
-        var startScreen = document.getElementById('start-screen');
-        var playerNameInput = document.getElementById('player-name');
-        var startGameButton = document.getElementById('start-game-button');
-        var globalHighscoreBody = document.getElementById('global-highscore-body');
-        var localHighscoreBody = document.getElementById('local-highscore-body');
-        var gameArea = document.getElementById('game-area');
-        var hero = document.getElementById('hero');
-        var inventoryDisplay = document.getElementById('inventory');
-        var quizModal = document.getElementById('quiz-modal');
-        var quizTitle = document.getElementById('quiz-title');
-        var quizQuestion = document.getElementById('quiz-question');
-        var quizInputDisplay = document.getElementById('quiz-input-display');
-        var quizMessage = document.getElementById('quiz-message');
-        var numpadContainer = document.getElementById('numpad-container');
-        var enemyElement = document.getElementById('enemy'); // Keep button not found!"); }
+                } else { console.error("Start game button not found!"); }
             } catch(e) { console.error("Error in DOMContentLoaded:", e); }
         });
 
