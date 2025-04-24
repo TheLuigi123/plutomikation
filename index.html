@@ -123,7 +123,7 @@
         console.log("Audio section deleted.");
 
         // --- Spielzustand (using var) ---
-        // *** UNCOMMENTED ***
+        // Keep uncommented
         var currentPlayerName = "Anonym";
         var currentLevel = 1;
         var flowersCollected = 0;
@@ -139,7 +139,7 @@
         var wrongAnswersLog = {};
         var monsterEncounters = 0;
         var localHighScores = [];
-        console.log("Game state variables DECLARED."); // Changed log message
+        console.log("Game state variables DECLARED.");
 
         // --- Konfiguration (using var) ---
         var FLOWER_GOAL = 20;
@@ -163,7 +163,6 @@
         // --- Initialisierung ---
         function initGame() {
             console.log("initGame called (empty)");
-            // Content remains commented out
         }
 
         // --- Start Screen Logic ---
@@ -177,14 +176,13 @@
                 }
                 console.log("High score functions skipped");
                 if (startGameButton) {
-                    // Inner logic still commented
                     startGameButton.addEventListener('click', function() {
                         console.log("Start Game Button Clicked (inner logic commented)");
-                        /*
+                        /* // Inner logic still commented
                         var name = "";
                         if(playerNameInput) { name = playerNameInput.value.trim(); }
                         if (!name) { console.log("Player name missing"); return; }
-                        // currentPlayerName = name; // Assign to variable from restored state block
+                        currentPlayerName = name; // Assign to variable from restored state block
                         localStorage.setItem('lastPlayerName', name);
                         if(startScreen) { startScreen.classList.add('hidden'); }
                         console.log("Starting game setup (calling initGame)");
@@ -196,9 +194,6 @@
             } catch(e) { console.error("Error in DOMContentLoaded:", e); }
         });
 
-        // Minimal global declaration (now redundant if state block is active)
-        // var currentPlayerName = "Anonym";
-
 
         // --- ALL GAME LOGIC FUNCTIONS COMMENTED OUT OR EMPTY ---
         // ... function stubs ...
@@ -206,28 +201,50 @@
         function setupLevel() { /* ... */ }
         // ... other functions ...
 
-        // *** UNCOMMENT formatTime function ***
+        // *** UNCOMMENT formatTime function (Ultra-Conservative) ***
+        // Retyped manually, explicit semicolons, basic structure.
         function formatTime(milliseconds) {
-            if (typeof milliseconds !== 'number' || isNaN(milliseconds)) return 'Ungültig';
-            var totalSeconds = milliseconds / 1000;
-            var minutes = Math.floor(totalSeconds / 60);
-            var seconds = Math.floor(totalSeconds % 60);
-            var tenths = Math.floor((totalSeconds - Math.floor(totalSeconds)) * 10);
-            var minutesStr = minutes < 10 ? '0' + minutes : String(minutes);
-            var secondsStr = seconds < 10 ? '0' + seconds : String(seconds);
+            var timeValue = milliseconds; // Assign to new var
+            var minutes; // Declare vars separately
+            var seconds;
+            var tenths;
+            var totalSeconds;
+            var minutesStr;
+            var secondsStr;
+
+            // Explicit type check and NaN check first
+            if (typeof timeValue !== 'number') {
+                return 'Ungültig';
+            }
+            if (isNaN(timeValue)) {
+                 return 'Ungültig';
+            }
+
+            totalSeconds = timeValue / 1000; // Perform calculations
+            minutes = Math.floor(totalSeconds / 60);
+            seconds = Math.floor(totalSeconds % 60);
+            tenths = Math.floor((totalSeconds - Math.floor(totalSeconds)) * 10);
+
+            // Manual padding
+            if (minutes < 10) {
+                minutesStr = '0' + minutes;
+            } else {
+                minutesStr = String(minutes);
+            }
+            if (seconds < 10) {
+                secondsStr = '0' + seconds;
+            } else {
+                secondsStr = String(seconds);
+            }
+
+            // Basic string concatenation for return
             return minutesStr + ':' + secondsStr + '.' + tenths;
         }
-        console.log("formatTime function defined.");
+        console.log("formatTime function defined (conservative).");
+
 
         function loadLocalHighScores() { /* ... */ }
-        function saveLocalHighScores() { /* ... */ }
-        function updateLocalHighScores(newScore) { /* ... */ }
-        function populateScoreTable(tbodyEl, scores) { /* ... */ }
-        function displayLocalHighScores() { /* ... */ }
-        function displayLocalHighScoresEndScreen() { /* ... */ }
-        function fetchAndDisplayGlobalHighScores() { /* ... */ }
-        function logWrongAnswer(num1, num2) { /* ... */ }
-        function formatWrongAnswersForDisplay() { return ["<li>Keine Fehler gemacht!</li>"]; }
+        // ... other function stubs ...
         function endGame() { /* ... */ }
 
         // --- Hilfsfunktionen ---
