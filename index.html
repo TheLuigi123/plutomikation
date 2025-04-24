@@ -145,6 +145,8 @@
     </div>
 
     <script>
+        // IMPORTANT: Ensure this file is saved as UTF-8 WITHOUT BOM
+        // Perform code cleaning (copy/paste to plain text editor) if issues persist
         console.log("SCRIPT START");
 
         // --- Firebase Konfiguration ---
@@ -188,18 +190,18 @@
         var localEndHighscoreBody = document.getElementById('local-end-highscore-body');
         var wrongAnswersList = document.getElementById('wrong-answers-list');
         var playAgainButton = document.getElementById('play-again-button');
-        console.log("DOM Elements Referenced");
+        console.log("DOM Elements Referenced"); // Check if this log appears
 
-        // --- Audio Context & Sounds ---
-        // *** ENTIRE AUDIO SECTION DELETED ***
-        console.log("Audio section deleted.");
+
+        // --- Audio Context & Sounds --- DELETED
 
 
         // --- Spielzustand (using var) ---
         var currentPlayerName = "Anonym";
         var gameIsOver = false;
-        var localHighScores = []; // Keep for structure if needed later
+        var localHighScores = [];
         console.log("Basic game state variables declared.");
+
 
         // --- Konfiguration (using var) ---
         var FLOWER_GOAL = 20;
@@ -208,6 +210,7 @@
         var NUM_QUESTIONS_TO_GENERATE = 5;
         var flowerColors = [ { bg: '#f48fb1', border: '#ad1457' }, { bg: '#90caf9', border: '#1e88e5' }, { bg: '#ffe082', border: '#ffab00' }, { bg: '#a5d6a7', border: '#388e3c' }, { bg: '#b39ddb', border: '#5e35b1' } ];
         console.log("Config variables declared.");
+
 
         // --- Feind Konfiguration & Zustand (using var) ---
         var BASE_ENEMY_STEP_SIZE = 10;
@@ -224,8 +227,8 @@
         // --- Initialisierung ---
         function initGame() {
             console.log("initGame called (empty)");
-            // Content remains commented out
         }
+
 
         // --- Start Screen Logic ---
         document.addEventListener('DOMContentLoaded', function() {
@@ -266,6 +269,7 @@
             }
         });
 
+
         // --- ALL GAME LOGIC FUNCTIONS COMMENTED OUT OR EMPTY ---
         function handleFirstClick(event) { /* Content commented out */ }
         function setupLevel() { /* Content commented out */ }
@@ -304,9 +308,9 @@
         function formatWrongAnswersForDisplay() { return ["<li>Keine Fehler gemacht!</li>"]; }
         function endGame() { /* Content commented out */ }
         function getRandomPosition(bounds, margin) { return { x: 50, y: 50 }; }
-        function escapeHtml(unsafe) { if (!unsafe) return ""; return unsafe.replace(/&/g,"&").replace(/</g,"<").replace(/>/g,">").replace(/"/g,""").replace(/'/g,"'"); }
+        function escapeHtml(unsafe) { if (!unsafe) return ""; return unsafe.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#039;"); }
 
-        console.log("SCRIPT END");
+        console.log("SCRIPT END"); // Check if this log appears
     </script>
 </body>
 </html>
