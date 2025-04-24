@@ -185,7 +185,7 @@
                         var name = "";
                         if(playerNameInput) { name = playerNameInput.value.trim(); }
                         if (!name) { console.log("Player name missing"); return; }
-                        window.currentPlayerName = name;
+                        window.currentPlayerName = name; // Assign to global scope if state block is commented
                         localStorage.setItem('lastPlayerName', name);
                         if(startScreen) { startScreen.classList.add('hidden'); }
                         console.log("Starting game setup (calling initGame)");
@@ -197,7 +197,7 @@
             } catch(e) { console.error("Error in DOMContentLoaded:", e); }
         });
 
-        // Minimal global declaration
+        // Minimal global declaration if main state block is commented
         var currentPlayerName = "Anonym";
 
 
